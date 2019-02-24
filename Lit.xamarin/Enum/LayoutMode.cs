@@ -1,6 +1,6 @@
 ﻿namespace Lit.xamarin
 {
-    public enum Placement
+    public enum LayoutMode
     {
         None,
 
@@ -13,8 +13,6 @@
         Right,
 
         Bottom,
-
-        LeftCenter,
 
         TopLeft,
 
@@ -29,6 +27,10 @@
         BottomCenter,
 
         BottomLeft,
+
+        LeftCenter,
+
+        Center,
 
         Fill
     }

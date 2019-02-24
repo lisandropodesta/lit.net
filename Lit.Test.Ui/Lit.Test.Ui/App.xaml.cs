@@ -14,25 +14,24 @@ namespace Lit.Test.Ui
             InitializeComponent();
 
             MainPage = new MainPage();
-        }
 
-        protected override void OnStart()
-        {
             var data = new Calculator();
 
-            var parent = (Element)MainPage.FindByName("WorkArea") ?? MainPage;
+            var parent = MainPage.FindByName("WorkArea") as StackLayout;
 
             Mapper.Create(parent, data);
         }
 
+        protected override void OnStart()
+        {
+        }
+
         protected override void OnSleep()
         {
-            // Handle when your app sleeps
         }
 
         protected override void OnResume()
         {
-            // Handle when your app resumes
         }
     }
 }
