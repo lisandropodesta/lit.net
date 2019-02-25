@@ -375,6 +375,29 @@
         }
 
         /// <summary>
+        /// Checks if a type inherits from an ancestor.
+        /// </summary>
+        public static bool IsSubclassOf(Type type, Type ancestor)
+        {
+            if (ancestor.IsGenericType)
+            {
+                while (type != null && type != typeof(object))
+                {
+                    if (ancestor == (type.IsGenericType ? type.GetGenericTypeDefinition() : type))
+                    {
+                        return true;
+                    }
+
+                    type = type.BaseType;
+                }
+
+                return false;
+            }
+
+            return type.IsSubclassOf(ancestor);
+        }
+
+        /// <summary>
         /// Determines whether a type is an enum.
         /// </summary>
         public static bool IsEnumType(Type type)

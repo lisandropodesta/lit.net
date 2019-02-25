@@ -32,6 +32,11 @@
         public TargetProperty Property { get; set; }
 
         /// <summary>
+        /// Data context sets as property value.
+        /// </summary>
+        public bool OwnDataContext { get; set; }
+
+        /// <summary>
         /// Style to be assigned.
         /// </summary>
         public string Style { get; set; }

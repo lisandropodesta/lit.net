@@ -8,7 +8,17 @@
         /// <summary>
         /// The object that produced the event.
         /// </summary>
-        public Element Element { get; set; }
+        public View View { get; set; }
+
+        /// <summary>
+        /// Command name.
+        /// </summary>
+        public string CommandName { get; set; }
+
+        /// <summary>
+        /// Command parameter.
+        /// </summary>
+        public string CommandParameter { get; set; }
 
         /// <summary>
         /// Property information.

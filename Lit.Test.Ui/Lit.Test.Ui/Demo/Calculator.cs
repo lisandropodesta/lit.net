@@ -20,72 +20,73 @@
 
         #region User interface
 
-        [LitUi(ControlType.Label, Row = 0, Col = 0, ColSpan = -1, ContentLayout = LayoutMode.TopRight, Text = "0")]
+        [LitUi(ControlType.Label, Row = 0, Col = 0, ColSpan = -1, ContentLayout = LayoutMode.TopRight, Text = "0", Property = TargetProperty.Text)]
         public VisualProperty<string> Screen { get; set; }
 
         [UiOnClick(Row = 1, Col = 0)]
-        public VisualProperty<string> Input_CE { get; set; }
+        public bool Input_CE { get; set; }
 
         [UiOnClick(Row = 1, Col = 1)]
-        public VisualProperty<string> Input_C { get; set; }
+        public bool Input_C { get; set; }
 
         [UiOnClick(Row = 1, Col = 2, Text = @"%")]
-        public VisualProperty<string> Input_MOD { get; set; }
+        public bool Input_MOD { get; set; }
 
         [UiOnClick(Row = 1, Col = 3, Text = @"/")]
-        public VisualProperty<string> Input_Div { get; set; }
+        public bool Input_Div { get; set; }
 
         [UiOnClick(Row = 2, Col = 0)]
-        public VisualProperty<string> Input_7 { get; set; }
+        public bool Input_7 { get; set; }
 
         [UiOnClick(Row = 2, Col = 1)]
-        public VisualProperty<string> Input_8 { get; set; }
+        public bool Input_8 { get; set; }
 
         [UiOnClick(Row = 2, Col = 2)]
-        public VisualProperty<string> Input_9 { get; set; }
+        public bool Input_9 { get; set; }
 
         [UiOnClick(Row = 2, Col = 3, Text = @"x")]
-        public VisualProperty<string> Input_Mul { get; set; }
+        public bool Input_Mul { get; set; }
 
         [UiOnClick(Row = 3, Col = 0)]
-        public VisualProperty<string> Input_4 { get; set; }
+        public bool Input_4 { get; set; }
 
         [UiOnClick(Row = 3, Col = 1)]
-        public VisualProperty<string> Input_5 { get; set; }
+        public bool Input_5 { get; set; }
 
         [UiOnClick(Row = 3, Col = 2)]
-        public VisualProperty<string> Input_6 { get; set; }
+        public bool Input_6 { get; set; }
 
         [UiOnClick(Row = 3, Col = 3, Text = @"-")]
-        public VisualProperty<string> Input_Sub { get; set; }
+        public bool Input_Sub { get; set; }
 
         [UiOnClick(Row = 4, Col = 0)]
-        public VisualProperty<string> Input_1 { get; set; }
+        public bool Input_1 { get; set; }
 
         [UiOnClick(Row = 4, Col = 1)]
-        public VisualProperty<string> Input_2 { get; set; }
+        public bool Input_2 { get; set; }
 
         [UiOnClick(Row = 4, Col = 2)]
-        public VisualProperty<string> Input_3 { get; set; }
+        public bool Input_3 { get; set; }
 
         [UiOnClick(Row = 4, Col = 3, Text = @"+")]
-        public VisualProperty<string> Input_Add { get; set; }
+        public bool Input_Add { get; set; }
 
         [UiOnClick(Row = 5, Col = 0, Text = @"+/-")]
-        public VisualProperty<string> Input_Sgn { get; set; }
+        public bool Input_Sgn { get; set; }
 
         [UiOnClick(Row = 5, Col = 1)]
-        public VisualProperty<string> Input_0 { get; set; }
+        public bool Input_0 { get; set; }
 
         [UiOnClick(Row = 5, Col = 2, Text = @".")]
-        public VisualProperty<string> Input_Dot { get; set; }
+        public bool Input_Dot { get; set; }
 
         [UiOnClick(Row = 5, Col = 3, Text = @"=")]
-        public VisualProperty<string> Input_Res { get; set; }
+        public bool Input_Res { get; set; }
 
         /// <summary>
         /// Key pressed event.
         /// </summary>
+        [LitUi(ControlType.None)]
         public ControlEvent OnKeyPressed { get { return null; } set { KeyPressed(value); } }
 
         #endregion
@@ -103,13 +104,12 @@
         /// <summary>
         /// Process a key pressed.
         /// </summary>
-        private void KeyPressed(ControlEvent eventData)
+        private void KeyPressed(ControlEvent e)
         {
-            var uiattr = eventData.Property.Attribute;
-            switch (uiattr.OnClickCommand)
+            switch (e.CommandName)
             {
                 case OnKeyPressedTag:
-                    stack.PutKey(uiattr.CommandParameter);
+                    stack.PutKey(e.CommandParameter);
                     Screen.Value = stack.Screen;
                     break;
             }

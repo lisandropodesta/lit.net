@@ -4,6 +4,7 @@
     using Xamarin.Forms;
     using Lit.DataType;
     using System.Reflection;
+    using System.ComponentModel;
 
     public static class Mapper
     {
@@ -14,29 +15,8 @@
 
         public static View Create(Layout<View> parent, Type template, object data)
         {
-            /*if (IsVisualObjectType(templateType))
-            {
-                var control = (VisualElement)Activator.CreateInstance(templateType);
-                control.Parent = parent;
-
-                AssignProperties(control, data);
-                // < Label Text = "Welcome to Lit.xamarin!" HorizontalOptions = "Center" VerticalOptions = "CenterAndExpand" />
-
-                return control;
-            }*/
-
             return SetupControl(parent, template, null, data);
         }
-
-        /*private static void AssignProperties(View control, object data)
-        {
-            //var x = TypeHelper.GetPropertiesDict<LitUiAttribute>(control.GetType());
-        }*/
-
-        /*private static bool IsVisualObjectType(Type type)
-        {
-            return type != null && type.IsSubclassOf(typeof(VisualElement));
-        }*/
 
         /// <summary>
         /// Setup a control, it may create a new one.
@@ -89,13 +69,13 @@
                 {
                     parent.Children.Add(control);
                 }
+
+                UpdateControl(control, attr, propInfo, data, true);
             }
-            else if (attr == null || attr.CtrlType == ControlType.None)
+            /*else if (attr == null || attr.CtrlType == ControlType.None)
             {
                 control = parent;
-            }
-
-            UpdateControl(control, attr, propInfo, data, true);
+            }*/
 
             return control;
         }
@@ -151,7 +131,7 @@
                                 SetupLabel(label, controlProps, attr, propInfo);
                             }
 
-                            return UpdateLabel(label, controlProps, data, dataProps);
+                            return UpdateLabel(label, controlProps, attr, propInfo, data, dataProps);
                         }
 
                         return false;
@@ -163,7 +143,7 @@
                         {
                             if (setup)
                             {
-                                SetupButton(button, controlProps, attr, propInfo);
+                                SetupButton(button, controlProps, attr, propInfo, data, dataProps);
                             }
 
                             return UpdateButton(button, controlProps, data, dataProps);
@@ -210,9 +190,23 @@
         /// <summary>
         /// Update a Label control.
         /// </summary>
-        private static bool UpdateLabel(Label control, IReflectionProperties controlProps, object data, IReflectionProperties<LitUiAttribute> dataProps)
+        private static bool UpdateLabel(Label control, IReflectionProperties controlProps, LitUiAttribute attr, PropertyInfo propInfo,
+            object data, IReflectionProperties<LitUiAttribute> dataProps)
         {
             var changed = false;
+
+            if (attr != null)
+            {
+                switch (attr.Property)
+                {
+                    case TargetProperty.None:
+                        break;
+
+                    case TargetProperty.Text:
+                        UpdatePropertyValue(control, controlProps, @"Text", data, true);
+                        break;
+                }
+            }
 
             if (dataProps != null)
             {
@@ -233,7 +227,8 @@
         /// <summary>
         /// Setup a Button control.
         /// </summary>
-        private static void SetupButton(Button control, IReflectionProperties controlProps, LitUiAttribute attr, PropertyInfo propInfo)
+        private static void SetupButton(Button control, IReflectionProperties controlProps, LitUiAttribute attr, PropertyInfo propInfo,
+            object data, IReflectionProperties<LitUiAttribute> dataProps)
         {
             SetupCommon(control, controlProps, attr, propInfo);
 
@@ -244,6 +239,28 @@
 
                 UpdatePropertyValue(control, controlProps, "HorizontalOptions", GetHorizontalOptions(attr.LayoutMode, attr.ContentLayout), true);
                 UpdatePropertyValue(control, controlProps, "VerticalOptions", GetVerticalOptions(attr.LayoutMode, attr.ContentLayout), true);
+
+                control.Clicked += delegate (object sender, EventArgs e)
+                 {
+                     if (!string.IsNullOrEmpty(attr.OnClickCommand))
+                     {
+                         if (dataProps.ContainsKey(attr.OnClickCommand))
+                         {
+                             var cmdPropInfo = dataProps[attr.OnClickCommand].PropertyInfo;
+                             var parameter = attr.CommandParameter ?? attr.GetAutoCommandParameter(propInfo);
+
+                             var ev = new ControlEvent
+                             {
+                                 View = sender as View,
+                                 CommandName = attr.OnClickCommand,
+                                 CommandParameter = parameter,
+                                 Property = dataProps[propInfo.Name]
+                             };
+
+                             cmdPropInfo.SetValue(data, ev, null);
+                         }
+                     }
+                 };
             }
         }
 
@@ -273,7 +290,6 @@
                     {
                         var reflectionProperty = pair.Value;
                         var propInfo = reflectionProperty.PropertyInfo;
-                        var propValue = propInfo.GetValue(data, null);
                         var propAttr = reflectionProperty.Attribute;
 
                         switch (step)
@@ -299,12 +315,30 @@
 
                             case 2:
                                 {
-                                    /*if (propInfo.PropertyType.IsSubclassOf(typeof(VisualProperty<>)))
+                                    var propValue = propInfo.GetValue(data, null);
+                                    var isVisualProperty = TypeHelper.IsSubclassOf(propInfo.PropertyType, typeof(VisualProperty<>));
+
+                                    if (isVisualProperty)
                                     {
+                                        if (propValue == null)
+                                        {
+                                            propValue = Activator.CreateInstance(propInfo.PropertyType);
+                                            propInfo.SetValue(data, propValue, null);
+                                        }
+                                    }
 
-                                    }*/
+                                    var visualProp = isVisualProperty ? propValue as VisualProperty : null;
+                                    var childData = isVisualProperty ? visualProp.GetData() : propAttr.OwnDataContext ? propValue : data;
+                                    var child = SetupControl(control, propAttr, propInfo, childData);
 
-                                    var child = SetupControl(control, propAttr, propInfo, propValue);
+                                    if (isVisualProperty)
+                                    {
+                                        visualProp.Bind(child);
+                                        visualProp.PropertyChanged += delegate (object sender, PropertyChangedEventArgs e)
+                                        {
+                                            UpdateControl(sender as View, propAttr, propInfo, visualProp.GetData(), false);
+                                        };
+                                    }
                                 }
                                 break;
                         }

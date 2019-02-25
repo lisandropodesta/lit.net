@@ -34,7 +34,8 @@
 
         public void PutKey(string key)
         {
-            switch (key.ToUpper())
+            key = key.ToUpper();
+            switch (key)
             {
                 case @".":
                 case @"DOT":
@@ -51,12 +52,16 @@
                 case @"7":
                 case @"8":
                 case @"9":
+                    PutDigit(key[0] - '0');
+                    break;
+
                 case @"A":
                 case @"B":
                 case @"C":
                 case @"D":
                 case @"E":
                 case @"F":
+                    PutDigit(10 + key[0] - 'A');
                     break;
 
                 case @"BIN":
@@ -121,7 +126,7 @@
                     integerValue = integerValue * radix + digit;
                 }
 
-                inputText += '0' + digit;
+                inputText += (char)('0' + digit);
             }
         }
 
