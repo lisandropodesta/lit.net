@@ -6,15 +6,19 @@
 
     public partial class MainPage : ContentPage
     {
+        public Calculator Calculator { get; set; }
+
         public MainPage()
         {
             InitializeComponent();
 
-            var data = new Calculator();
+            Calculator = new Calculator();
 
             var parent = FindByName("WorkArea") as StackLayout;
 
-            Mapper.Create(parent, data);
+            Mapper.Create(parent, Calculator);
+
+            Calculator.Update();
         }
     }
 }

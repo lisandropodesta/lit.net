@@ -290,6 +290,14 @@
         {
             return GetAttribute<TAttr>(type.GetRuntimeField(name)) != null;
         }
+        /// <summary>
+        /// Get an attribute from an enum value.
+        /// </summary>
+        public static TAttr GetFieldAttribute<TAttr, TEnum>(TEnum value) where TAttr : class
+        {
+            return GetFieldAttribute<TAttr>(typeof(TEnum), value);
+        }
+
 
         /// <summary>
         /// Get an attribute from an enum value.

@@ -27,5 +27,10 @@ namespace LitCalc
         {
             // Handle when your app resumes
         }
+
+        public void PutInputKey(string text)
+        {
+            (MainPage as MainPage).Calculator.PutKey(text);
+        }
     }
 }
