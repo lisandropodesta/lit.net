@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lit.common\Lit.common.csproj" />
-    <ProjectReference Include="..\Lit.xamarin\Lit.xamarin.csproj" />
+    <ProjectReference Include="..\lit.common\lit.common.csproj" />
+    <ProjectReference Include="..\lit.xamarin\lit.xamarin.csproj" />
   </ItemGroup>
 
 </Project>
