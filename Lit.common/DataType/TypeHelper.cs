@@ -1,10 +1,10 @@
-﻿namespace Lit.DataType
-{
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
 
+namespace Lit.DataType
+{
     public static class TypeHelper
     {
         /// <summary>

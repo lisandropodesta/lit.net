@@ -1,7 +1,7 @@
-﻿namespace Lit.DataType
-{
-    using System.Reflection;
+﻿using System.Reflection;
 
+namespace Lit.DataType
+{
     public class ReflectionMember : ReflectionMemberBase
     {
         public override MemberInfo MemberInfo { get { return memberInfo; } }

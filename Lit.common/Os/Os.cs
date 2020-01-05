@@ -1,7 +1,7 @@
-﻿namespace Lit.Os
-{
-    using Lit.Os.Fsys;
+﻿using Lit.Os.Fsys;
 
+namespace Lit.Os
+{
     public class Os
     {
         private static IOs os;

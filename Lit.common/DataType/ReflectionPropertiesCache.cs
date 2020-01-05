@@ -1,8 +1,8 @@
-﻿namespace Lit.DataType
-{
-    using System;
-    using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
+namespace Lit.DataType
+{
     public static class ReflectionPropertiesCache
     {
         private static readonly object theLock = new object();

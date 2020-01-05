@@ -1,7 +1,7 @@
-﻿namespace Lit.DataType
-{
-    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+namespace Lit.DataType
+{
     public class ReflectionProperties : Dictionary<string, ReflectionProperty>, IReflectionProperties
     {
     }

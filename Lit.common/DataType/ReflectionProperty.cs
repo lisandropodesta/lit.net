@@ -1,7 +1,7 @@
-﻿namespace Lit.DataType
-{
-    using System.Reflection;
+﻿using System.Reflection;
 
+namespace Lit.DataType
+{
     public class ReflectionProperty : ReflectionMemberBase
     {
         /// <summary>

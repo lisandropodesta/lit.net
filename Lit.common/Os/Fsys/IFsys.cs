@@ -1,7 +1,7 @@
-﻿namespace Lit.Os.Fsys
-{
-    using System;
+﻿using System;
 
+namespace Lit.Os.Fsys
+{
     public interface IFsys
     {
         string Concat(string path, string file);

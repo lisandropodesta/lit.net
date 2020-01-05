@@ -1,10 +1,10 @@
-﻿namespace Lit.Os.Win.Fsys
-{
-    using System;
-    using System.IO;
-    using Newtonsoft.Json;
-    using Lit.Os.Fsys;
+﻿using System;
+using System.IO;
+using Newtonsoft.Json;
+using Lit.Os.Fsys;
 
+namespace Lit.Os.Win.Fsys
+{
     public class Fsys : IFsys
     {
         public string Concat(string path, string file)

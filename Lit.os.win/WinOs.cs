@@ -1,8 +1,8 @@
-﻿namespace Lit.Os.Win
-{
-    using Lit.Os;
-    using Lit.Os.Fsys;
+﻿using Lit.Os;
+using Lit.Os.Fsys;
 
+namespace Lit.Os.Win
+{
     public class WinOs : IOs
     {
         private Fsys.Fsys files;

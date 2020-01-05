@@ -1,10 +1,10 @@
-﻿namespace Lit.DataType
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
+namespace Lit.DataType
+{
     /// <summary>
     /// ReflectionClass is a base class that inspects its properties looking for an attribute and builds a property list that allows
     /// automated interaction.
