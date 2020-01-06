@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Lit.Ui.Wpf</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\Lit.Ui\Lit.Ui.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lit.Calc\Lit.Calc.csproj" />
+    <ProjectReference Include="..\..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\..\Lit.Os.Win\Lit.Os.Win.csproj" />
+    <ProjectReference Include="..\..\Lit.Ui.Wpf\Lit.Ui.Wpf.csproj" />
+    <ProjectReference Include="..\..\Lit.Ui\Lit.Ui.csproj" />
+  </ItemGroup>
+
+</Project>
