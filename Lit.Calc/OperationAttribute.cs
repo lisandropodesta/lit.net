@@ -1,4 +1,4 @@
-﻿namespace Lit.calc
+﻿namespace Lit.Calc
 {
     using Lit.DataType;
     using System;

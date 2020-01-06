@@ -1,4 +1,4 @@
-﻿namespace Lit.calc
+﻿namespace Lit.Calc
 {
     /// <summary>
     /// Operations that the calculator can perform.

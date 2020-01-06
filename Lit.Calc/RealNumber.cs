@@ -1,4 +1,4 @@
-﻿namespace Lit.calc
+﻿namespace Lit.Calc
 {
     using System;
     using System.Numerics;

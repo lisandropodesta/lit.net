@@ -1,6 +1,6 @@
-﻿namespace Lit.calc
+﻿namespace Lit.Calc
 {
-    using Lit.xamarin;
+    using Lit.Ui;
 
     [LitUi(ControlType.Container)]
     public class Calculator

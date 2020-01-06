@@ -1,89 +1,30 @@
-﻿namespace Lit.xamarin
+﻿using System;
+using System.Reflection;
+using System.ComponentModel;
+using Xamarin.Forms;
+using Lit.DataType;
+
+namespace Lit.Ui.Xamarin
 {
-    using System;
-    using Xamarin.Forms;
-    using Lit.DataType;
-    using System.Reflection;
-    using System.ComponentModel;
-
-    public static class Mapper
+    public class XamarinMapper : Mapper<Layout<View>, Grid, View>
     {
-        public static object Create(Layout<View> parent, object data)
-        {
-            return Create(parent, data.GetType(), data);
-        }
-
-        public static View Create(Layout<View> parent, Type template, object data)
-        {
-            return SetupControl(parent, template, null, data);
-        }
+        private static readonly object theLock = new object();
 
         /// <summary>
-        /// Setup a control, it may create a new one.
+        /// Instance setup.
         /// </summary>
-        private static View SetupControl(Layout<View> parent, Type template, PropertyInfo propInfo, object data)
+        public static void Initialize()
         {
-            var attr = TypeHelper.GetAttribute<LitUiAttribute>(template);
-            return SetupControl(parent, attr, propInfo, data);
-        }
-
-        /// <summary>
-        /// Setup a control, it may create a new one.
-        /// </summary>
-        private static View SetupControl(Layout<View> parent, LitUiAttribute attr, PropertyInfo propInfo, object data)
-        {
-            var control = attr != null ? CreateControl(attr.CtrlType) : null;
-
-            if (control != null)
+            lock (theLock)
             {
-                if (attr.HasGridSpecification && parent is Grid grid)
+                if (Instance == null)
                 {
-                    var left = attr.Col;
-                    var right = attr.Col + attr.ColSpan < 0 ? grid.ColumnDefinitions.Count + attr.ColSpan : attr.ColSpan - 1;
-                    var top = attr.Row;
-                    var bottom = attr.Row + attr.RowSpan < 0 ? grid.RowDefinitions.Count + attr.RowSpan : attr.RowSpan - 1;
-
-                    grid.Children.Add(control, attr.Col, attr.Row);
-
-                    var colSpan = attr.ColSpan;
-                    if (colSpan < 0)
-                    {
-                        colSpan = 1 + grid.ColumnDefinitions.Count + attr.ColSpan - attr.Col;
-                    }
-                    if (colSpan != 1)
-                    {
-                        Grid.SetColumnSpan(control, colSpan);
-                    }
-
-                    var rowSpan = attr.RowSpan;
-                    if (rowSpan < 0)
-                    {
-                        rowSpan = 1 + grid.RowDefinitions.Count + attr.RowSpan - attr.Row;
-                    }
-                    if (rowSpan != 1)
-                    {
-                        Grid.SetRowSpan(control, rowSpan);
-                    }
+                    Instance = new XamarinMapper();
                 }
-                else
-                {
-                    parent.Children.Add(control);
-                }
-
-                UpdateControl(control, attr, propInfo, data, true);
             }
-            /*else if (attr == null || attr.CtrlType == ControlType.None)
-            {
-                control = parent;
-            }*/
-
-            return control;
         }
 
-        /// <summary>
-        /// Create a new control.
-        /// </summary>
-        private static View CreateControl(ControlType? controlType)
+        protected override View CreateControl(ControlType? controlType)
         {
             switch (controlType ?? ControlType.None)
             {
@@ -102,21 +43,52 @@
             }
         }
 
-        /// <summary>
-        /// Update and optionally setup a control.
-        /// </summary>
-        private static bool UpdateControl(View control, LitUiAttribute attr, PropertyInfo propInfo, object data, bool setup)
+        protected override int GetColumnsCount(Grid grid)
         {
-            var controlType = attr?.CtrlType;
-            if (controlType == ControlType.None)
-            {
-                controlType = GetControlType(control);
-            }
+            return grid.ColumnDefinitions.Count;
+        }
 
-            var controlProps = controlType != ControlType.None ? ReflectionPropertiesCache.Get(control.GetType()) : null;
+        protected override int GetRowsCount(Grid grid)
+        {
+            return grid.RowDefinitions.Count;
+        }
 
-            var dataProps = data != null ? ReflectionPropertiesCache<LitUiAttribute>.Get(data.GetType()) : null;
+        protected override void AddChild(Layout<View> parent, View control)
+        {
+            parent.Children.Add(control);
+        }
 
+        protected override void AddChild(Grid grid, View control, int col, int row)
+        {
+            grid.Children.Add(control, col, row);
+        }
+
+        protected override void SetRowSpan(View control, int rowSpan)
+        {
+            Grid.SetRowSpan(control, rowSpan);
+        }
+
+        protected override void SetColumnSpan(View control, int colSpan)
+        {
+            Grid.SetColumnSpan(control, colSpan);
+        }
+
+        protected override ControlType? GetControlType(View control)
+        {
+            if (control is Label)
+                return ControlType.Label;
+
+            if (control is Button)
+                return ControlType.Button;
+
+            if (control is Layout)
+                return ControlType.Container;
+
+            return null;
+        }
+
+        protected override bool UpdateControl(bool setup, ControlType? controlType, View control, IReflectionProperties controlProps, LitUiAttribute attr, PropertyInfo propInfo, object data, IReflectionProperties<LitUiAttribute> dataProps)
+        {
             switch (controlType)
             {
                 case ControlType.None:
@@ -181,9 +153,9 @@
 
             if (attr != null)
             {
-                UpdatePropertyValue(control, controlProps, @"Text", attr.Text, true);
-                UpdatePropertyValue(control, controlProps, "HorizontalOptions", GetHorizontalOptions(attr.LayoutMode, attr.ContentLayout), true);
-                UpdatePropertyValue(control, controlProps, "VerticalOptions", GetVerticalOptions(attr.LayoutMode, attr.ContentLayout), true);
+                UpdatePropertyValue(control, controlProps, nameof(control.Text), attr.Text, true);
+                UpdatePropertyValue(control, controlProps, nameof(control.HorizontalOptions), GetHorizontalOptions(attr.LayoutMode, attr.ContentLayout), true);
+                UpdatePropertyValue(control, controlProps, nameof(control.VerticalOptions), GetVerticalOptions(attr.LayoutMode, attr.ContentLayout), true);
             }
         }
 
@@ -203,7 +175,7 @@
                         break;
 
                     case TargetProperty.Text:
-                        UpdatePropertyValue(control, controlProps, @"Text", data, true);
+                        UpdatePropertyValue(control, controlProps, nameof(control.Text), data, true);
                         break;
                 }
             }
@@ -235,32 +207,32 @@
             if (attr != null)
             {
                 var text = attr.Text ?? attr.GetAutoCommandParameter(propInfo);
-                UpdatePropertyValue(control, controlProps, @"Text", text, true);
+                UpdatePropertyValue(control, controlProps, nameof(control.Text), text, true);
 
-                UpdatePropertyValue(control, controlProps, "HorizontalOptions", GetHorizontalOptions(attr.LayoutMode, attr.ContentLayout), true);
-                UpdatePropertyValue(control, controlProps, "VerticalOptions", GetVerticalOptions(attr.LayoutMode, attr.ContentLayout), true);
+                UpdatePropertyValue(control, controlProps, nameof(control.HorizontalOptions), GetHorizontalOptions(attr.LayoutMode, attr.ContentLayout), true);
+                UpdatePropertyValue(control, controlProps, nameof(control.VerticalOptions), GetVerticalOptions(attr.LayoutMode, attr.ContentLayout), true);
 
                 control.Clicked += delegate (object sender, EventArgs e)
-                 {
-                     if (!string.IsNullOrEmpty(attr.OnClickCommand))
-                     {
-                         if (dataProps.ContainsKey(attr.OnClickCommand))
-                         {
-                             var cmdPropInfo = dataProps[attr.OnClickCommand].PropertyInfo;
-                             var parameter = attr.CommandParameter ?? attr.GetAutoCommandParameter(propInfo);
+                {
+                    if (!string.IsNullOrEmpty(attr.OnClickCommand))
+                    {
+                        if (dataProps.ContainsKey(attr.OnClickCommand))
+                        {
+                            var cmdPropInfo = dataProps[attr.OnClickCommand].PropertyInfo;
+                            var parameter = attr.CommandParameter ?? attr.GetAutoCommandParameter(propInfo);
 
-                             var ev = new ControlEvent
-                             {
-                                 View = sender as View,
-                                 CommandName = attr.OnClickCommand,
-                                 CommandParameter = parameter,
-                                 Property = dataProps[propInfo.Name]
-                             };
+                            var ev = new ControlEvent
+                            {
+                                Sender = sender,
+                                CommandName = attr.OnClickCommand,
+                                CommandParameter = parameter,
+                                Property = dataProps[propInfo.Name]
+                            };
 
-                             cmdPropInfo.SetValue(data, ev, null);
-                         }
-                     }
-                 };
+                            cmdPropInfo.SetValue(data, ev, null);
+                        }
+                    }
+                };
             }
         }
 
@@ -329,7 +301,7 @@
 
                                     var visualProp = isVisualProperty ? propValue as VisualProperty : null;
                                     var childData = isVisualProperty ? visualProp.GetData() : propAttr.OwnDataContext ? propValue : data;
-                                    var child = SetupControl(control, propAttr, propInfo, childData);
+                                    var child = CreateControl(control, propAttr, propInfo, childData);
 
                                     if (isVisualProperty)
                                     {
@@ -358,27 +330,6 @@
         }
 
         /// <summary>
-        /// Update a control property's value usign reflection information.
-        /// </summary>
-        private static bool UpdatePropertyValue(object control, IReflectionProperties props, string propName, object value, bool onlyIfNotNull)
-        {
-            if (!onlyIfNotNull || value != null)
-            {
-                if (props.TryGetValue(propName, out ReflectionProperty prop))
-                {
-                    var currValue = prop.PropertyInfo.GetValue(control, null);
-                    if (currValue != value)
-                    {
-                        prop.PropertyInfo.SetValue(control, value, null);
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Common setup for a control.
         /// </summary>
         private static void SetupCommon(View control, IReflectionProperties controlProps, LitUiAttribute attr, PropertyInfo propInfo)
@@ -386,23 +337,6 @@
             if (attr != null)
             {
             }
-        }
-
-        /// <summary>
-        /// Get the type of a control assuming attr is right.
-        /// </summary>
-        private static ControlType? GetControlType(View control)
-        {
-            if (control is Label)
-                return ControlType.Label;
-
-            if (control is Button)
-                return ControlType.Button;
-
-            if (control is Layout)
-                return ControlType.Container;
-
-            return null;
         }
 
         /// <summary>
@@ -504,66 +438,6 @@
                 case LayoutMode.Floating:
                 default:
                     return null;
-            }
-        }
-
-        /// <summary>
-        /// Translate a layout mode to horizontal expansion
-        /// </summary>
-        private static bool GetHorizontalExpands(LayoutMode mode)
-        {
-            switch (mode)
-            {
-                case LayoutMode.Top:
-                case LayoutMode.Bottom:
-                case LayoutMode.Fill:
-                    return true;
-
-                case LayoutMode.TopLeft:
-                case LayoutMode.Left:
-                case LayoutMode.LeftCenter:
-                case LayoutMode.BottomLeft:
-                case LayoutMode.TopCenter:
-                case LayoutMode.Center:
-                case LayoutMode.BottomCenter:
-                case LayoutMode.TopRight:
-                case LayoutMode.Right:
-                case LayoutMode.RightCenter:
-                case LayoutMode.BottomRight:
-                case LayoutMode.None:
-                case LayoutMode.Floating:
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        /// Translate a layout mode to vertical expansion
-        /// </summary>
-        private static bool GetVerticalExpands(LayoutMode mode)
-        {
-            switch (mode)
-            {
-                case LayoutMode.Left:
-                case LayoutMode.Right:
-                case LayoutMode.Fill:
-                    return true;
-
-                case LayoutMode.Top:
-                case LayoutMode.Bottom:
-                case LayoutMode.TopLeft:
-                case LayoutMode.LeftCenter:
-                case LayoutMode.BottomLeft:
-                case LayoutMode.TopCenter:
-                case LayoutMode.Center:
-                case LayoutMode.BottomCenter:
-                case LayoutMode.TopRight:
-                case LayoutMode.RightCenter:
-                case LayoutMode.BottomRight:
-                case LayoutMode.None:
-                case LayoutMode.Floating:
-                default:
-                    return false;
             }
         }
     }

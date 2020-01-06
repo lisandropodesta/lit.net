@@ -1,14 +1,13 @@
-﻿namespace Lit.xamarin
+﻿namespace Lit.Ui
 {
     using Lit.DataType;
-    using Xamarin.Forms;
 
     public class ControlEvent
     {
         /// <summary>
         /// The object that produced the event.
         /// </summary>
-        public View View { get; set; }
+        public object Sender { get; set; }
 
         /// <summary>
         /// Command name.

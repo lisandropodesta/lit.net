@@ -1,4 +1,4 @@
-﻿namespace Lit.calc
+﻿namespace Lit.Calc
 {
     /// <summary>
     /// Precedence of operators. Match C# definition.

@@ -1,4 +1,4 @@
-﻿namespace Lit.xamarin
+﻿namespace Lit.Ui
 {
     using System;
     using System.Reflection;

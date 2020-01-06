@@ -1,4 +1,4 @@
-﻿namespace Lit.xamarin
+﻿namespace Lit.Ui
 {
     public enum LayoutMode
     {

@@ -1,17 +1,16 @@
-﻿namespace Lit.xamarin
+﻿namespace Lit.Ui
 {
     using System.ComponentModel;
-    using Xamarin.Forms;
 
     public abstract class VisualProperty : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected View View { get; private set; }
+        protected object View { get; private set; }
 
-        public void Bind(View view)
+        public void Bind(object element)
         {
-            View = view;
+            View = element;
         }
 
         public abstract object GetData();

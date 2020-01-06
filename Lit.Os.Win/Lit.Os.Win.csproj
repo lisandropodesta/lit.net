@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Lit.Os.Win</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lit.common\lit.common.csproj" />
+    <ProjectReference Include="..\Lit.Common\Lit.Common.csproj" />
   </ItemGroup>
 
 </Project>

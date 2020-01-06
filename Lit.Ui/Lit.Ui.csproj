@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Lit.Ui</AssemblyName>
+    <RootNamespace>Lit.Ui</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lit.common\lit.common.csproj" />
-    <ProjectReference Include="..\lit.xamarin\lit.xamarin.csproj" />
+    <ProjectReference Include="..\Lit.common\Lit.common.csproj" />
   </ItemGroup>
 
 </Project>
