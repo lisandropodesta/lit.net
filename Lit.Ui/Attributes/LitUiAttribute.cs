@@ -1,9 +1,9 @@
-﻿namespace Lit.Ui
-{
-    using System;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
+﻿using System;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
+namespace Lit.Ui
+{
     /// <summary>
     /// Visual attributes for automatic screen construction.
     /// </summary>

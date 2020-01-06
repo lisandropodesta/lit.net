@@ -1,7 +1,7 @@
-﻿namespace Lit.Ui
-{
-    using Lit.DataType;
+﻿using Lit.DataType;
 
+namespace Lit.Ui
+{
     public class ControlEvent
     {
         /// <summary>

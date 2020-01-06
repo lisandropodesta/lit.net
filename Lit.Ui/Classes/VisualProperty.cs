@@ -1,7 +1,7 @@
-﻿namespace Lit.Ui
-{
-    using System.ComponentModel;
+﻿using System.ComponentModel;
 
+namespace Lit.Ui
+{
     public abstract class VisualProperty : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
