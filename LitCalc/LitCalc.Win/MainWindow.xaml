@@ -4,7 +4,56 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LitCalc.Win"
+        xmlns:controls="clr-namespace:LitCalc.Win.Controls"
+        xmlns:lit="clr-namespace:Lit.Ui.Wpf.Controls;assembly=Lit.Ui.Wpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-   
+        Title="MainWindow"
+        Height="450"
+        Width="800">
+
+    <Grid>
+        <controls:CalculatorControl/>
+
+        <lit:CircularMenuControl x:Name="CircularMenu"/>
+
+        <!--<Path Stroke="Black" StrokeThickness="2" Fill="LightYellow">
+            <Path.Data>
+                <PathGeometry>
+                    <PathGeometry.Figures>
+                        <PathFigure StartPoint="10,20" IsClosed="False">
+                            <PolyLineSegment Points="10,190" />
+                            <ArcSegment Point="20,200" Size="10 10" />
+                            <PolyLineSegment Points="390,200" />
+                            <ArcSegment Point="400,190" Size="10 10" />
+                            <PolyLineSegment Points="400,20" />
+                            <ArcSegment Point="390,10" Size="10 10" />
+                            <PolyLineSegment Points="20,10" />
+                            <ArcSegment Point="10,20" Size="10 10" />
+                        </PathFigure>
+                    </PathGeometry.Figures>
+                    <PathGeometry.Transform>
+                        <TransformGroup>
+                            <TranslateTransform X="0" Y="20" />
+                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        </TransformGroup>
+                    </PathGeometry.Transform>
+                </PathGeometry>
+            </Path.Data>
+        </Path>-->
+
+        <!--<Path Stroke="Black" StrokeThickness="1" Fill="Yellow">
+            <Path.Data>
+                <PathGeometry>
+                    <PathGeometry.Figures>
+                        <PathFigure StartPoint="20,80" IsClosed="True">
+                            <PolyLineSegment
+                                Points="60,60 90,75 75,45 95,5 115,45 100,75 130,60 170,80
+                                        130,100 100,85 115,115 95,155"/>
+                            <ArcSegment Point="20,80" Size="70 90" RotationAngle="45" />
+                        </PathFigure>
+                    </PathGeometry.Figures>
+                </PathGeometry>
+            </Path.Data>
+        </Path>-->
+    </Grid>
 </Window>

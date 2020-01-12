@@ -5,6 +5,7 @@ using System.Windows.Input;
 
 using Lit.Calc;
 using Lit.Ui.Wpf;
+using Lit.Ui.Wpf.Controls;
 
 namespace LitCalc.Win
 {
@@ -56,14 +57,19 @@ namespace LitCalc.Win
             { Key.Escape, "CA" }
         };
 
+        private CircularMenuControl circularMenu;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            this.PreviewKeyDown += MainWindow_PreviewKeyDown;
+            circularMenu = FindName("CircularMenu") as CircularMenuControl;
+
+            PreviewKeyDown += MainWindow_PreviewKeyDown;
 
             Calculator = new Calculator();
 
+            /*
             var grid = new Grid();
             this.AddChild(grid);
 
@@ -71,6 +77,7 @@ namespace LitCalc.Win
             WpfMapper.Create(grid, Calculator);
 
             Calculator.Update();
+            */
         }
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
