@@ -5,26 +5,26 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu model.
     /// </summary>
-    public abstract class MenuModel : MenuObjectModel
+    public abstract class CircularMenuModel : CircularMenuObjectModel
     {
         /// <summary>
         /// Menu configuration.
         /// </summary>
-        public Menu Config => menu;
+        public CircularMenu Config => menu;
 
-        private readonly Menu menu;
+        private readonly CircularMenu menu;
 
         /// <summary>
         /// Layers.
         /// </summary>
-        public IReadOnlyList<MenuLayerModel> Layers => layers;
+        public IReadOnlyList<CircularMenuLayerModel> Layers => layers;
 
-        private readonly List<MenuLayerModel> layers = new List<MenuLayerModel>();
+        private readonly List<CircularMenuLayerModel> layers = new List<CircularMenuLayerModel>();
 
         /// <summary>
         /// Initializes the menu.
         /// </summary>
-        protected MenuModel(Menu menu)
+        protected CircularMenuModel(CircularMenu menu)
         {
             this.menu = menu;
 
@@ -42,7 +42,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Finds the displayed menu item related to a menu item.
         /// </summary>
-        public MenuItemModel FindMenuItem(MenuItem item)
+        public CircularMenuItemModel FindMenuItem(CircularMenuItem item)
         {
             foreach (var layer in layers)
             {
@@ -59,7 +59,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Get a specific layer.
         /// </summary>
-        protected MenuLayerModel GetLayer(int layer)
+        protected CircularMenuLayerModel GetLayer(int layer)
         {
             while (layer >= layers.Count)
             {
@@ -74,7 +74,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Creates a layer.
         /// </summary>
-        protected abstract MenuLayerModel CreateLayer();
+        protected abstract CircularMenuLayerModel CreateLayer();
 
         #endregion
     }

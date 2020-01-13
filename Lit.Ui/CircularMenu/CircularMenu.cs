@@ -7,7 +7,7 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu configuration.
     /// </summary>
-    public class Menu
+    public class CircularMenu
     {
         /// <summary>
         /// Sort items by catergory.
@@ -42,7 +42,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Default items shape.
         /// </summary>
-        public ItemShape ItemsDefaultShape { get; set; }
+        public CircularItemShape ItemsDefaultShape { get; set; }
 
         /// <summary>
         /// Default background color for items.
@@ -57,11 +57,11 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Action to be executed.
         /// </summary>
-        public Action<MenuItem, object> DefaultCommand { get; set; }
+        public Action<CircularMenuItem, object> DefaultCommand { get; set; }
 
         /// <summary>
         /// Items list.
         /// </summary>
-        public IEnumerable<MenuItem> Items { get; set; }
+        public IEnumerable<CircularMenuItem> Items { get; set; }
     }
 }

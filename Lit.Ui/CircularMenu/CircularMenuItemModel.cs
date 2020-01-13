@@ -3,14 +3,14 @@
     /// <summary>
     /// Circular menu item model.
     /// </summary>
-    public abstract class MenuItemModel : MenuObjectModel
+    public abstract class CircularMenuItemModel : CircularMenuObjectModel
     {
         /// <summary>
         /// Item definition.
         /// </summary>
-        public MenuItem Config { get => item; private set => SetProp(ref item, value); }
+        public CircularMenuItem Config { get => item; private set => SetProp(ref item, value); }
 
-        private MenuItem item;
+        private CircularMenuItem item;
 
         /// <summary>
         /// Enabled flag.
@@ -22,7 +22,7 @@
         /// <summary>
         /// Associated category.
         /// </summary>
-        public MenuCategoryModel Category { get; set; }
+        public CircularMenuCategoryModel Category { get; set; }
 
         /// <summary>
         /// Flag if this is the first object on the category (clockwise).
@@ -37,7 +37,7 @@
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected MenuItemModel(MenuItem item)
+        protected CircularMenuItemModel(CircularMenuItem item)
         {
             this.item = item;
         }

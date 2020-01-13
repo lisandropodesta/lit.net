@@ -5,7 +5,7 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Menu object model.
     /// </summary>
-    public abstract class MenuObjectModel : BaseModel
+    public abstract class CircularMenuObjectModel : BaseModel
     {
         /// <summary>
         /// Displayed flag.

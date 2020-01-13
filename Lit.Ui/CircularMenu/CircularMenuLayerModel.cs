@@ -7,18 +7,18 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu layer model.
     /// </summary>
-    public abstract class MenuLayerModel : MenuObjectModel
+    public abstract class CircularMenuLayerModel : CircularMenuObjectModel
     {
         /// <summary>
         /// Configuration.
         /// </summary>
-        protected Menu Config => menu.Config;
+        protected CircularMenu Config => menu.Config;
 
-        private readonly MenuModel menu;
+        private readonly CircularMenuModel menu;
 
-        private readonly List<MenuItemModel> items = new List<MenuItemModel>();
+        private readonly List<CircularMenuItemModel> items = new List<CircularMenuItemModel>();
 
-        private readonly List<MenuCategoryModel> categories = new List<MenuCategoryModel>();
+        private readonly List<CircularMenuCategoryModel> categories = new List<CircularMenuCategoryModel>();
 
         private bool hasScrolling;
 
@@ -41,7 +41,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected MenuLayerModel(MenuModel menu)
+        protected CircularMenuLayerModel(CircularMenuModel menu)
         {
             this.menu = menu;
         }
@@ -49,7 +49,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Adds an item to the layer.
         /// </summary>
-        public void Add(MenuItem item)
+        public void Add(CircularMenuItem item)
         {
             var di = CreateItem(item);
             di.IsEnabled = item.IsEnabled;
@@ -59,7 +59,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Finds the displayed menu item related to a menu item.
         /// </summary>
-        public MenuItemModel FindMenuItem(MenuItem item)
+        public CircularMenuItemModel FindMenuItem(CircularMenuItem item)
         {
             return items.FirstOrDefault(i => i.Config == item);
         }
@@ -71,12 +71,10 @@ namespace Lit.Ui.CircularMenu
         {
             if (Config.SortByCategory)
             {
-
+                // TODO: implement this feature
             }
 
             CalcLayout();
-
-            //SortByTargetAngle();
 
             CreateCategories();
         }
@@ -213,7 +211,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Get the absolute item size.
         /// </summary>
-        private static double GetItemAbsSize(MenuItemModel item, double relSizeValue)
+        private static double GetItemAbsSize(CircularMenuItemModel item, double relSizeValue)
         {
             if (item.Config.TargetSize.HasValue)
             {
@@ -226,7 +224,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Force an item value of relative size.
         /// </summary>
-        private static double GetItemRelativeSize(MenuItemModel item)
+        private static double GetItemRelativeSize(CircularMenuItemModel item)
         {
             return !item.Config.RelativeSize.HasValue || item.Config.RelativeSize.Value <= 0 ? 1 : item.Config.RelativeSize.Value;
         }
@@ -236,7 +234,7 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         private void CreateCategories()
         {
-            MenuItemModel prevItem = null;
+            CircularMenuItemModel prevItem = null;
 
             foreach (var item in items)
             {
@@ -267,12 +265,12 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Creates an item.
         /// </summary>
-        protected abstract MenuItemModel CreateItem(MenuItem item);
+        protected abstract CircularMenuItemModel CreateItem(CircularMenuItem item);
 
         /// <summary>
         /// Creates a category.
         /// </summary>
-        protected abstract MenuCategoryModel CreateCategory(string title);
+        protected abstract CircularMenuCategoryModel CreateCategory(string title);
 
         #endregion
     }

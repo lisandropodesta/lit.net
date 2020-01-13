@@ -3,7 +3,7 @@
     /// <summary>
     /// Item shape.
     /// </summary>
-    public enum ItemShape
+    public enum CircularItemShape
     {
         /// <summary>
         /// Default shape for the menu.

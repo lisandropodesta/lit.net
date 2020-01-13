@@ -6,7 +6,7 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu item configuration.
     /// </summary>
-    public class MenuItem
+    public class CircularMenuItem
     {
         /// <summary>
         /// Item category.
@@ -56,7 +56,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Display shape.
         /// </summary>
-        public ItemShape Shape { get; set; }
+        public CircularItemShape Shape { get; set; }
 
         /// <summary>
         /// Shaper background color.
@@ -86,7 +86,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Action to be executed.
         /// </summary>
-        public Action<MenuItem, object> Command { get; set; }
+        public Action<CircularMenuItem, object> Command { get; set; }
 
         /// <summary>
         /// Command parameter.

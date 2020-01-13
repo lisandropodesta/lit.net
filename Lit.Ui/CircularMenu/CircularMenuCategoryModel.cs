@@ -1,9 +1,9 @@
 ﻿namespace Lit.Ui.CircularMenu
 {
     /// <summary>
-    /// Menu category model.
+    /// Circular menu category model.
     /// </summary>
-    public abstract class MenuCategoryModel : MenuObjectModel
+    public abstract class CircularMenuCategoryModel : CircularMenuObjectModel
     {
         /// <summary>
         /// Title.
@@ -15,7 +15,7 @@
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected MenuCategoryModel(string title)
+        protected CircularMenuCategoryModel(string title)
         {
             Title = title;
         }
