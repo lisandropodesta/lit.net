@@ -12,7 +12,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// </summary>
         public WpfCircularMenuLayerModel Layer => layer;
 
-        private readonly WpfCircularMenuLayerModel layer;
+        private WpfCircularMenuLayerModel layer;
 
         /// <summary>
         /// Constructor.
@@ -20,6 +20,15 @@ namespace Lit.Ui.Wpf.CircularMenu
         public WpfCircularMenuCategoryModel(WpfCircularMenuLayerModel layer, string title) : base(title)
         {
             this.layer = layer;
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            layer = null;
+            base.Release();
         }
     }
 }

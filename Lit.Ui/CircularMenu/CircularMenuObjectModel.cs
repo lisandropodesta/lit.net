@@ -1,4 +1,5 @@
 ﻿using Lit.Ui.Classes;
+using System.Collections.Generic;
 
 namespace Lit.Ui.CircularMenu
 {
@@ -86,6 +87,37 @@ namespace Lit.Ui.CircularMenu
                 var delta = (value - ToAngle) / 2;
                 size -= delta / 2;
                 SetProp(ref relAngle, relAngle + delta / 2, nameof(RelAngle), true);
+            }
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        protected CircularMenuObjectModel()
+        {
+            isVisible = true;
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected virtual void Release()
+        {
+        }
+
+        /// <summary>
+        /// Closes a list of objects.
+        /// </summary>
+        protected static void Release<T>(IList<T> list) where T : CircularMenuObjectModel
+        {
+            if (list != null)
+            {
+                foreach (var i in list)
+                {
+                    i.Release();
+                }
+
+                list.Clear();
             }
         }
     }

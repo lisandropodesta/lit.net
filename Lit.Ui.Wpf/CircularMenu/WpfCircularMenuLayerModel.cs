@@ -5,14 +5,14 @@ namespace Lit.Ui.Wpf.CircularMenu
     /// <summary>
     /// WPF circular menu layer model.
     /// </summary>
-    public class WpfCircularMenuLayerModel : CircularMenuLayerModel
+    public class WpfCircularMenuLayerModel : CircularMenuLayerModel<WpfCircularMenuItem>
     {
         /// <summary>
         /// Menu model.
         /// </summary>
         public WpfCircularMenuModel Menu => menu;
 
-        private readonly WpfCircularMenuModel menu;
+        private WpfCircularMenuModel menu;
 
         /// <summary>
         /// Constructor.
@@ -20,6 +20,15 @@ namespace Lit.Ui.Wpf.CircularMenu
         public WpfCircularMenuLayerModel(WpfCircularMenuModel menu) : base(menu)
         {
             this.menu = menu;
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            menu = null;
+            base.Release();
         }
 
         protected override CircularMenuCategoryModel CreateCategory(string title)

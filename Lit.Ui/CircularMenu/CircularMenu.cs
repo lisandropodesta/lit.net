@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace Lit.Ui.CircularMenu
 {
     /// <summary>
     /// Circular menu configuration.
     /// </summary>
-    public class CircularMenu
+    public class CircularMenu<T> where T : CircularMenuItem
     {
         /// <summary>
         /// Sort items by catergory.
@@ -45,23 +44,17 @@ namespace Lit.Ui.CircularMenu
         public CircularItemShape ItemsDefaultShape { get; set; }
 
         /// <summary>
-        /// Default background color for items.
-        /// </summary>
-        public Color ItemsDefaultBackground { get; set; }
-
-        /// <summary>
-        /// Default border color for items.
-        /// </summary>
-        public Color ItemsDefaultBorder { get; set; }
-
-        /// <summary>
-        /// Action to be executed.
-        /// </summary>
-        public Action<CircularMenuItem, object> DefaultCommand { get; set; }
-
-        /// <summary>
         /// Items list.
         /// </summary>
-        public IEnumerable<CircularMenuItem> Items { get; set; }
+        public IEnumerable<T> Items { get; set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public CircularMenu()
+        {
+            DisplayFromAngle = Math.PI;
+            DisplayToAngle = 0;
+        }
     }
 }

@@ -43,6 +43,16 @@
         }
 
         /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            item = null;
+            Category = null;
+            base.Release();
+        }
+
+        /// <summary>
         /// Process layout changes.
         /// </summary>
         protected override void OnLayoutChanged()

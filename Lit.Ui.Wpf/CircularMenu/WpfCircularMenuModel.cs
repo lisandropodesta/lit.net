@@ -1,20 +1,37 @@
 ﻿using Lit.Ui.CircularMenu;
+using System.Windows.Controls;
 
 namespace Lit.Ui.Wpf.CircularMenu
 {
     /// <summary>
     /// WPF circular menu model.
     /// </summary>
-    public class WpfCircularMenuModel : CircularMenuModel
+    public class WpfCircularMenuModel : CircularMenuModel<WpfCircularMenuItem>
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        public WpfCircularMenuModel(Ui.CircularMenu.CircularMenu menu) : base(menu)
+        public WpfCircularMenuModel(CircularMenu<WpfCircularMenuItem> menu) : base(menu)
         {
         }
 
-        protected override CircularMenuLayerModel CreateLayer()
+        /// <summary>
+        /// Shows the menu.
+        /// </summary>
+        public void Show(Panel container)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            base.Release();
+        }
+
+        protected override CircularMenuLayerModel<WpfCircularMenuItem> CreateLayer()
         {
             return new WpfCircularMenuLayerModel(this);
         }

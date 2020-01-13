@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-
-namespace Lit.Ui.CircularMenu
+﻿namespace Lit.Ui.CircularMenu
 {
     /// <summary>
     /// Circular menu item configuration.
@@ -59,16 +56,6 @@ namespace Lit.Ui.CircularMenu
         public CircularItemShape Shape { get; set; }
 
         /// <summary>
-        /// Shaper background color.
-        /// </summary>
-        public Color? ShapeBackground { get; set; }
-
-        /// <summary>
-        /// Shape border color.
-        /// </summary>
-        public Color? ShapeBorder { get; set; }
-
-        /// <summary>
         /// Target angle (radians).
         /// </summary>
         public double? TargetAngle { get; set; }
@@ -84,13 +71,10 @@ namespace Lit.Ui.CircularMenu
         public double? RelativeSize { get; set; }
 
         /// <summary>
-        /// Action to be executed.
+        /// Triggers the action
         /// </summary>
-        public Action<CircularMenuItem, object> Command { get; set; }
-
-        /// <summary>
-        /// Command parameter.
-        /// </summary>
-        public object CommandParameter { get; set; }
+        public virtual void TriggerAction(object sender)
+        {
+        }
     }
 }

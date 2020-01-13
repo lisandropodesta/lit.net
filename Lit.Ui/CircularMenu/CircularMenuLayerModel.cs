@@ -7,14 +7,14 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu layer model.
     /// </summary>
-    public abstract class CircularMenuLayerModel : CircularMenuObjectModel
+    public abstract class CircularMenuLayerModel<T> : CircularMenuObjectModel where T : CircularMenuItem
     {
         /// <summary>
         /// Configuration.
         /// </summary>
-        protected CircularMenu Config => menu.Config;
+        protected CircularMenu<T> Config => menu.Config;
 
-        private readonly CircularMenuModel menu;
+        private readonly CircularMenuModel<T> menu;
 
         private readonly List<CircularMenuItemModel> items = new List<CircularMenuItemModel>();
 
@@ -41,9 +41,19 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CircularMenuLayerModel(CircularMenuModel menu)
+        protected CircularMenuLayerModel(CircularMenuModel<T> menu)
         {
             this.menu = menu;
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            Release(items);
+            Release(categories);
+            base.Release();
         }
 
         /// <summary>

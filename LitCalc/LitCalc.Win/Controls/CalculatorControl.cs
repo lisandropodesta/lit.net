@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-
+using Lit.Ui.CircularMenu;
 using Lit.Ui.Wpf.Animation;
+using Lit.Ui.Wpf.CircularMenu;
 using Lit.Ui.Wpf.Controls;
 
 namespace LitCalc.Win.Controls
@@ -14,7 +16,7 @@ namespace LitCalc.Win.Controls
     /// <summary>
     /// Calculator control.
     /// </summary>
-    public class CalculatorControl : Canvas
+    public class CalculatorControl : Canvas, IWpfCircularMenuContext
     {
         private const int MarginPx = 10;
 
@@ -27,6 +29,10 @@ namespace LitCalc.Win.Controls
 
         private Path display;
 
+        CircularMenu<WpfCircularMenuItem> ICircularMenuContext<WpfCircularMenuItem>.ContextMenu => contextMenu;
+
+        private readonly WpfCircularMenu contextMenu;
+
         public CalculatorControl()
         {
             SizeChanged += MainControl_SizeChanged;
@@ -38,12 +44,48 @@ namespace LitCalc.Win.Controls
 
             UpdateControls();
             Children.Add(display);
+
+            // Context menu creation
+            contextMenu = new WpfCircularMenu
+            {
+                Items = new List<WpfCircularMenuItem>()
+                {
+                    new WpfCircularMenuItem
+                    {
+                        Text = "Left",
+                        TargetAngle = Math.PI,
+                        TargetSize = Math.PI / 6,
+                        ShapeBackground = Colors.Yellow,
+                        Command = Option1
+                    },
+                    new WpfCircularMenuItem
+                    {
+                        Text = "Top",
+                        TargetAngle = Math.PI/2,
+                        TargetSize = Math.PI / 6,
+                        ShapeBackground = Colors.Yellow,
+                        Command = Option1
+                    },
+                    new WpfCircularMenuItem
+                    {
+                        Text = "Top",
+                        TargetAngle = 0,
+                        TargetSize = Math.PI / 6,
+                        ShapeBackground = Colors.Yellow,
+                        Command = Option1
+                    },
+                }
+            };
+        }
+
+        private void Option1(WpfCircularMenuItem item, object sender, object parameter)
+        {
+
         }
 
         private void MainControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var p = e.GetPosition(this);
-            e.Source = this;
         }
 
         private void MainControl_SizeChanged(object sender, SizeChangedEventArgs e)

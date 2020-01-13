@@ -1,12 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-
-using Lit.Ui.Wpf.Animation;
+using Lit.Ui.Wpf.CircularMenu;
 
 namespace Lit.Ui.Wpf.Controls
 {
@@ -20,6 +15,11 @@ namespace Lit.Ui.Wpf.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CircularMenuControl), new FrameworkPropertyMetadata(typeof(CircularMenuControl)));
         }
 
+        private WpfCircularMenuModel model;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CircularMenuControl()
         {
             this.Loaded += CircularMenu_Loaded;
@@ -37,6 +37,39 @@ namespace Lit.Ui.Wpf.Controls
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             var p = e.GetPosition(this);
+
+            var target = GetTarget(e.Source);
+            if (target != null)
+            {
+                CloseMenu();
+
+                model = new WpfCircularMenuModel(target.ContextMenu);
+                model.Show(this);
+            }
+        }
+
+        private void CloseMenu()
+        {
+            if (model != null)
+            {
+                model.Close();
+                model = null;
+            }
+        }
+
+        private IWpfCircularMenuContext GetTarget(object source)
+        {
+            while (source != null)
+            {
+                if (source is IWpfCircularMenuContext menu)
+                {
+                    return menu;
+                }
+
+                source = (source as FrameworkElement)?.Parent;
+            }
+
+            return null;
         }
     }
 }

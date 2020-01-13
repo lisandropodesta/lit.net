@@ -5,26 +5,26 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu model.
     /// </summary>
-    public abstract class CircularMenuModel : CircularMenuObjectModel
+    public abstract class CircularMenuModel<T> : CircularMenuObjectModel where T : CircularMenuItem
     {
         /// <summary>
         /// Menu configuration.
         /// </summary>
-        public CircularMenu Config => menu;
+        public CircularMenu<T> Config => menu;
 
-        private readonly CircularMenu menu;
+        private readonly CircularMenu<T> menu;
 
         /// <summary>
         /// Layers.
         /// </summary>
-        public IReadOnlyList<CircularMenuLayerModel> Layers => layers;
+        public IReadOnlyList<CircularMenuLayerModel<T>> Layers => layers;
 
-        private readonly List<CircularMenuLayerModel> layers = new List<CircularMenuLayerModel>();
+        private readonly List<CircularMenuLayerModel<T>> layers = new List<CircularMenuLayerModel<T>>();
 
         /// <summary>
         /// Initializes the menu.
         /// </summary>
-        protected CircularMenuModel(CircularMenu menu)
+        protected CircularMenuModel(CircularMenu<T> menu)
         {
             this.menu = menu;
 
@@ -40,9 +40,26 @@ namespace Lit.Ui.CircularMenu
         }
 
         /// <summary>
+        /// Close the menu al free all elements.
+        /// </summary>
+        public void Close()
+        {
+            Release();
+        }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            Release(layers);
+            base.Release();
+        }
+
+        /// <summary>
         /// Finds the displayed menu item related to a menu item.
         /// </summary>
-        public CircularMenuItemModel FindMenuItem(CircularMenuItem item)
+        public CircularMenuItemModel FindMenuItem(T item)
         {
             foreach (var layer in layers)
             {
@@ -59,7 +76,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Get a specific layer.
         /// </summary>
-        protected CircularMenuLayerModel GetLayer(int layer)
+        protected CircularMenuLayerModel<T> GetLayer(int layer)
         {
             while (layer >= layers.Count)
             {
@@ -74,7 +91,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Creates a layer.
         /// </summary>
-        protected abstract CircularMenuLayerModel CreateLayer();
+        protected abstract CircularMenuLayerModel<T> CreateLayer();
 
         #endregion
     }
