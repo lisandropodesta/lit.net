@@ -11,9 +11,9 @@
         public string Category { get; set; }
 
         /// <summary>
-        /// Item layer.
+        /// Item ring.
         /// </summary>
-        public int? Layer { get; set; }
+        public int? Ring { get; set; }
 
         /// <summary>
         /// Visible flag.

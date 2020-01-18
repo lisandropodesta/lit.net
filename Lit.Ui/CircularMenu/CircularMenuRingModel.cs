@@ -5,9 +5,9 @@ using System.Linq;
 namespace Lit.Ui.CircularMenu
 {
     /// <summary>
-    /// Circular menu layer model.
+    /// Circular menu ring model.
     /// </summary>
-    public abstract class CircularMenuLayerModel<T> : CircularMenuObjectModel where T : CircularMenuItem
+    public abstract class CircularMenuRingModel<T> : CircularMenuObjectModel where T : CircularMenuItem
     {
         /// <summary>
         /// Configuration.
@@ -41,7 +41,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CircularMenuLayerModel(CircularMenuModel<T> menu)
+        protected CircularMenuRingModel(CircularMenuModel<T> menu)
         {
             this.menu = menu;
         }
@@ -57,7 +57,7 @@ namespace Lit.Ui.CircularMenu
         }
 
         /// <summary>
-        /// Adds an item to the layer.
+        /// Adds an item to the ring.
         /// </summary>
         public void Add(CircularMenuItem item)
         {

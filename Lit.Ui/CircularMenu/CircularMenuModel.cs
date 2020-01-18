@@ -15,11 +15,11 @@ namespace Lit.Ui.CircularMenu
         private readonly CircularMenu<T> menu;
 
         /// <summary>
-        /// Layers.
+        /// Rings.
         /// </summary>
-        public IReadOnlyList<CircularMenuLayerModel<T>> Layers => layers;
+        public IReadOnlyList<CircularMenuRingModel<T>> Rings => rings;
 
-        private readonly List<CircularMenuLayerModel<T>> layers = new List<CircularMenuLayerModel<T>>();
+        private readonly List<CircularMenuRingModel<T>> rings = new List<CircularMenuRingModel<T>>();
 
         /// <summary>
         /// Initializes the menu.
@@ -30,12 +30,12 @@ namespace Lit.Ui.CircularMenu
 
             foreach (var item in menu.Items)
             {
-                GetLayer(item.Layer ?? 0).Add(item);
+                GetRing(item.Ring ?? 0).Add(item);
             }
 
-            foreach (var layer in layers)
+            foreach (var ring in rings)
             {
-                layer.ArrangeItems();
+                ring.ArrangeItems();
             }
         }
 
@@ -52,7 +52,7 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         protected override void Release()
         {
-            Release(layers);
+            Release(rings);
             base.Release();
         }
 
@@ -61,9 +61,9 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         public CircularMenuItemModel FindMenuItem(T item)
         {
-            foreach (var layer in layers)
+            foreach (var ring in rings)
             {
-                var di = layer.FindMenuItem(item);
+                var di = ring.FindMenuItem(item);
                 if (di != null)
                 {
                     return di;
@@ -74,24 +74,24 @@ namespace Lit.Ui.CircularMenu
         }
 
         /// <summary>
-        /// Get a specific layer.
+        /// Get a specific ring.
         /// </summary>
-        protected CircularMenuLayerModel<T> GetLayer(int layer)
+        protected CircularMenuRingModel<T> GetRing(int ringIndex)
         {
-            while (layer >= layers.Count)
+            while (ringIndex >= rings.Count)
             {
-                layers.Add(CreateLayer());
+                rings.Add(CreateRing());
             }
 
-            return layers[layer];
+            return rings[ringIndex];
         }
 
         #region Abstract methods.
 
         /// <summary>
-        /// Creates a layer.
+        /// Creates a ring.
         /// </summary>
-        protected abstract CircularMenuLayerModel<T> CreateLayer();
+        protected abstract CircularMenuRingModel<T> CreateRing();
 
         #endregion
     }

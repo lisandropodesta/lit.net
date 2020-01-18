@@ -31,9 +31,9 @@ namespace Lit.Ui.Wpf.CircularMenu
             base.Release();
         }
 
-        protected override CircularMenuLayerModel<WpfCircularMenuItem> CreateLayer()
+        protected override CircularMenuRingModel<WpfCircularMenuItem> CreateRing()
         {
-            return new WpfCircularMenuLayerModel(this);
+            return new WpfCircularMenuRingModel(this);
         }
     }
 }

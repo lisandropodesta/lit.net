@@ -8,18 +8,18 @@ namespace Lit.Ui.Wpf.CircularMenu
     public class WpfCircularMenuItemModel : CircularMenuItemModel
     {
         /// <summary>
-        /// Layer model.
+        /// Ring model.
         /// </summary>
-        public WpfCircularMenuLayerModel Layer => layer;
+        public WpfCircularMenuRingModel Ring => ring;
 
-        private WpfCircularMenuLayerModel layer;
+        private WpfCircularMenuRingModel ring;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public WpfCircularMenuItemModel(WpfCircularMenuLayerModel layer, CircularMenuItem item) : base(item)
+        public WpfCircularMenuItemModel(WpfCircularMenuRingModel ring, CircularMenuItem item) : base(item)
         {
-            this.layer = layer;
+            this.ring = ring;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// </summary>
         protected override void Release()
         {
-            layer = null;
+            ring = null;
             base.Release();
         }
     }
