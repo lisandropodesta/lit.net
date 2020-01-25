@@ -8,11 +8,11 @@ namespace Lit.Ui.Wpf.Controls
     /// <summary>
     /// Awesome circular menu.
     /// </summary>
-    public class CircularMenuControl : Canvas
+    public class WpfCircularMenuControl : Canvas
     {
-        static CircularMenuControl()
+        static WpfCircularMenuControl()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CircularMenuControl), new FrameworkPropertyMetadata(typeof(CircularMenuControl)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(WpfCircularMenuControl), new FrameworkPropertyMetadata(typeof(WpfCircularMenuControl)));
         }
 
         private WpfCircularMenuModel model;
@@ -20,7 +20,7 @@ namespace Lit.Ui.Wpf.Controls
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CircularMenuControl()
+        public WpfCircularMenuControl()
         {
             this.Loaded += CircularMenu_Loaded;
         }
@@ -36,7 +36,7 @@ namespace Lit.Ui.Wpf.Controls
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            var p = e.GetPosition(this);
+            var pos = e.GetPosition(this);
 
             var target = GetTarget(e.Source);
             if (target != null)
@@ -44,7 +44,7 @@ namespace Lit.Ui.Wpf.Controls
                 CloseMenu();
 
                 model = new WpfCircularMenuModel(target.ContextMenu);
-                model.Show(this);
+                model.Show(this, pos);
             }
         }
 
@@ -52,7 +52,7 @@ namespace Lit.Ui.Wpf.Controls
         {
             if (model != null)
             {
-                model.Close();
+                model.Dispose();
                 model = null;
             }
         }

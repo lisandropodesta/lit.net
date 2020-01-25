@@ -14,7 +14,7 @@
     <Grid>
         <controls:CalculatorControl/>
 
-        <lit:CircularMenuControl x:Name="CircularMenu"/>
+        <lit:WpfCircularMenuControl x:Name="CircularMenu"/>
 
         <!--<Path Stroke="Black" StrokeThickness="2" Fill="LightYellow">
             <Path.Data>

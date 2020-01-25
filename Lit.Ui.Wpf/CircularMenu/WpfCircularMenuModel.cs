@@ -1,5 +1,6 @@
-﻿using Lit.Ui.CircularMenu;
+﻿using System.Windows;
 using System.Windows.Controls;
+using Lit.Ui.CircularMenu;
 
 namespace Lit.Ui.Wpf.CircularMenu
 {
@@ -18,9 +19,12 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// <summary>
         /// Shows the menu.
         /// </summary>
-        public void Show(Panel container)
+        public void Show(Canvas canvas, Point pos)
         {
-            throw new System.NotImplementedException();
+            foreach (var ring in Rings)
+            {
+                (ring as WpfCircularMenuRingModel).Show(canvas, pos);
+            }
         }
 
         /// <summary>

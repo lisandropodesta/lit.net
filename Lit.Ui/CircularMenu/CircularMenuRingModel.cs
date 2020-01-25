@@ -16,6 +16,11 @@ namespace Lit.Ui.CircularMenu
 
         private readonly CircularMenuModel<T> menu;
 
+        /// <summary>
+        /// Items.
+        /// </summary>
+        public IReadOnlyList<CircularMenuItemModel> Items => items;
+
         private readonly List<CircularMenuItemModel> items = new List<CircularMenuItemModel>();
 
         private readonly List<CircularMenuCategoryModel> categories = new List<CircularMenuCategoryModel>();
@@ -63,6 +68,9 @@ namespace Lit.Ui.CircularMenu
         {
             var di = CreateItem(item);
             di.IsEnabled = item.IsEnabled;
+            di.FromRadius = FromRadius;
+            di.ToRadius = ToRadius;
+
             items.Add(di);
         }
 
@@ -84,15 +92,51 @@ namespace Lit.Ui.CircularMenu
                 // TODO: implement this feature
             }
 
+            CalcItemsLayout();
+
             CalcLayout();
 
             CreateCategories();
         }
 
         /// <summary>
-        /// Calculates item sizes and angles.
+        /// Calculates the ring limits.
         /// </summary>
         private void CalcLayout()
+        {
+            if (FromAngle == ToAngle)
+            {
+                var fromAngle = 5 * Math.PI / 4;
+                var toAngle = -Math.PI / 4;
+
+                if (!hasScrolling)
+                {
+                    var first = true;
+                    foreach (var item in items)
+                    {
+                        if (first || fromAngle < item.FromAngle)
+                        {
+                            fromAngle = item.FromAngle;
+                        }
+
+                        if (first || toAngle > item.ToAngle)
+                        {
+                            toAngle = item.ToAngle;
+                        }
+
+                        first = false;
+                    }
+                }
+
+                FromAngle = fromAngle;
+                ToAngle = toAngle;
+            }
+        }
+
+        /// <summary>
+        /// Calculates item sizes and angles.
+        /// </summary>
+        private void CalcItemsLayout()
         {
             double? fromAngle = null;
             var fromIndex = 0;

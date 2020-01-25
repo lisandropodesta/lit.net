@@ -57,13 +57,13 @@ namespace LitCalc.Win
             { Key.Escape, "CA" }
         };
 
-        private CircularMenuControl circularMenu;
+        private WpfCircularMenuControl circularMenu;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            circularMenu = FindName("CircularMenu") as CircularMenuControl;
+            circularMenu = FindName("CircularMenu") as WpfCircularMenuControl;
 
             PreviewKeyDown += MainWindow_PreviewKeyDown;
 

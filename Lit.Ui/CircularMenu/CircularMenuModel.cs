@@ -40,14 +40,6 @@ namespace Lit.Ui.CircularMenu
         }
 
         /// <summary>
-        /// Close the menu al free all elements.
-        /// </summary>
-        public void Close()
-        {
-            Release();
-        }
-
-        /// <summary>
         /// Release all memory references.
         /// </summary>
         protected override void Release()
@@ -80,7 +72,13 @@ namespace Lit.Ui.CircularMenu
         {
             while (ringIndex >= rings.Count)
             {
-                rings.Add(CreateRing());
+                var ring = CreateRing();
+
+                var internalRadius = rings.Count == 0 ? menu.CenterRadius : rings[rings.Count - 1].ToRadius;
+                ring.FromRadius = internalRadius;
+                ring.ToRadius = internalRadius + menu.RingSize;
+
+                rings.Add(ring);
             }
 
             return rings[ringIndex];

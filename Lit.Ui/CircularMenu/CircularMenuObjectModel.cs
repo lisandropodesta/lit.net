@@ -70,8 +70,8 @@ namespace Lit.Ui.CircularMenu
             get => rotation + relAngle + size / 2;
             set
             {
-                var delta = (value - FromAngle) / 2;
-                size += delta / 2;
+                var delta = value - FromAngle;
+                size += delta;
                 SetProp(ref relAngle, relAngle + delta / 2, nameof(RelAngle), true);
             }
         }
@@ -84,8 +84,8 @@ namespace Lit.Ui.CircularMenu
             get => rotation + relAngle - size / 2;
             set
             {
-                var delta = (value - ToAngle) / 2;
-                size -= delta / 2;
+                var delta = value - ToAngle;
+                size -= delta;
                 SetProp(ref relAngle, relAngle + delta / 2, nameof(RelAngle), true);
             }
         }
@@ -96,13 +96,6 @@ namespace Lit.Ui.CircularMenu
         protected CircularMenuObjectModel()
         {
             isVisible = true;
-        }
-
-        /// <summary>
-        /// Release all memory references.
-        /// </summary>
-        protected virtual void Release()
-        {
         }
 
         /// <summary>

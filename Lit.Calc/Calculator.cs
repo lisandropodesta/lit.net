@@ -166,8 +166,15 @@
 
         public void Update()
         {
-            Debug.Value = stack.Debug;
-            Screen.Value = stack.Screen;
+            if (Debug != null)
+            {
+                Debug.Value = stack.Debug;
+            }
+
+            if (Screen != null)
+            {
+                Screen.Value = stack.Screen;
+            }
         }
 
         /// <summary>

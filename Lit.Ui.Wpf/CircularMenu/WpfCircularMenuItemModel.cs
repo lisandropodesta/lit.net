@@ -1,4 +1,7 @@
-﻿using Lit.Ui.CircularMenu;
+﻿using System.Windows;
+using System.Windows.Controls;
+using Lit.Ui.CircularMenu;
+using Lit.Ui.Wpf.Shapes;
 
 namespace Lit.Ui.Wpf.CircularMenu
 {
@@ -14,6 +17,8 @@ namespace Lit.Ui.Wpf.CircularMenu
 
         private WpfCircularMenuRingModel ring;
 
+        private readonly WpfRingSector ringSector = new WpfRingSector();
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -23,10 +28,19 @@ namespace Lit.Ui.Wpf.CircularMenu
         }
 
         /// <summary>
+        /// Shows the item.
+        /// </summary>
+        public void Show(Canvas canvas, Point pos)
+        {
+            WpfCircularMenuTool.Show(ringSector, canvas, pos, this);
+        }
+
+        /// <summary>
         /// Release all memory references.
         /// </summary>
         protected override void Release()
         {
+            ringSector.IsVisible = false;
             ring = null;
             base.Release();
         }

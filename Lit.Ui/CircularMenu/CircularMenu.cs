@@ -39,6 +39,16 @@ namespace Lit.Ui.CircularMenu
         public double MinimumItemSize { get; set; }
 
         /// <summary>
+        /// Internal radius for the first ring.
+        /// </summary>
+        public double CenterRadius { get; set; }
+
+        /// <summary>
+        /// Ring radial size.
+        /// </summary>
+        public double RingSize { get; set; }
+
+        /// <summary>
         /// Default items shape.
         /// </summary>
         public CircularItemShape ItemsDefaultShape { get; set; }

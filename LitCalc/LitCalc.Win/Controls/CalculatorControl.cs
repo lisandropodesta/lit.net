@@ -48,6 +48,8 @@ namespace LitCalc.Win.Controls
             // Context menu creation
             contextMenu = new WpfCircularMenu
             {
+                CenterRadius = 20,
+                RingSize = 50,
                 Items = new List<WpfCircularMenuItem>()
                 {
                     new WpfCircularMenuItem
