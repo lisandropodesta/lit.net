@@ -8,7 +8,7 @@ namespace Lit.Ui.Wpf.Shapes
     /// <summary>
     /// WPF ring sector shape.
     /// </summary>
-    public class WpfRingSector : WpfShapeBase
+    public class WpfRingSector : WpfShapeBase<IWpfRingSectorSource>
     {
         /// <summary>
         /// Generated path.
@@ -18,64 +18,17 @@ namespace Lit.Ui.Wpf.Shapes
         private Path path;
 
         /// <summary>
-        /// Reference X coordinate.
+        /// Updates the shape.
         /// </summary>
-        public double CenterX { get => centerX; set => SetProp(ref centerX, value, Change.Layout, nameof(CenterX)); }
-
-        private double centerX;
-
-        /// <summary>
-        /// Reference Y coordinate.
-        /// </summary>
-        public double CenterY { get => centerY; set => SetProp(ref centerY, value, Change.Layout, nameof(CenterY)); }
-
-        private double centerY;
-
-        /// <summary>
-        /// Minimum radius.
-        /// </summary>
-        public double RadiusMin { get => radiusMin; set => SetProp(ref radiusMin, value, Change.Layout, nameof(RadiusMin)); }
-
-        private double radiusMin;
-
-        /// <summary>
-        /// Maximum radius.
-        /// </summary>
-        public double RadiusMax { get => radiusMax; set => SetProp(ref radiusMax, value, Change.Layout, nameof(RadiusMax)); }
-
-        private double radiusMax;
-
-        /// <summary>
-        /// Starting angle.
-        /// </summary>
-        public double AngleFrom { get => angleFrom; set => SetProp(ref angleFrom, value, Change.Layout, nameof(AngleFrom)); }
-
-        private double angleFrom;
-
-        /// <summary>
-        /// Ending angle.
-        /// </summary>
-        public double AngleTo { get => angleTo; set => SetProp(ref angleTo, value, Change.Layout, nameof(AngleTo)); }
-
-        private double angleTo;
-
-        /// <summary>
-        /// Border thickness.
-        /// </summary>
-        public double? BorderThickness { get => borderThickness; set => SetProp(ref borderThickness, value, Change.Aspect, nameof(BorderThickness)); }
-
-        private double? borderThickness;
-
-        public Color? BorderColor { get => borderColor; set => SetProp(ref borderColor, value, Change.Aspect, nameof(BorderColor)); }
-
-        private Color? borderColor;
-
-        public Color? BackgroundColor { get => backgroundColor; set => SetProp(ref backgroundColor, value, Change.Aspect, nameof(BackgroundColor)); }
-
-        private Color? backgroundColor;
-
-        protected override void UpdateItems()
+        protected override void UpdateItems(IWpfRingSectorSource source)
         {
+            var centerX = source.CenterX;
+            var centerY = source.CenterY;
+            var radiusMin = source.RadiusMin;
+            var radiusMax = source.RadiusMax;
+            var angleFrom = source.AngleFrom;
+            var angleTo = source.AngleTo;
+
             var cos = Math.Cos(angleFrom);
             var sin = Math.Sin(angleFrom);
 
@@ -122,9 +75,9 @@ namespace Lit.Ui.Wpf.Shapes
                 (figure.Segments[3] as ArcSegment).IsLargeArc = isLargeArc;
             }
 
-            path.StrokeThickness = borderThickness ?? 1;
-            path.Stroke = borderColor.HasValue ? new SolidColorBrush(borderColor.Value) : null;
-            path.Fill = backgroundColor.HasValue ? new SolidColorBrush(backgroundColor.Value) : null;
+            path.StrokeThickness = source.BorderThickness;
+            path.Stroke = new SolidColorBrush(source.BorderColor);
+            path.Fill = new SolidColorBrush(source.BackgroundColor);
         }
     }
 }

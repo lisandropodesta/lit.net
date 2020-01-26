@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using Lit.Ui.CircularMenu;
 using Lit.Ui.Wpf.Shapes;
@@ -9,7 +9,7 @@ namespace Lit.Ui.Wpf.CircularMenu
     /// <summary>
     /// WPF circular menu item.
     /// </summary>
-    public class WpfCircularMenuItem : CircularMenuItem
+    public class WpfCircularMenuItem : CircularMenuItem, IWpfRingSectorSource
     {
         /// <summary>
         /// Shaper background color.
@@ -41,6 +41,32 @@ namespace Lit.Ui.Wpf.CircularMenu
             Command.Invoke(this, sender, CommandParameter);
         }
 
+        #region IWpfRingSectorSource
+
+        bool IWpfShapeSource.IsVisible => MustDisplay;
+
+        Canvas IWpfShapeSource.Canvas => WpfRing?.WpfMenu.Canvas;
+
+        double IWpfRingSectorSource.CenterX => WpfRing?.WpfMenu.Position.X ?? 0;
+
+        double IWpfRingSectorSource.CenterY => WpfRing?.WpfMenu.Position.Y ?? 0;
+
+        double IWpfRingSectorSource.RadiusMin => FromRadius;
+
+        double IWpfRingSectorSource.RadiusMax => ToRadius;
+
+        double IWpfRingSectorSource.AngleFrom => FromAngle;
+
+        double IWpfRingSectorSource.AngleTo => ToAngle;
+
+        double IWpfRingSectorSource.BorderThickness => ShapeBorderThickness ?? 1;
+
+        Color IWpfRingSectorSource.BorderColor => ShapeBorderColor ?? Colors.Black;
+
+        Color IWpfRingSectorSource.BackgroundColor => ShapeBackgroundColor ?? Colors.White;
+
+        #endregion
+
         #region Render
 
         /// <summary>
@@ -61,7 +87,7 @@ namespace Lit.Ui.Wpf.CircularMenu
 
             if (change >= Change.Visibility)
             {
-                ringSector.Show(this, wpfRing?.WpfMenu.Canvas, wpfRing?.WpfMenu.Position ?? new Point());
+                ringSector.Update(this);
             }
         }
 

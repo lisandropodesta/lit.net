@@ -1,4 +1,6 @@
-﻿using Lit.Ui.CircularMenu;
+﻿using System.Windows.Controls;
+using System.Windows.Media;
+using Lit.Ui.CircularMenu;
 using Lit.Ui.Wpf.Shapes;
 
 namespace Lit.Ui.Wpf.CircularMenu
@@ -6,7 +8,7 @@ namespace Lit.Ui.Wpf.CircularMenu
     /// <summary>
     /// WPF circular menu ring.
     /// </summary>
-    public class WpfCircularMenuRing : CircularMenuRing<WpfCircularMenuItem>
+    public class WpfCircularMenuRing : CircularMenuRing<WpfCircularMenuItem>, IWpfRingSectorSource
     {
         public WpfCircularMenu WpfMenu => wpfMenu;
 
@@ -22,6 +24,32 @@ namespace Lit.Ui.Wpf.CircularMenu
             wpfMenu = menu;
         }
 
+        #region IWpfRingSectorSource
+
+        bool IWpfShapeSource.IsVisible => MustDisplay;
+
+        Canvas IWpfShapeSource.Canvas => WpfMenu.Canvas;
+
+        double IWpfRingSectorSource.CenterX => wpfMenu.Position.X;
+
+        double IWpfRingSectorSource.CenterY => wpfMenu.Position.Y;
+
+        double IWpfRingSectorSource.RadiusMin => FromRadius;
+
+        double IWpfRingSectorSource.RadiusMax => ToRadius;
+
+        double IWpfRingSectorSource.AngleFrom => FromAngle;
+
+        double IWpfRingSectorSource.AngleTo => ToAngle;
+
+        double IWpfRingSectorSource.BorderThickness => 1;
+
+        Color IWpfRingSectorSource.BorderColor => Colors.Black;
+
+        Color IWpfRingSectorSource.BackgroundColor => Colors.White;
+
+        #endregion
+
         /// <summary>
         /// Process layout change event.
         /// </summary>
@@ -33,7 +61,7 @@ namespace Lit.Ui.Wpf.CircularMenu
             {
                 if (change >= Change.Visibility)
                 {
-                    ringSector.Show(this, wpfMenu.Canvas, wpfMenu.Position);
+                    ringSector.Update(this);
                 }
 
                 Items.ForEach(i => i.BeginUpdate());
