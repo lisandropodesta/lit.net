@@ -4,12 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Lit.Ui.CircularMenu;
-using Lit.Ui.Wpf.Animation;
 using Lit.Ui.Wpf.CircularMenu;
-using Lit.Ui.Wpf.Controls;
 
 namespace LitCalc.Win.Controls
 {
@@ -57,7 +54,25 @@ namespace LitCalc.Win.Controls
                         Text = "Left",
                         TargetAngle = Math.PI,
                         TargetSize = Math.PI / 6,
-                        ShapeBackground = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow,
+                        Command = Option1
+                    },
+                    new WpfCircularMenuItem
+                    {
+                        Text = "2",
+                        ShapeBackgroundColor = Colors.Red,
+                        Command = Option1
+                    },
+                    new WpfCircularMenuItem
+                    {
+                        Text = "2",
+                        ShapeBackgroundColor = Colors.Green,
+                        Command = Option1
+                    },
+                    new WpfCircularMenuItem
+                    {
+                        Text = "1",
+                        ShapeBackgroundColor = Colors.Blue,
                         Command = Option1
                     },
                     new WpfCircularMenuItem
@@ -65,7 +80,7 @@ namespace LitCalc.Win.Controls
                         Text = "Top",
                         TargetAngle = Math.PI/2,
                         TargetSize = Math.PI / 6,
-                        ShapeBackground = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow,
                         Command = Option1
                     },
                     new WpfCircularMenuItem
@@ -73,7 +88,7 @@ namespace LitCalc.Win.Controls
                         Text = "Top",
                         TargetAngle = 0,
                         TargetSize = Math.PI / 6,
-                        ShapeBackground = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow,
                         Command = Option1
                     },
                 }

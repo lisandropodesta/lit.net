@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Lit.Ui.CircularMenu
 {
     /// <summary>
-    /// Circular menu configuration.
+    /// Circular menu.
     /// </summary>
-    public class CircularMenu<T> where T : CircularMenuItem
+    public abstract class CircularMenu<T> : CircularMenuObjectModel where T : CircularMenuItem
     {
         /// <summary>
         /// Sort items by catergory.
@@ -61,10 +61,88 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CircularMenu()
+        protected CircularMenu()
         {
             DisplayFromAngle = Math.PI;
             DisplayToAngle = 0;
         }
+
+        /// <summary>
+        /// Release all memory references.
+        /// </summary>
+        protected override void Release()
+        {
+            IsShowing = false;
+            Release(rings);
+            base.Release();
+        }
+
+        #region Render
+
+        /// <summary>
+        /// Rings.
+        /// </summary>
+        public IReadOnlyList<CircularMenuRing<T>> Rings => rings;
+
+        private readonly List<CircularMenuRing<T>> rings = new List<CircularMenuRing<T>>();
+
+        private bool layoutReady;
+
+        /// <summary>
+        /// Process layout change event.
+        /// </summary>
+        protected override void OnPropertyChanged(Change change, string name)
+        {
+            if (MustDisplay && (change >= Change.Layout || !layoutReady))
+            {
+                Arrange();
+                layoutReady = true;
+            }
+
+            if (change >= Change.Visibility)
+            {
+                Rings.ForEach(r => r.IsShowing = IsShowing);
+            }
+
+            base.OnPropertyChanged(change, name);
+        }
+
+        /// <summary>
+        /// Initializes the menu.
+        /// </summary>
+        private void Arrange()
+        {
+            rings.ForEach(r => r.ClearItems());
+
+            Items.ForEach(item => GetRing(item.Ring ?? 0).Add(item));
+
+            rings.ForEach(r => r.ArrangeItems());
+        }
+
+        /// <summary>
+        /// Get a specific ring.
+        /// </summary>
+        private CircularMenuRing<T> GetRing(int ringIndex)
+        {
+            while (ringIndex >= rings.Count)
+            {
+                var ring = CreateRing();
+
+                var internalRadius = rings.Count == 0 ? CenterRadius : rings[rings.Count - 1].ToRadius;
+                ring.FromRadius = internalRadius;
+                ring.ToRadius = internalRadius + RingSize;
+
+                rings.Add(ring);
+            }
+
+            return rings[ringIndex];
+        }
+
+        /// <summary>
+        /// Creates a ring.
+        /// </summary>
+        protected abstract CircularMenuRing<T> CreateRing();
+
+        #endregion
     }
 }

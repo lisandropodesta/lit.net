@@ -1,29 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Lit.Ui.CircularMenu
 {
     /// <summary>
-    /// Circular menu ring model.
+    /// Circular menu ring.
     /// </summary>
-    public abstract class CircularMenuRingModel<T> : CircularMenuObjectModel where T : CircularMenuItem
+    public abstract class CircularMenuRing<T> : CircularMenuObjectModel where T : CircularMenuItem
     {
         /// <summary>
         /// Configuration.
         /// </summary>
-        protected CircularMenu<T> Config => menu.Config;
-
-        private readonly CircularMenuModel<T> menu;
+        protected CircularMenu<T> Menu { get; private set; }
 
         /// <summary>
         /// Items.
         /// </summary>
-        public IReadOnlyList<CircularMenuItemModel> Items => items;
+        public IReadOnlyList<CircularMenuItem> Items => items;
 
-        private readonly List<CircularMenuItemModel> items = new List<CircularMenuItemModel>();
+        private readonly List<CircularMenuItem> items = new List<CircularMenuItem>();
 
-        private readonly List<CircularMenuCategoryModel> categories = new List<CircularMenuCategoryModel>();
+        private readonly List<CircularMenuCategory> categories = new List<CircularMenuCategory>();
 
         private bool hasScrolling;
 
@@ -46,9 +43,9 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CircularMenuRingModel(CircularMenuModel<T> menu)
+        protected CircularMenuRing(CircularMenu<T> menu)
         {
-            this.menu = menu;
+            Menu = menu;
         }
 
         /// <summary>
@@ -62,24 +59,20 @@ namespace Lit.Ui.CircularMenu
         }
 
         /// <summary>
+        /// Clear al items and categories.
+        /// </summary>
+        public void ClearItems()
+        {
+            items.Clear();
+            categories.Clear();
+        }
+
+        /// <summary>
         /// Adds an item to the ring.
         /// </summary>
         public void Add(CircularMenuItem item)
         {
-            var di = CreateItem(item);
-            di.IsEnabled = item.IsEnabled;
-            di.FromRadius = FromRadius;
-            di.ToRadius = ToRadius;
-
-            items.Add(di);
-        }
-
-        /// <summary>
-        /// Finds the displayed menu item related to a menu item.
-        /// </summary>
-        public CircularMenuItemModel FindMenuItem(CircularMenuItem item)
-        {
-            return items.FirstOrDefault(i => i.Config == item);
+            items.Add(item);
         }
 
         /// <summary>
@@ -87,7 +80,7 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         public void ArrangeItems()
         {
-            if (Config.SortByCategory)
+            if (Menu.SortByCategory)
             {
                 // TODO: implement this feature
             }
@@ -150,13 +143,13 @@ namespace Lit.Ui.CircularMenu
 
                 if (item.IsVisible)
                 {
-                    var cfg = item.Config;
+                    var cfg = item;
                     var absSize = 0.0;
                     var relSize = 0.0;
 
                     if (cfg.TargetSize.HasValue)
                     {
-                        absSize = item.Config.TargetSize.Value;
+                        absSize = cfg.TargetSize.Value;
                         absSizeSum += absSize;
                     }
                     else
@@ -166,16 +159,16 @@ namespace Lit.Ui.CircularMenu
                         relSizeSum += relSize;
                     }
 
-                    if (item.Config.TargetAngle.HasValue)
+                    if (cfg.TargetAngle.HasValue)
                     {
-                        if (i == fromIndex)
+                        if (i > fromIndex)
                         {
-                            item.RelAngle = item.Config.TargetAngle.Value;
-                            item.Size = absSize > 0 ? absSize : Config.MinimumItemSize;
+                            AssignLayout(fromIndex, i, fromAngle, cfg.TargetAngle.Value, absSizeSum - absSize / 2, relSizeSum - relSize / 2, minRelSize);
                         }
                         else
                         {
-                            AssignLayout(fromIndex, i, fromAngle, item.Config.TargetAngle.Value, absSizeSum - absSize / 2, relSizeSum - relSize / 2, minRelSize);
+                            item.RelAngle = cfg.TargetAngle.Value;
+                            item.Size = absSize > 0 ? absSize : Menu.MinimumItemSize;
                         }
 
                         fromAngle = item.ToAngle;
@@ -204,10 +197,10 @@ namespace Lit.Ui.CircularMenu
         private void AssignLayout(int fromIndex, int toIndex, double? fromAngle, double? toAngle, double absSizeSum, double relSizeSum, double minRelSize)
         {
             // Calculates with available space
-            var totalSize = (fromAngle ?? Config.DisplayFromAngle) - (toAngle ?? Config.DisplayToAngle);
+            var totalSize = (fromAngle ?? Menu.DisplayFromAngle) - (toAngle ?? Menu.DisplayToAngle);
             var relSizeValue = relSizeSum > 0 ? (totalSize - absSizeSum) / relSizeSum : 0.0;
 
-            if (totalSize < absSizeSum || relSizeValue * minRelSize < Config.MinimumItemSize)
+            if (totalSize < absSizeSum || relSizeValue * minRelSize < Menu.MinimumItemSize)
             {
                 if (fromAngle.HasValue && toAngle.HasValue)
                 {
@@ -216,7 +209,7 @@ namespace Lit.Ui.CircularMenu
 
                 // Calculates with scrolling
                 hasScrolling = true;
-                relSizeValue = relSizeSum > 0 ? Config.MinimumItemSize / minRelSize : 0.0;
+                relSizeValue = relSizeSum > 0 ? Menu.MinimumItemSize / minRelSize : 0.0;
                 totalSize = absSizeSum + relSizeSum * relSizeValue;
 
                 if (!fromAngle.HasValue)
@@ -242,7 +235,7 @@ namespace Lit.Ui.CircularMenu
                     var itemSize = GetItemAbsSize(item, relSizeValue);
                     item.Size = itemSize;
                     item.RelAngle = angle - itemSize / 2;
-                    angle += itemSize;
+                    angle -= itemSize;
                 }
             }
         }
@@ -257,7 +250,7 @@ namespace Lit.Ui.CircularMenu
                 if (item.IsVisible)
                 {
                     item.Rotation = Rotation;
-                    item.IsHidden = item.FromAngle > Config.DisplayFromAngle || Config.DisplayToAngle > item.ToAngle;
+                    item.IsHidden = item.FromAngle > Menu.DisplayFromAngle || Menu.DisplayToAngle > item.ToAngle;
                 }
             }
         }
@@ -265,11 +258,11 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Get the absolute item size.
         /// </summary>
-        private static double GetItemAbsSize(CircularMenuItemModel item, double relSizeValue)
+        private static double GetItemAbsSize(CircularMenuItem item, double relSizeValue)
         {
-            if (item.Config.TargetSize.HasValue)
+            if (item.TargetSize.HasValue)
             {
-                return item.Config.TargetSize.Value;
+                return item.TargetSize.Value;
             }
 
             return relSizeValue * GetItemRelativeSize(item);
@@ -278,9 +271,9 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Force an item value of relative size.
         /// </summary>
-        private static double GetItemRelativeSize(CircularMenuItemModel item)
+        private static double GetItemRelativeSize(CircularMenuItem item)
         {
-            return !item.Config.RelativeSize.HasValue || item.Config.RelativeSize.Value <= 0 ? 1 : item.Config.RelativeSize.Value;
+            return !item.RelativeSize.HasValue || item.RelativeSize.Value <= 0 ? 1 : item.RelativeSize.Value;
         }
 
         /// <summary>
@@ -288,20 +281,20 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         private void CreateCategories()
         {
-            CircularMenuItemModel prevItem = null;
+            CircularMenuItem prevItem = null;
 
             foreach (var item in items)
             {
-                if (!string.IsNullOrEmpty(item.Config.Category))
+                if (!string.IsNullOrEmpty(item.CategoryName))
                 {
-                    if (prevItem?.Config.Category == item.Config.Category)
+                    if (prevItem?.CategoryName == item.CategoryName)
                     {
-                        item.Category = prevItem.Category;
+                        item.CategoryName = prevItem.CategoryName;
                         prevItem.LastCategoryObject = false;
                     }
                     else
                     {
-                        item.Category = CreateCategory(item.Config.Category);
+                        item.Category = CreateCategory(item.CategoryName);
                         categories.Add(item.Category);
 
                         item.FirstCategoryObject = true;
@@ -317,14 +310,9 @@ namespace Lit.Ui.CircularMenu
         #region Abstract methods
 
         /// <summary>
-        /// Creates an item.
-        /// </summary>
-        protected abstract CircularMenuItemModel CreateItem(CircularMenuItem item);
-
-        /// <summary>
         /// Creates a category.
         /// </summary>
-        protected abstract CircularMenuCategoryModel CreateCategory(string title);
+        protected abstract CircularMenuCategory CreateCategory(string title);
 
         #endregion
     }

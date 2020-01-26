@@ -157,7 +157,6 @@
         /// <summary>
         /// Send text to the calculator.
         /// </summary>
-        /// <param name="text"></param>
         public void PutKey(string text)
         {
             stack.PutKey(text);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Lit.Ui.Classes
+namespace Lit.Ui
 {
     /// <summary>
     /// Base data model.
@@ -9,15 +9,39 @@ namespace Lit.Ui.Classes
     public class BaseModel : INotifyPropertyChanged, IDisposable
     {
         /// <summary>
+        /// Property change affectation.
+        /// </summary>
+        protected enum Change
+        {
+            /// <summary>
+            /// Change without affecting visual aspect.
+            /// </summary>
+            Data,
+
+            /// <summary>
+            /// Change affecting visibility.
+            /// </summary>
+            Visibility,
+
+            /// <summary>
+            /// Change affecting visual aspect.
+            /// </summary>
+            Aspect,
+
+            /// <summary>
+            /// Change affecting layout/shape.
+            /// </summary>
+            Layout
+        }
+
+        /// <summary>
         /// Property changed event.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private int updateCount;
+        private int updatingCount;
 
-        private bool flagChanged;
-
-        private bool flagLayoutChanged;
+        private Change? updatingChange;
 
         /// <summary>
         /// Dispose allocated resources but the element still can be activated.
@@ -34,7 +58,7 @@ namespace Lit.Ui.Classes
         {
             lock (this)
             {
-                updateCount++;
+                updatingCount++;
             }
         }
 
@@ -43,40 +67,37 @@ namespace Lit.Ui.Classes
         /// </summary>
         public void EndUpdate()
         {
-            var changed = false;
-            var layoutChanged = false;
+            Change? flags = null;
 
             lock (this)
             {
-                if (updateCount > 0)
+                if (updatingCount > 0)
                 {
-                    updateCount--;
+                    updatingCount--;
                 }
 
-                if (updateCount == 0)
+                if (updatingCount == 0)
                 {
-                    changed = flagChanged;
-                    layoutChanged = flagLayoutChanged;
-                    flagChanged = false;
-                    flagLayoutChanged = false;
+                    flags = updatingChange;
+                    updatingChange = null;
                 }
             }
 
-            if (changed)
+            if (flags.HasValue)
             {
-                NotifyPropertyChanged(null, layoutChanged);
+                NotifyPropertyChanged(flags.Value, null);
             }
         }
 
         /// <summary>
         /// Generic property assignment.
         /// </summary>
-        protected bool SetProp<T>(ref T prop, T value, string name = null, bool layoutChanged = false)
+        protected bool SetProp<T>(ref T prop, T value, Change change, string name = null)
         {
             if (prop == null && value != null || prop != null && !prop.Equals(value))
             {
                 prop = value;
-                OnPropertyChanged(name, layoutChanged);
+                InformPropertyChanged(change, name);
                 return true;
             }
 
@@ -84,18 +105,32 @@ namespace Lit.Ui.Classes
         }
 
         /// <summary>
-        /// Property changed event managment.
+        /// Check if the model is being updated.
         /// </summary>
-        protected virtual void OnPropertyChanged(string name, bool layoutChanged)
+        protected bool IsUpdating()
+        {
+            lock (this)
+            {
+                return updatingCount > 0;
+            }
+        }
+
+        /// <summary>
+        /// Informs that a property has changed.
+        /// </summary>
+        protected void InformPropertyChanged(Change change, string name)
         {
             bool mustNotify;
 
             lock (this)
             {
-                if (updateCount > 0)
+                if (updatingCount > 0)
                 {
-                    flagChanged = true;
-                    flagLayoutChanged = flagLayoutChanged || layoutChanged;
+                    if (!updatingChange.HasValue || updatingChange.Value < change)
+                    {
+                        updatingChange = change;
+                    }
+
                     mustNotify = false;
                 }
                 else
@@ -106,27 +141,24 @@ namespace Lit.Ui.Classes
 
             if (mustNotify)
             {
-                NotifyPropertyChanged(name, layoutChanged);
+                NotifyPropertyChanged(change, name);
             }
         }
 
         /// <summary>
         /// Notify property changed.
         /// </summary>
-        private void NotifyPropertyChanged(string name, bool layoutChanged)
+        private void NotifyPropertyChanged(Change change, string name)
         {
-            if (layoutChanged)
-            {
-                OnLayoutChanged();
-            }
+            OnPropertyChanged(change, name);
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         /// <summary>
-        /// A property affecting layout has changed.
+        /// Property changed event managment.
         /// </summary>
-        protected virtual void OnLayoutChanged()
+        protected virtual void OnPropertyChanged(Change change, string name)
         {
         }
 

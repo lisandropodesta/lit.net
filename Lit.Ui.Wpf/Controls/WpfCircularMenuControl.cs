@@ -15,7 +15,7 @@ namespace Lit.Ui.Wpf.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(WpfCircularMenuControl), new FrameworkPropertyMetadata(typeof(WpfCircularMenuControl)));
         }
 
-        private WpfCircularMenuModel model;
+        private WpfCircularMenu menu;
 
         /// <summary>
         /// Constructor.
@@ -43,17 +43,17 @@ namespace Lit.Ui.Wpf.Controls
             {
                 CloseMenu();
 
-                model = new WpfCircularMenuModel(target.ContextMenu);
-                model.Show(this, pos);
+                menu = target.ContextMenu as WpfCircularMenu;
+                menu.Show(this, pos);
             }
         }
 
         private void CloseMenu()
         {
-            if (model != null)
+            if (menu != null)
             {
-                model.Dispose();
-                model = null;
+                menu.Hide();
+                menu = null;
             }
         }
 

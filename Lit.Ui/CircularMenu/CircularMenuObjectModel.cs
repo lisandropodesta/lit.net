@@ -1,5 +1,4 @@
-﻿using Lit.Ui.Classes;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Lit.Ui.CircularMenu
 {
@@ -9,56 +8,63 @@ namespace Lit.Ui.CircularMenu
     public abstract class CircularMenuObjectModel : BaseModel
     {
         /// <summary>
-        /// Displayed flag.
+        /// Must display flag.
         /// </summary>
-        public bool IsDisplayed => isVisible && !isHidden;
+        public bool MustDisplay => isVisible && !isHidden && isShowing;
 
         /// <summary>
         /// Visible flag.
         /// </summary>
-        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, nameof(IsVisible), !isHidden); }
+        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, !isHidden ? Change.Visibility : Change.Data, nameof(IsVisible)); }
 
         private bool isVisible;
 
         /// <summary>
         /// Hidden flag.
         /// </summary>
-        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, nameof(IsHidden), isVisible); }
+        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, isVisible ? Change.Visibility : Change.Data, nameof(IsHidden)); }
 
         private bool isHidden;
 
         /// <summary>
+        /// Showing flag.
+        /// </summary>
+        public bool IsShowing { get => isShowing; set => SetProp(ref isShowing, value, Change.Visibility, nameof(IsShowing)); }
+
+        private bool isShowing;
+
+        /// <summary>
         /// Starting radius.
         /// </summary>
-        public double FromRadius { get => fromRadius; set => SetProp(ref fromRadius, value, nameof(FromRadius), true); }
+        public double FromRadius { get => fromRadius; set => SetProp(ref fromRadius, value, Change.Layout, nameof(FromRadius)); }
 
         private double fromRadius;
 
         /// <summary>
         /// Ending radius.
         /// </summary>
-        public double ToRadius { get => toRadius; set => SetProp(ref toRadius, value, nameof(ToRadius), true); }
+        public double ToRadius { get => toRadius; set => SetProp(ref toRadius, value, Change.Layout, nameof(ToRadius)); }
 
         private double toRadius;
 
         /// <summary>
         /// Relative angle.
         /// </summary>
-        public double RelAngle { get => relAngle; set => SetProp(ref relAngle, value, nameof(RelAngle), true); }
+        public double RelAngle { get => relAngle; set => SetProp(ref relAngle, value, Change.Layout, nameof(RelAngle)); }
 
         private double relAngle;
 
         /// <summary>
         /// Rotation angle.
         /// </summary>
-        public virtual double Rotation { get => rotation; set => SetProp(ref rotation, value, nameof(Rotation), true); }
+        public virtual double Rotation { get => rotation; set => SetProp(ref rotation, value, Change.Layout, nameof(Rotation)); }
 
         private double rotation;
 
         /// <summary>
         /// Item size.
         /// </summary>
-        public double Size { get => size; set => SetProp(ref size, value, nameof(Size), true); }
+        public double Size { get => size; set => SetProp(ref size, value, Change.Layout, nameof(Size)); }
 
         private double size;
 
@@ -72,7 +78,7 @@ namespace Lit.Ui.CircularMenu
             {
                 var delta = value - FromAngle;
                 size += delta;
-                SetProp(ref relAngle, relAngle + delta / 2, nameof(RelAngle), true);
+                SetProp(ref relAngle, relAngle + delta / 2, Change.Layout, nameof(RelAngle));
             }
         }
 
@@ -86,7 +92,7 @@ namespace Lit.Ui.CircularMenu
             {
                 var delta = value - ToAngle;
                 size -= delta;
-                SetProp(ref relAngle, relAngle + delta / 2, nameof(RelAngle), true);
+                SetProp(ref relAngle, relAngle + delta / 2, Change.Layout, nameof(RelAngle));
             }
         }
 
@@ -96,6 +102,7 @@ namespace Lit.Ui.CircularMenu
         protected CircularMenuObjectModel()
         {
             isVisible = true;
+            isHidden = false;
         }
 
         /// <summary>
