@@ -8,7 +8,7 @@ namespace Lit.Ui.Wpf.Shapes
     /// <summary>
     /// WPF ring sector shape.
     /// </summary>
-    public class WpfRingSector : WpfShapeBase<IWpfRingSectorSource>
+    public class WpfRingSector : WpfShape<IWpfRingSectorSource>
     {
         /// <summary>
         /// Generated path.

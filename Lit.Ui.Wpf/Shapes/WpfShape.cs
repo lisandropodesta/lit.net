@@ -7,7 +7,7 @@ namespace Lit.Ui.Wpf.Shapes
     /// <summary>
     /// WPF shape base.
     /// </summary>
-    public abstract class WpfShapeBase<T> where T : IWpfShapeSource
+    public abstract class WpfShape<T> where T : IWpfShapeSource
     {
         /// <summary>
         /// Displayed flag.
