@@ -1,4 +1,7 @@
-﻿namespace Lit.Ui.CircularMenu
+﻿using System;
+using System.Drawing;
+
+namespace Lit.Ui.CircularMenu
 {
     /// <summary>
     /// Circular menu item.
@@ -71,28 +74,46 @@
         public double? RelativeSize { get; set; }
 
         /// <summary>
-        /// Triggers the action
+        /// Shaper background color.
         /// </summary>
-        public virtual void TriggerAction(object sender)
-        {
-        }
+        public Color? ShapeBackgroundColor { get; set; }
+
+        /// <summary>
+        /// Shape border color.
+        /// </summary>
+        public Color? ShapeBorderColor { get; set; }
+
+        /// <summary>
+        /// Action to be executed.
+        /// </summary>
+        public Action<CircularMenuItem, object> Command { get; set; }
+
+        /// <summary>
+        /// Command parameter.
+        /// </summary>
+        public object CommandParameter { get; set; }
 
         #region Render
 
         /// <summary>
+        /// Associated menu.
+        /// </summary>
+        internal CircularMenu Menu { get; set; }
+
+        /// <summary>
         /// Associated category.
         /// </summary>
-        public CircularMenuCategory Category { get; set; }
+        internal CircularMenuCategory Category { get; set; }
 
         /// <summary>
         /// Flag if this is the first object on the category (clockwise).
         /// </summary>
-        public bool FirstCategoryObject { get; set; }
+        internal bool FirstCategoryObject { get; set; }
 
         /// <summary>
         /// Flag if this is the last object on the category (clockwise).
         /// </summary>
-        public bool LastCategoryObject { get; set; }
+        internal bool LastCategoryObject { get; set; }
 
         /// <summary>
         /// Process layout changes.
@@ -113,6 +134,22 @@
                     Category.ToAngle = ToAngle;
                 }
             }
+        }
+
+        /// <summary>
+        /// Triggers the action
+        /// </summary>
+        protected void TriggerAction()
+        {
+            var cmd = Command;
+            var cmdParam = CommandParameter;
+
+            if (Menu?.CloseOnSelection ?? false)
+            {
+                Menu.Show = false;
+            }
+
+            cmd?.Invoke(this, cmdParam);
         }
 
         #endregion

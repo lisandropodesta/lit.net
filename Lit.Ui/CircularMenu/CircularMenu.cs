@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Lit.Ui.CircularMenu
 {
     /// <summary>
     /// Circular menu.
     /// </summary>
-    public abstract class CircularMenu<T> : CircularMenuObjectModel where T : CircularMenuItem
+    public abstract class CircularMenu : CircularMenuObjectModel
     {
+        /// <summary>
+        /// Makes the menu close upon selection.
+        /// </summary>
+        public bool CloseOnSelection { get; set; }
+
         /// <summary>
         /// Sort items by catergory.
         /// </summary>
@@ -54,9 +60,19 @@ namespace Lit.Ui.CircularMenu
         public CircularItemShape ItemsDefaultShape { get; set; }
 
         /// <summary>
+        /// Default background color for items.
+        /// </summary>
+        public Color ItemsDefaultBackground { get; set; }
+
+        /// <summary>
+        /// Default border color for items.
+        /// </summary>
+        public Color ItemsDefaultBorder { get; set; }
+
+        /// <summary>
         /// Items list.
         /// </summary>
-        public IEnumerable<T> Items { get; set; }
+        public IEnumerable<CircularMenuItem> Items { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -72,7 +88,7 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         protected override void Release()
         {
-            IsShowing = false;
+            Show = false;
             Release(rings);
             base.Release();
         }
@@ -82,9 +98,9 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Rings.
         /// </summary>
-        public IReadOnlyList<CircularMenuRing<T>> Rings => rings;
+        internal IReadOnlyList<CircularMenuRing> Rings => rings;
 
-        private readonly List<CircularMenuRing<T>> rings = new List<CircularMenuRing<T>>();
+        private readonly List<CircularMenuRing> rings = new List<CircularMenuRing>();
 
         private bool layoutReady;
 
@@ -93,7 +109,7 @@ namespace Lit.Ui.CircularMenu
         /// </summary>
         protected override void OnPropertyChanged(Change change, string name)
         {
-            if (MustDisplay && (change >= Change.Layout || !layoutReady))
+            if (IsShowing && (change >= Change.Layout || !layoutReady))
             {
                 Arrange();
                 layoutReady = true;
@@ -101,7 +117,7 @@ namespace Lit.Ui.CircularMenu
 
             if (change >= Change.Visibility)
             {
-                Rings.ForEach(r => r.IsShowing = IsShowing);
+                Rings.ForEach(r => r.Show = Show);
             }
 
             base.OnPropertyChanged(change, name);
@@ -114,7 +130,11 @@ namespace Lit.Ui.CircularMenu
         {
             rings.ForEach(r => r.ClearItems());
 
-            Items.ForEach(item => GetRing(item.Ring ?? 0).Add(item));
+            Items.ForEach(item =>
+            {
+                item.Menu = this;
+                GetRing(item.Ring ?? 0).Add(item);
+            });
 
             rings.ForEach(r => r.ArrangeItems());
         }
@@ -122,7 +142,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Get a specific ring.
         /// </summary>
-        private CircularMenuRing<T> GetRing(int ringIndex)
+        private CircularMenuRing GetRing(int ringIndex)
         {
             while (ringIndex >= rings.Count)
             {
@@ -141,7 +161,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Creates a ring.
         /// </summary>
-        protected abstract CircularMenuRing<T> CreateRing();
+        protected abstract CircularMenuRing CreateRing();
 
         #endregion
     }

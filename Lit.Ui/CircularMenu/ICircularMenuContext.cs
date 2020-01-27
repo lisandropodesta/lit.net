@@ -3,8 +3,8 @@
     /// <summary>
     /// Circular menu context definition.
     /// </summary>
-    public interface ICircularMenuContext<T> where T : CircularMenuItem
+    public interface ICircularMenuContext
     {
-        CircularMenu<T> ContextMenu { get; }
+        CircularMenu ContextMenu { get; }
     }
 }

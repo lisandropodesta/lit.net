@@ -8,30 +8,30 @@ namespace Lit.Ui.CircularMenu
     public abstract class CircularMenuObjectModel : BaseModel
     {
         /// <summary>
-        /// Must display flag.
+        /// Showing flag.
         /// </summary>
-        public bool MustDisplay => isVisible && !isHidden && isShowing;
+        public bool IsShowing => show && isVisible && !isHidden;
+
+        /// <summary>
+        /// Show control.
+        /// </summary>
+        public bool Show { get => show; set => SetProp(ref show, value, isVisible && !isHidden ? Change.Visibility : Change.Data, nameof(Show)); }
+
+        private bool show;
 
         /// <summary>
         /// Visible flag.
         /// </summary>
-        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, !isHidden ? Change.Visibility : Change.Data, nameof(IsVisible)); }
+        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, show && !isHidden ? Change.Visibility : Change.Data, nameof(IsVisible)); }
 
         private bool isVisible;
 
         /// <summary>
         /// Hidden flag.
         /// </summary>
-        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, isVisible ? Change.Visibility : Change.Data, nameof(IsHidden)); }
+        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, show && isVisible ? Change.Visibility : Change.Data, nameof(IsHidden)); }
 
         private bool isHidden;
-
-        /// <summary>
-        /// Showing flag.
-        /// </summary>
-        public bool IsShowing { get => isShowing; set => SetProp(ref isShowing, value, Change.Visibility, nameof(IsShowing)); }
-
-        private bool isShowing;
 
         /// <summary>
         /// Starting radius.

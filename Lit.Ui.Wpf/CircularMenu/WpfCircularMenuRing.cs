@@ -8,9 +8,9 @@ namespace Lit.Ui.Wpf.CircularMenu
     /// <summary>
     /// WPF circular menu ring.
     /// </summary>
-    public class WpfCircularMenuRing : CircularMenuRing<WpfCircularMenuItem>, IWpfRingSectorSource
+    public class WpfCircularMenuRing : CircularMenuRing, IWpfRingSectorSource
     {
-        public WpfCircularMenu WpfMenu => wpfMenu;
+        internal WpfCircularMenu WpfMenu => wpfMenu;
 
         private readonly WpfCircularMenu wpfMenu;
 
@@ -26,7 +26,7 @@ namespace Lit.Ui.Wpf.CircularMenu
 
         #region IWpfRingSectorSource
 
-        bool IWpfShapeSource.IsVisible => MustDisplay;
+        bool IWpfShapeSource.IsVisible => IsShowing;
 
         Canvas IWpfShapeSource.Canvas => WpfMenu.Canvas;
 
@@ -69,7 +69,7 @@ namespace Lit.Ui.Wpf.CircularMenu
                 Items.ForEach(item =>
                 {
                     (item as WpfCircularMenuItem).WpfRing = this;
-                    item.IsShowing = IsShowing;
+                    item.Show = Show;
                     item.FromRadius = FromRadius;
                     item.ToRadius = ToRadius;
                 });

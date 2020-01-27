@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Lit.Ui.CircularMenu;
+using Lit.Ui.Wpf;
 using Lit.Ui.Wpf.CircularMenu;
 
 namespace LitCalc.Win.Controls
@@ -13,7 +14,7 @@ namespace LitCalc.Win.Controls
     /// <summary>
     /// Calculator control.
     /// </summary>
-    public class CalculatorControl : Canvas, IWpfCircularMenuContext
+    public class CalculatorControl : Canvas, ICircularMenuContext
     {
         private const int MarginPx = 10;
 
@@ -26,7 +27,7 @@ namespace LitCalc.Win.Controls
 
         private Path display;
 
-        CircularMenu<WpfCircularMenuItem> ICircularMenuContext<WpfCircularMenuItem>.ContextMenu => contextMenu;
+        CircularMenu ICircularMenuContext.ContextMenu => contextMenu;
 
         private readonly WpfCircularMenu contextMenu;
 
@@ -45,6 +46,7 @@ namespace LitCalc.Win.Controls
             // Context menu creation
             contextMenu = new WpfCircularMenu
             {
+                CloseOnSelection = true,
                 CenterRadius = 20,
                 RingSize = 50,
                 Items = new List<WpfCircularMenuItem>()
@@ -54,25 +56,25 @@ namespace LitCalc.Win.Controls
                         Text = "Left",
                         TargetAngle = Math.PI,
                         TargetSize = Math.PI / 6,
-                        ShapeBackgroundColor = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow.WinColor(),
                         Command = Option1
                     },
                     new WpfCircularMenuItem
                     {
-                        Text = "2",
-                        ShapeBackgroundColor = Colors.Red,
+                        Text = "Rojo",
+                        ShapeBackgroundColor = Colors.Red.WinColor(),
                         Command = Option1
                     },
                     new WpfCircularMenuItem
                     {
-                        Text = "2",
-                        ShapeBackgroundColor = Colors.Green,
+                        Text = "Verde",
+                        ShapeBackgroundColor = Colors.Green.WinColor(),
                         Command = Option1
                     },
                     new WpfCircularMenuItem
                     {
-                        Text = "1",
-                        ShapeBackgroundColor = Colors.Blue,
+                        Text = "Azul",
+                        ShapeBackgroundColor = Colors.Blue.WinColor(),
                         Command = Option1
                     },
                     new WpfCircularMenuItem
@@ -80,24 +82,24 @@ namespace LitCalc.Win.Controls
                         Text = "Top",
                         TargetAngle = Math.PI/2,
                         TargetSize = Math.PI / 6,
-                        ShapeBackgroundColor = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow.WinColor(),
                         Command = Option1
                     },
                     new WpfCircularMenuItem
                     {
-                        Text = "Top",
+                        Text = "Right",
                         TargetAngle = 0,
                         TargetSize = Math.PI / 6,
-                        ShapeBackgroundColor = Colors.Yellow,
+                        ShapeBackgroundColor = Colors.Yellow.WinColor(),
                         Command = Option1
                     },
                 }
             };
         }
 
-        private void Option1(WpfCircularMenuItem item, object sender, object parameter)
+        private void Option1(CircularMenuItem item, object parameter)
         {
-
+            MessageBox.Show(item.Text);
         }
 
         private void MainControl_MouseDown(object sender, MouseButtonEventArgs e)

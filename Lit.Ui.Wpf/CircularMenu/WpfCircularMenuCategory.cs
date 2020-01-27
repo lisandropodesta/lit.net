@@ -10,7 +10,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// <summary>
         /// Ring model.
         /// </summary>
-        public WpfCircularMenuRing Ring => ring;
+        internal WpfCircularMenuRing Ring => ring;
 
         private WpfCircularMenuRing ring;
 

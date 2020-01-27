@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Lit.Ui.CircularMenu;
 using Lit.Ui.Wpf.CircularMenu;
 
 namespace Lit.Ui.Wpf.Controls
@@ -44,7 +45,7 @@ namespace Lit.Ui.Wpf.Controls
                 CloseMenu();
 
                 menu = target.ContextMenu as WpfCircularMenu;
-                menu.Show(this, pos);
+                menu.ShowAt(this, pos);
             }
         }
 
@@ -52,16 +53,16 @@ namespace Lit.Ui.Wpf.Controls
         {
             if (menu != null)
             {
-                menu.Hide();
+                menu.Show = false;
                 menu = null;
             }
         }
 
-        private IWpfCircularMenuContext GetTarget(object source)
+        private ICircularMenuContext GetTarget(object source)
         {
             while (source != null)
             {
-                if (source is IWpfCircularMenuContext menu)
+                if (source is ICircularMenuContext menu)
                 {
                     return menu;
                 }

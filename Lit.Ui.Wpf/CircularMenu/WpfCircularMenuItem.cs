@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using Lit.Ui.CircularMenu;
 using Lit.Ui.Wpf.Shapes;
@@ -11,39 +10,9 @@ namespace Lit.Ui.Wpf.CircularMenu
     /// </summary>
     public class WpfCircularMenuItem : CircularMenuItem, IWpfRingSectorSource
     {
-        /// <summary>
-        /// Shaper background color.
-        /// </summary>
-        public Color? ShapeBackgroundColor { get; set; }
-
-        /// <summary>
-        /// Shape border color.
-        /// </summary>
-        public Color? ShapeBorderColor { get; set; }
-
-        /// <summary>
-        /// Action to be executed.
-        /// </summary>
-        public Action<WpfCircularMenuItem, object, object> Command { get; set; }
-
-        /// <summary>
-        /// Command parameter.
-        /// </summary>
-        public object CommandParameter { get; set; }
-
-        /// <summary>
-        /// Triggers the action
-        /// </summary>
-        public override void TriggerAction(object sender)
-        {
-            base.TriggerAction(sender);
-
-            Command.Invoke(this, sender, CommandParameter);
-        }
-
         #region IWpfRingSectorSource
 
-        bool IWpfShapeSource.IsVisible => MustDisplay;
+        bool IWpfShapeSource.IsVisible => IsShowing;
 
         Canvas IWpfShapeSource.Canvas => WpfRing?.WpfMenu.Canvas;
 
@@ -61,9 +30,9 @@ namespace Lit.Ui.Wpf.CircularMenu
 
         double IWpfRingSectorSource.BorderThickness => ShapeBorderThickness ?? 1;
 
-        Color IWpfRingSectorSource.BorderColor => ShapeBorderColor ?? Colors.Black;
+        Color IWpfRingSectorSource.BorderColor => ShapeBorderColor.HasValue ? ShapeBorderColor.Value.WpfColor() : Colors.Black;
 
-        Color IWpfRingSectorSource.BackgroundColor => ShapeBackgroundColor ?? Colors.White;
+        Color IWpfRingSectorSource.BackgroundColor => ShapeBackgroundColor.HasValue ? ShapeBackgroundColor.Value.WpfColor() : Colors.White;
 
         #endregion
 
@@ -72,7 +41,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// <summary>
         /// Assigned ring.
         /// </summary>
-        public WpfCircularMenuRing WpfRing { get => wpfRing; set => SetProp(ref wpfRing, value, Change.Visibility); }
+        internal WpfCircularMenuRing WpfRing { get => wpfRing; set => SetProp(ref wpfRing, value, Change.Visibility); }
 
         private WpfCircularMenuRing wpfRing;
 
@@ -87,7 +56,14 @@ namespace Lit.Ui.Wpf.CircularMenu
 
             if (change >= Change.Visibility)
             {
+                var first = ringSector.Path == null;
+
                 ringSector.Update(this);
+
+                if (first && ringSector.Path != null && Command != null)
+                {
+                    ringSector.Path.MouseLeftButtonUp += (s, e) => TriggerAction();
+                }
             }
         }
 

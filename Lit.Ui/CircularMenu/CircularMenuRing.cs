@@ -6,12 +6,12 @@ namespace Lit.Ui.CircularMenu
     /// <summary>
     /// Circular menu ring.
     /// </summary>
-    public abstract class CircularMenuRing<T> : CircularMenuObjectModel where T : CircularMenuItem
+    public abstract class CircularMenuRing : CircularMenuObjectModel
     {
         /// <summary>
         /// Configuration.
         /// </summary>
-        protected CircularMenu<T> Menu { get; private set; }
+        protected CircularMenu Menu { get; private set; }
 
         /// <summary>
         /// Items.
@@ -43,7 +43,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CircularMenuRing(CircularMenu<T> menu)
+        protected CircularMenuRing(CircularMenu menu)
         {
             Menu = menu;
         }
@@ -61,7 +61,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Clear al items and categories.
         /// </summary>
-        public void ClearItems()
+        internal void ClearItems()
         {
             items.Clear();
             categories.Clear();
@@ -70,7 +70,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Adds an item to the ring.
         /// </summary>
-        public void Add(CircularMenuItem item)
+        internal void Add(CircularMenuItem item)
         {
             items.Add(item);
         }
@@ -78,7 +78,7 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Arranges all items.
         /// </summary>
-        public void ArrangeItems()
+        internal void ArrangeItems()
         {
             if (Menu.SortByCategory)
             {
