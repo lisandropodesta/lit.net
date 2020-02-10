@@ -321,11 +321,49 @@ namespace Lit.DataType
         }
 
         /// <summary>
+        /// Determines whether a type is an enum.
+        /// </summary>
+        public static bool IsEnumType(Type type)
+        {
+            return type != null && type.GetTypeInfo().IsEnum;
+        }
+
+        /// <summary>
+        /// Finds an attribute in an enum value.
+        /// </summary>
+        public static bool GetEnumAttribute<T>(Type enumType, object value, out T attr)
+        {
+            if (enumType != null && enumType.IsEnum && GetEnumAttribute(enumType, Enum.GetName(enumType, value), out attr))
+                return true;
+
+            attr = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Finds an attribute in an enum field.
+        /// </summary>
+        public static bool GetEnumAttribute<TAttr>(Type enumType, string fieldName, out TAttr attr) where TAttr : class
+        {
+            var fieldInfo = enumType != null && enumType.IsEnum ? enumType.GetField(fieldName) : null;
+            return GetAttribute(fieldInfo, out attr);
+        }
+
+        /// <summary>
         /// Determines whether a member info has an attribute or not.
         /// </summary>
         public static bool HasAttribute<TAttr>(MemberInfo memberInfo) where TAttr : class
         {
             return GetAttribute<TAttr>(memberInfo) != null;
+        }
+
+        /// <summary>
+        /// Get an attribute from a member info.
+        /// </summary>
+        public static bool GetAttribute<TAttr>(MemberInfo memberInfo, out TAttr attr) where TAttr : class
+        {
+            attr = GetAttribute<TAttr>(memberInfo);
+            return attr != null;
         }
 
         /// <summary>
@@ -403,14 +441,6 @@ namespace Lit.DataType
             }
 
             return type.IsSubclassOf(ancestor);
-        }
-
-        /// <summary>
-        /// Determines whether a type is an enum.
-        /// </summary>
-        public static bool IsEnumType(Type type)
-        {
-            return type != null && type.GetTypeInfo().IsEnum;
         }
     }
 }

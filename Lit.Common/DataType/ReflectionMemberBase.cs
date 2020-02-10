@@ -8,6 +8,11 @@ namespace Lit.DataType
         /// Member information.
         /// </summary>
         public abstract MemberInfo MemberInfo { get; }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}.{1}]", MemberInfo.DeclaringType?.Name, MemberInfo.Name);
+        }
     }
 
     public abstract class ReflectionMemberBase<T> : ReflectionMemberBase where T : class
@@ -20,6 +25,11 @@ namespace Lit.DataType
         public ReflectionMemberBase(T attribute)
         {
             Attribute = attribute;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}.{1}]", MemberInfo.DeclaringType?.Name, MemberInfo.Name);
         }
     }
 }
