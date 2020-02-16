@@ -15,7 +15,7 @@ namespace Lit.Db.MySql
 
         #endregion
 
-        protected override MySqlConnection GetConnection()
+        protected override MySqlConnection CreateConnection()
         {
             return new MySqlConnection(ConnectionString);
         }

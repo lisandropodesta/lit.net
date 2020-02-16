@@ -5,9 +5,6 @@
     /// </summary>
     public class MySqlDefaultNaming : DbNaming
     {
-        public MySqlDefaultNaming()
-            : base(Placing.Sufix, Case.Snake, "id")
-        {
-        }
+        public MySqlDefaultNaming() : base(Placing.Sufix, Case.Snake, "id") { }
     }
 }

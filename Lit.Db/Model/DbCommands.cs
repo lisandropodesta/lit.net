@@ -122,13 +122,13 @@ namespace Lit.Db.Model
         /// <returns></returns>
         protected TH GetConnectionOpened()
         {
-            var conn = GetConnection();
+            var conn = CreateConnection();
             conn.Open();
             return conn;
         }
 
         protected abstract DbStoredProcedure<TH, TS> CreateStoredProcedure(string name, TH connection);
 
-        protected abstract TH GetConnection();
+        protected abstract TH CreateConnection();
     }
 }

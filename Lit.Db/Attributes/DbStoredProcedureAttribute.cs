@@ -3,7 +3,7 @@
 namespace Lit.Db.Attributes
 {
     /// <summary>
-    /// Stored procedure definition
+    /// Stored procedure attributes definition.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class DbStoredProcedureAttribute : Attribute

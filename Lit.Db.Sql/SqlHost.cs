@@ -15,7 +15,7 @@ namespace Lit.Db.Sql
 
         #endregion
 
-        protected override SqlConnection GetConnection()
+        protected override SqlConnection CreateConnection()
         {
             return new SqlConnection(ConnectionString);
         }

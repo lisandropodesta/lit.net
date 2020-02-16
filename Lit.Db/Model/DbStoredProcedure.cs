@@ -14,7 +14,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Constructor.
         /// </summary>
-        public DbStoredProcedure(string name)
+        protected DbStoredProcedure(string name)
         {
             this.name = name;
         }

@@ -5,9 +5,6 @@
     /// </summary>
     public class SqlDefaultNaming : DbNaming
     {
-        public SqlDefaultNaming()
-            : base(Placing.Prefix, Case.Pascal, "Id")
-        {
-        }
+        public SqlDefaultNaming() : base(Placing.Prefix, Case.Pascal, "Id") { }
     }
 }

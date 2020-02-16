@@ -1,5 +1,4 @@
-﻿using System.Data;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Model
@@ -7,40 +6,22 @@ namespace Lit.Db.MySql.Model
     /// <summary>
     /// Stored procedure information.
     /// </summary>
-    internal class MySqlStoredProcedure : DbStoredProcedure<MySqlConnection, MySqlCommand>
+    internal class MySqlStoredProcedure : DbStoredProcedureBase<MySqlConnection, MySqlCommand, MySqlParameter>
     {
-        private readonly MySqlParameter[] parameters;
+        #region Constructors
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MySqlStoredProcedure(string name, MySqlConnection connection)
-            : base(name)
+        public MySqlStoredProcedure(string name, MySqlConnection connection) : base(name) { }
+
+        #endregion
+
+        protected override MySqlCommand CreateCommandRaw(string name, MySqlConnection connection)
         {
-            var cmd = CreateCommand(name, connection);
-
-            MySqlCommandBuilder.DeriveParameters(cmd);
-
-            parameters = new MySqlParameter[cmd.Parameters.Count];
-            cmd.Parameters.CopyTo(parameters, 0);
+            return new MySqlCommand(name, connection);
         }
 
-        /// <summary>
-        /// Gets a sql command with populated parameters.
-        /// </summary>
-        protected override MySqlCommand CreateCommand(string name, MySqlConnection connection)
+        protected override void DeriveParameters(MySqlCommand command)
         {
-            var cmd = new MySqlCommand(name, connection)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-
-            if (parameters != null)
-            {
-                cmd.Parameters.AddRange(parameters);
-            }
-
-            return cmd;
+            MySqlCommandBuilder.DeriveParameters(command);
         }
     }
 }
