@@ -8,31 +8,37 @@ namespace Lit.Db
     public interface IDbCommands
     {
         /// <summary>
-        /// Executes a query loading results in a template.
+        /// Executes a query template.
         /// </summary>
         T ExecuteQuery<T>(string query, Action<T> setup = null)
             where T : new();
 
         /// <summary>
-        /// Execute a stored procedure template with a parameters initialization action.
+        /// Executes a query template.
+        /// </summary>
+        T ExecuteQuery<T>(Action<T> setup = null)
+            where T : new();
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        T ExecuteStoredProcedure<T>(string storedProcedureName, Action<T> setup = null)
+            where T : new();
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        void ExecuteStoredProcedure<T>(string storedProcedureName, T template);
+
+        /// <summary>
+        /// Execute a stored procedure/query template.
         /// </summary>
         T ExecuteTemplate<T>(Action<T> setup = null)
             where T : new();
 
         /// <summary>
-        /// Execute a stored procedure template with a parameters initialization action.
-        /// </summary>
-        T ExecuteTemplate<T>(string storedProcedureName, Action<T> setup = null)
-            where T : new();
-
-        /// <summary>
-        /// Execute a stored procedure template with parameters already initialized.
+        /// Execute a stored procedure/query template.
         /// </summary>
         void ExecuteTemplate<T>(T template);
-
-        /// <summary>
-        /// Execute a stored procedure template with parameters already initialized.
-        /// </summary>
-        void ExecuteTemplate<T>(T template, string storedProcedureName);
     }
 }

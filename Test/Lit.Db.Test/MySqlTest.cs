@@ -46,6 +46,7 @@ namespace Lit.Db.Test
             public Engine Engine { get; protected set; }
         }
 
+        [DbQuery("select * from INFORMATION_SCHEMA.TABLES where table_schema = '{{@table_schema}}'")]
         public class SchemaQuery
         {
             [DbParameter]
@@ -57,9 +58,7 @@ namespace Lit.Db.Test
 
         public static void Execute(MySqlHost db)
         {
-            var query = "select * from INFORMATION_SCHEMA.TABLES where table_schema = '{{@table_schema}}'";
-
-            var data = db.ExecuteQuery<SchemaQuery>(query, p =>
+            var data = db.ExecuteQuery<SchemaQuery>(p =>
              {
                  p.TableSchema = "wikialgorithm";
              });

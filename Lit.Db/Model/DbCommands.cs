@@ -21,77 +21,85 @@ namespace Lit.Db.Model
         public IDbNaming DbNaming;
 
         /// <summary>
-        /// Executes a query loading results in a template.
+        /// Executes a query template.
         /// </summary>
         public T ExecuteQuery<T>(string query, Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(query, false, setup);
+            return ExecuteTemplate(query, DbTemplateKind.Query, setup);
         }
 
         /// <summary>
-        /// Execute a stored procedure template with a parameters initialization action.
+        /// Executes a query template.
+        /// </summary>
+        public T ExecuteQuery<T>(Action<T> setup = null)
+            where T : new()
+        {
+            return ExecuteTemplate(null, DbTemplateKind.Query, setup);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        public T ExecuteStoredProcedure<T>(string storedProcedureName, Action<T> setup = null)
+            where T : new()
+        {
+            return ExecuteTemplate(storedProcedureName, DbTemplateKind.StoredProcedure, setup);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        public void ExecuteStoredProcedure<T>(string storedProcedureName, T template)
+        {
+            ExecuteTemplate(template, storedProcedureName, DbTemplateKind.StoredProcedure, null);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure/query template.
         /// </summary>
         public T ExecuteTemplate<T>(Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(null, true, setup);
+            return ExecuteTemplate(null, null, setup);
         }
 
         /// <summary>
-        /// Execute a stored procedure template with a parameters initialization action.
-        /// </summary>
-        public T ExecuteTemplate<T>(string storedProcedureName, Action<T> setup = null)
-            where T : new()
-        {
-            return ExecuteTemplate(storedProcedureName, true, setup);
-        }
-
-        /// <summary>
-        /// Execute a stored procedure template with parameters already initialized.
+        /// Execute a stored procedure/query template.
         /// </summary>
         public void ExecuteTemplate<T>(T template)
         {
-            ExecuteTemplate(template, null, true, null);
-        }
-
-        /// <summary>
-        /// Execute a stored procedure template with parameters already initialized.
-        /// </summary>
-        public void ExecuteTemplate<T>(T template, string storedProcedureName)
-        {
-            ExecuteTemplate(template, storedProcedureName, true, null);
+            ExecuteTemplate(template, null, null, null);
         }
 
         /// <summary>
         /// Initializes and executes a stored procedure or query template.
         /// </summary>
-        private T ExecuteTemplate<T>(string text, bool isStoredProcedure, Action<T> setup)
+        private T ExecuteTemplate<T>(string text, DbTemplateKind? kind, Action<T> setup)
             where T : new()
         {
             var template = new T();
-            ExecuteTemplate(template, text, isStoredProcedure, setup);
+            ExecuteTemplate(template, text, kind, setup);
             return template;
         }
 
         /// <summary>
         /// Execute a stored procedure or query with a template already initialized.
         /// </summary>
-        private void ExecuteTemplate<T>(T template, string text, bool isStoredProcedure, Action<T> setup)
+        private void ExecuteTemplate<T>(T template, string text, DbTemplateKind? kind, Action<T> setup)
         {
             setup?.Invoke(template);
 
             var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
 
-            if (isStoredProcedure)
+            var isStoredProcedure = (kind ?? binding.Kind) == DbTemplateKind.StoredProcedure;
+
+            if (string.IsNullOrEmpty(text))
             {
+                text = binding.Text;
                 if (string.IsNullOrEmpty(text))
                 {
-                    text = binding.StoredProcedureName;
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        throw new ArgumentException($"Class {typeof(T).Name} has no stored procedure name defined (attribute DbStoredProcedureAttribute)");
-                    }
+                    throw new ArgumentException($"Class {typeof(T).FullName} has no stored procedure / query defined");
                 }
             }
 

@@ -3,27 +3,27 @@
 namespace Lit.Db.Attributes
 {
     /// <summary>
-    /// Stored procedure attributes definition.
+    /// Query attributes definition.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class DbStoredProcedureAttribute : Attribute
+    public class DbQueryAttribute : Attribute
     {
         /// <summary>
         /// Name of the stored procedure.
         /// </summary>
-        public string StoredProcedureName => name;
+        public string QueryText => text;
 
-        private readonly string name;
+        private readonly string text;
 
         #region Constructors
 
-        public DbStoredProcedureAttribute()
+        public DbQueryAttribute()
         {
         }
 
-        public DbStoredProcedureAttribute(string name)
+        public DbQueryAttribute(string text)
         {
-            this.name = name;
+            this.text = text;
         }
 
         #endregion

@@ -9,7 +9,7 @@ using Lit.Db.Attributes;
 namespace Lit.Db.Model
 {
     /// <summary>
-    /// Stored procedure template information.
+    /// Stored procedure/query template information.
     /// </summary>
     internal class DbTemplateBinding<TS>
         where TS : DbCommand
@@ -39,6 +39,13 @@ namespace Lit.Db.Model
         #endregion
 
         /// <summary>
+        /// Template kind.
+        /// </summary>
+        public DbTemplateKind Kind => kind;
+
+        private readonly DbTemplateKind kind;
+
+        /// <summary>
         /// Template data type.
         /// </summary>
         public Type TemplateType => templateType;
@@ -46,11 +53,11 @@ namespace Lit.Db.Model
         private readonly Type templateType;
 
         /// <summary>
-        /// Stored procedure name.
+        /// Stored procedure name / query text.
         /// </summary>
-        public string StoredProcedureName => storedProcedureName;
+        public string Text => text;
 
-        private string storedProcedureName;
+        private string text;
 
         /// <summary>
         /// Recordset referenced count.
@@ -86,8 +93,25 @@ namespace Lit.Db.Model
             this.templateType = templateType;
             mode = DbExecutionMode.NonQuery;
 
-            var attr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType);
-            storedProcedureName = attr?.StoredProcedureName;
+            var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType);
+            var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType);
+
+            if (qattr != null && sattr != null)
+            {
+                throw new ArgumentException($"Invalid definition of both, query and stored procedure attributes in class [{templateType.FullName}]");
+            }
+
+            if (qattr != null)
+            {
+                text = qattr.QueryText;
+                kind = DbTemplateKind.Query;
+            }
+
+            if (sattr != null)
+            {
+                text = sattr.StoredProcedureName;
+                kind = DbTemplateKind.StoredProcedure;
+            }
 
             foreach (var propInfo in templateType.GetProperties())
             {
