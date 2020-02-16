@@ -11,9 +11,9 @@ namespace Lit.Db.Attributes
         /// <summary>
         /// Name of the field.
         /// </summary>
-        public string DbName => dbName;
+        public string FieldName => name;
 
-        protected readonly string dbName;
+        protected readonly string name;
 
         /// <summary>
         /// Optional field flag.
@@ -24,11 +24,13 @@ namespace Lit.Db.Attributes
 
         #region Constructors
 
+        public DbFieldAttribute() { }
+
         public DbFieldAttribute(bool isOptional = false) : this(null, isOptional) { }
 
-        public DbFieldAttribute(string dbName = null, bool isOptional = false)
+        public DbFieldAttribute(string name = null, bool isOptional = false)
         {
-            this.dbName = dbName;
+            this.name = name;
             this.isOptional = isOptional;
         }
 

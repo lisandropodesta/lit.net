@@ -11,7 +11,7 @@ namespace Lit.Db.Attributes
         /// <summary>
         /// Name of the stored procedure.
         /// </summary>
-        public string Name => name;
+        public string StoredProcedureName => name;
 
         private readonly string name;
 

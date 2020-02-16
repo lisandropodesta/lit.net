@@ -12,9 +12,9 @@ namespace Lit.Db.Attributes
         /// <summary>
         /// Name of the parameter.
         /// </summary>
-        public string DbName => dbName;
+        public string ParameterName => name;
 
-        protected readonly string dbName;
+        protected readonly string name;
 
         /// <summary>
         /// Flow of information direction 
@@ -34,9 +34,9 @@ namespace Lit.Db.Attributes
 
         public DbParameterAttribute(ParameterDirection direction, bool isOptional = false) : this(null, direction, isOptional) { }
 
-        public DbParameterAttribute(string dbName = null, ParameterDirection direction = ParameterDirection.Input, bool isOptional = false)
+        public DbParameterAttribute(string name = null, ParameterDirection direction = ParameterDirection.Input, bool isOptional = false)
         {
-            this.dbName = dbName;
+            this.name = name;
             this.direction = direction;
             this.isOptional = isOptional;
         }

@@ -1,9 +1,9 @@
-﻿namespace Lit.Db.Class
+﻿namespace Lit.Db.Model
 {
     /// <summary>
     /// Execution mode for stored procedure.
     /// </summary>
-    public enum DbExecutionMode
+    internal enum DbExecutionMode
     {
         NonQuery,
 

@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Lit.Db.Interface;
+using System.Data.Common;
 
-namespace Lit.Db.Class
+namespace Lit.Db.Model
 {
     /// <summary>
     /// Db commands implementation.
     /// </summary>
-    public abstract class DbCommands : IDbCommands
+    public abstract class DbCommands<TH, TS> : IDbCommands
+        where TH : DbConnection
+        where TS : DbCommand
     {
         // Stored procedures cache
-        private static readonly Dictionary<string, DbStoredProcedure> storedProcedures = new Dictionary<string, DbStoredProcedure>();
+        private static readonly Dictionary<string, DbStoredProcedure<TH, TS>> storedProcedures = new Dictionary<string, DbStoredProcedure<TH, TS>>();
+
+        // Db naming manager
+        public IDbNaming DbNaming;
 
         /// <summary>
         /// Execute a stored procedure template with a parameters initialization action.
@@ -51,7 +55,7 @@ namespace Lit.Db.Class
         /// </summary>
         public void ExecuteTemplate<T>(string storedProcedureName, T template)
         {
-            var binding = DbTemplateBinding.Get(typeof(T));
+            var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
 
             if (string.IsNullOrEmpty(storedProcedureName))
             {
@@ -62,9 +66,9 @@ namespace Lit.Db.Class
                 }
             }
 
-            using (var connection = GetSqlConnection())
+            using (var connection = GetConnectionOpened())
             {
-                using (var cmd = GetSqlCommand(storedProcedureName, connection))
+                using (var cmd = GetCommand(storedProcedureName, connection))
                 {
                     binding.SetInputParameters(cmd, template);
 
@@ -78,7 +82,7 @@ namespace Lit.Db.Class
                         case DbExecutionMode.Query:
                             using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                             {
-                                binding.LoadResults(reader, template);
+                                binding.LoadResults(reader, template, DbNaming);
                             }
                             break;
                     }
@@ -87,24 +91,24 @@ namespace Lit.Db.Class
         }
 
         /// <summary>
-        /// Gets a sql command attached to the current transaction and ready to be executed.
+        /// Gets a command attached to the current transaction and ready to be executed.
         /// </summary>
-        private SqlCommand GetSqlCommand(string name, SqlConnection connection)
+        private TS GetCommand(string name, TH connection)
         {
             var sp = GetStoredProcedure(name, connection);
-            return sp.GetSqlCommand(connection);
+            return sp.GetCommand(connection);
         }
 
         /// <summary>
         /// Gets a stored procedure information.
         /// </summary>
-        private DbStoredProcedure GetStoredProcedure(string name, SqlConnection connection)
+        private DbStoredProcedure<TH, TS> GetStoredProcedure(string name, TH connection)
         {
             lock (storedProcedures)
             {
                 if (!storedProcedures.TryGetValue(name, out var sp))
                 {
-                    sp = new DbStoredProcedure(name, connection);
+                    sp = CreateStoredProcedure(name, connection);
                     storedProcedures.Add(name, sp);
                 }
 
@@ -112,6 +116,19 @@ namespace Lit.Db.Class
             }
         }
 
-        protected abstract SqlConnection GetSqlConnection();
+        /// <summary>
+        /// Gets an opened connection.
+        /// </summary>
+        /// <returns></returns>
+        protected TH GetConnectionOpened()
+        {
+            var conn = GetConnection();
+            conn.Open();
+            return conn;
+        }
+
+        protected abstract DbStoredProcedure<TH, TS> CreateStoredProcedure(string name, TH connection);
+
+        protected abstract TH GetConnection();
     }
 }

@@ -3,12 +3,12 @@ using System.Reflection;
 using Lit.DataType;
 using Lit.Db.Attributes;
 
-namespace Lit.Db.Class
+namespace Lit.Db.Model
 {
     /// <summary>
     /// Db property binding.
     /// </summary>
-    public interface IDbPropertyBinding<TA>
+    internal interface IDbPropertyBinding<TA>
     {
         TA Attributes { get; }
     }
@@ -16,7 +16,7 @@ namespace Lit.Db.Class
     /// <summary>
     /// Binding to a database property (parameter/field).
     /// </summary>
-    public abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA> where TC : class where TA : Attribute
+    internal abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA> where TC : class where TA : Attribute
     {
         /// <summary>
         /// Attributes.
@@ -97,7 +97,7 @@ namespace Lit.Db.Class
                             else if (type == typeof(bool))
                             {
                                 value = bool.Parse((string)value);
-                            }
+                            } 
                             else if (IsInteger(type))
                             {
                                 value = long.Parse((string)value);
@@ -121,6 +121,8 @@ namespace Lit.Db.Class
                 case BindingMode.Class:
                 case BindingMode.List:
                 case BindingMode.Dictionary:
+                    break;
+
                 default:
                     throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
             }

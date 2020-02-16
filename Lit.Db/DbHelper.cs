@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
+using Lit.Db.Model;
 
-namespace Lit.Db.Class
+namespace Lit.Db
 {
     /// <summary>
     /// Helper class.
@@ -13,7 +14,7 @@ namespace Lit.Db.Class
         /// <summary>
         /// Assigns an input parameter by name.
         /// </summary>
-        public static void SetSqlParameter(SqlCommand cmd, string paramName, object value)
+        public static void SetSqlParameter(DbCommand cmd, string paramName, object value)
         {
             paramName = "@" + paramName;
 
@@ -28,7 +29,7 @@ namespace Lit.Db.Class
         /// <summary>
         /// Gets an output parameter by name.
         /// </summary>
-        public static object GetSqlParameter(SqlCommand cmd, string paramName)
+        public static object GetSqlParameter(DbCommand cmd, string paramName)
         {
             paramName = "@" + paramName;
 
@@ -43,9 +44,10 @@ namespace Lit.Db.Class
         /// <summary>
         /// Builds a generic list and loads a recordset in it.
         /// </summary>
-        public static object LoadSqlRecordset(SqlDataReader reader, Type type, int maxCount)
+        public static object LoadSqlRecordset<TS>(DbDataReader reader, Type type, int maxCount, IDbNaming dbNaming)
+            where TS : DbCommand
         {
-            var binding = DbTemplateBinding.Get(type);
+            var binding = DbTemplateBinding<TS>.Get(type, dbNaming);
             var listType = typeof(List<>).MakeGenericType(type);
             var result = Activator.CreateInstance(listType);
             var list = result as IList;

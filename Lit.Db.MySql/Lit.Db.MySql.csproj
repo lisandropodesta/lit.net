@@ -5,7 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.19" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\Lit.Db\Lit.Db.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Attributes\" />
   </ItemGroup>
 
 </Project>

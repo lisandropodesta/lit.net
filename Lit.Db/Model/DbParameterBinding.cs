@@ -1,37 +1,48 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Reflection;
 using Lit.DataType;
 using Lit.Db.Attributes;
 
-namespace Lit.Db.Class
+namespace Lit.Db.Model
 {
     /// <summary>
     /// Db parameter binding interface.
     /// </summary>
-    public interface IDbParameterBinding : IDbPropertyBinding<DbParameterAttribute>
+    internal interface IDbParameterBinding<TS> : IDbPropertyBinding<DbParameterAttribute>
+        where TS : DbCommand
     {
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
-        void SetInputParameters(SqlCommand cmd, object instance);
+        void SetInputParameters(TS cmd, object instance);
 
         /// <summary>
         /// Get output parameters.
         /// </summary>
-        void GetOutputParameters(SqlCommand cmd, object instance);
+        void GetOutputParameters(TS cmd, object instance);
     }
 
     /// <summary>
     /// Db parameter property binding.
     /// </summary>
-    public class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding where TC : class
+    internal class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding<TC>
+        where TC : DbCommand
     {
+        private readonly string parameterName;
+
         #region Constructor
 
-        public DbParameterBinding(PropertyInfo propInfo, DbParameterAttribute attr)
+        public DbParameterBinding(PropertyInfo propInfo, DbParameterAttribute attr, IDbNaming dbNaming)
             : base(propInfo, attr)
         {
+            parameterName = Attributes.ParameterName;
+            parameterName = dbNaming?.GetParameterName(propInfo, parameterName) ?? parameterName;
+
+            if (string.IsNullOrEmpty(parameterName))
+            {
+                throw new ArgumentException($"Null parameter name in DbParameterBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
+            }
         }
 
         #endregion
@@ -39,14 +50,14 @@ namespace Lit.Db.Class
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
-        public void SetInputParameters(SqlCommand cmd, object instance)
+        public void SetInputParameters(TC cmd, object instance)
         {
             try
             {
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        DbHelper.SetSqlParameter(cmd, Attributes.DbName, GetValue(instance));
+                        DbHelper.SetSqlParameter(cmd, Attributes.ParameterName, GetValue(instance));
                         break;
 
                     case BindingMode.Class:
@@ -68,14 +79,14 @@ namespace Lit.Db.Class
         /// <summary>
         /// Get output parameters.
         /// </summary>
-        public void GetOutputParameters(SqlCommand cmd, object instance)
+        public void GetOutputParameters(TC cmd, object instance)
         {
             try
             {
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        SetValue(instance, DbHelper.GetSqlParameter(cmd, Attributes.DbName));
+                        SetValue(instance, DbHelper.GetSqlParameter(cmd, Attributes.ParameterName));
                         break;
 
                     case BindingMode.Class:

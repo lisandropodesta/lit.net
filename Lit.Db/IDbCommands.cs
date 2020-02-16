@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Interface
+namespace Lit.Db
 {
     /// <summary>
     /// Commands interface with a Db.

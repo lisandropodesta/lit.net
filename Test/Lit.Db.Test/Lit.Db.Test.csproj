@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.19" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\..\Lit.Db.MySql\Lit.Db.MySql.csproj" />
+    <ProjectReference Include="..\..\Lit.Db.Sql\Lit.Db.Sql.csproj" />
+    <ProjectReference Include="..\..\Lit.Db\Lit.Db.csproj" />
+  </ItemGroup>
+
+</Project>

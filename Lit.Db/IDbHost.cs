@@ -1,9 +1,9 @@
-﻿namespace Lit.Db.Interface
+﻿namespace Lit.Db
 {
     /// <summary>
-    /// Data base connection definition.
+    /// Data base host definition.
     /// </summary>
-    public interface IDbConnection : IDbCommands
+    public interface IDbHost : IDbCommands
     {
         /// <summary>
         /// Connection string name.
