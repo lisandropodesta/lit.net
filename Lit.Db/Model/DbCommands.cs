@@ -13,10 +13,23 @@ namespace Lit.Db.Model
         where TS : DbCommand
     {
         // Stored procedures cache
-        private static readonly Dictionary<string, DbStoredProcedure<TH, TS>> storedProcedures = new Dictionary<string, DbStoredProcedure<TH, TS>>();
+        private static readonly Dictionary<string, DbStoredProcedure<TS>> storedProcedures = new Dictionary<string, DbStoredProcedure<TS>>();
 
-        // Db naming manager
+        /// <summary>
+        /// Db naming manager
+        /// </summary>
         public IDbNaming DbNaming;
+
+        /// <summary>
+        /// Executes a query loading results in a template.
+        /// </summary>
+        public T ExecuteQuery<T>(string query)
+            where T : new()
+        {
+            var template = new T();
+            ExecuteTemplate(query, template, false);
+            return template;
+        }
 
         /// <summary>
         /// Execute a stored procedure template with a parameters initialization action.
@@ -34,11 +47,8 @@ namespace Lit.Db.Model
             where T : new()
         {
             var template = new T();
-
             setup?.Invoke(template);
-
-            ExecuteTemplate(storedProcedureName, template);
-
+            ExecuteTemplate(template, storedProcedureName);
             return template;
         }
 
@@ -47,30 +57,44 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteTemplate<T>(T template)
         {
-            ExecuteTemplate(null, template);
+            ExecuteTemplate(template, null);
         }
 
         /// <summary>
         /// Execute a stored procedure template with parameters already initialized.
         /// </summary>
-        public void ExecuteTemplate<T>(string storedProcedureName, T template)
+        public void ExecuteTemplate<T>(T template, string storedProcedureName)
+        {
+            ExecuteTemplate<T>(storedProcedureName, template, true);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure or query with a template already initialized.
+        /// </summary>
+        private void ExecuteTemplate<T>(string text, T template, bool isStoredProcedure)
         {
             var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
 
-            if (string.IsNullOrEmpty(storedProcedureName))
+            if (isStoredProcedure)
             {
-                storedProcedureName = binding.StoredProcedureName;
-                if (string.IsNullOrEmpty(storedProcedureName))
+                if (string.IsNullOrEmpty(text))
                 {
-                    throw new ArgumentException($"Class {typeof(T).Name} has no stored procedure name defined (attribute DbStoredProcedureAttribute)");
+                    text = binding.StoredProcedureName;
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        throw new ArgumentException($"Class {typeof(T).Name} has no stored procedure name defined (attribute DbStoredProcedureAttribute)");
+                    }
                 }
             }
 
             using (var connection = GetConnectionOpened())
             {
-                using (var cmd = GetCommand(storedProcedureName, connection))
+                using (var cmd = GetCommand(text, connection, isStoredProcedure))
                 {
-                    binding.SetInputParameters(cmd, template);
+                    if (isStoredProcedure)
+                    {
+                        binding.SetInputParameters(cmd, template);
+                    }
 
                     switch (binding.Mode)
                     {
@@ -93,23 +117,33 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets a command attached to the current transaction and ready to be executed.
         /// </summary>
-        private TS GetCommand(string name, TH connection)
+        private TS GetCommand(string name, TH connection, bool isStoredProcedure)
         {
-            var sp = GetStoredProcedure(name, connection);
-            return sp.GetCommand(connection);
+            var cmd = CreateCommand(name, connection);
+
+            if (isStoredProcedure)
+            {
+                AddStoredProcedureParameters(name, cmd);
+            }
+
+            return cmd;
         }
 
         /// <summary>
-        /// Gets a stored procedure information.
+        /// Adds the stored procedure parameters.
         /// </summary>
-        private DbStoredProcedure<TH, TS> GetStoredProcedure(string name, TH connection)
+        private DbStoredProcedure<TS> AddStoredProcedureParameters(string name, TS command)
         {
             lock (storedProcedures)
             {
                 if (!storedProcedures.TryGetValue(name, out var sp))
                 {
-                    sp = CreateStoredProcedure(name, connection);
+                    sp = CreateStoredProcedure(name, command);
                     storedProcedures.Add(name, sp);
+                }
+                else
+                {
+                    sp.AddParameters(command);
                 }
 
                 return sp;
@@ -127,8 +161,10 @@ namespace Lit.Db.Model
             return conn;
         }
 
-        protected abstract DbStoredProcedure<TH, TS> CreateStoredProcedure(string name, TH connection);
-
         protected abstract TH CreateConnection();
+
+        protected abstract TS CreateCommand(string name, TH connection);
+
+        protected abstract DbStoredProcedure<TS> CreateStoredProcedure(string name, TS command);
     }
 }

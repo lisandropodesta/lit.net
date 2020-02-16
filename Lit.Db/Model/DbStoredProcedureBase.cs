@@ -6,50 +6,34 @@ namespace Lit.Db.Model
     /// <summary>
     /// Stored procedure information.
     /// </summary>
-    public abstract class DbStoredProcedureBase<TH, TS, TP> : DbStoredProcedure<TH, TS>
-        where TH : DbConnection
+    public abstract class DbStoredProcedureBase<TS, TP> : DbStoredProcedure<TS>
         where TS : DbCommand
         where TP : DbParameter
     {
-        private bool parametersLoaded;
-
-        private TP[] parameters;
+        private readonly TP[] parameters;
 
         #region Constructors
 
-        protected DbStoredProcedureBase(string name) : base(name) { }
+        protected DbStoredProcedureBase(string name, TS command)
+            : base(name)
+        {
+            command.CommandType = CommandType.StoredProcedure;
+
+            DeriveParameters(command);
+
+            parameters = new TP[command.Parameters.Count];
+            command.Parameters.CopyTo(parameters, 0);
+        }
 
         #endregion
 
-        /// <summary>
-        /// Gets a sql command with populated parameters.
-        /// </summary>
-        protected override TS CreateCommand(string name, TH connection)
+        public override void AddParameters(TS command)
         {
-            var cmd = CreateCommandRaw(name, connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            if (!parametersLoaded)
+            if (parameters != null)
             {
-                DeriveParameters(cmd);
-
-                parameters = new TP[cmd.Parameters.Count];
-                cmd.Parameters.CopyTo(parameters, 0);
-
-                parametersLoaded = true;
+                command.Parameters.AddRange(parameters);
             }
-            else if (parameters != null)
-            {
-                cmd.Parameters.AddRange(parameters);
-            }
-
-            return cmd;
         }
-
-        /// <summary>
-        /// Creates a raw command without parameters.
-        /// </summary>
-        protected abstract TS CreateCommandRaw(string name, TH connection);
 
         /// <summary>
         /// Get parameters from db.

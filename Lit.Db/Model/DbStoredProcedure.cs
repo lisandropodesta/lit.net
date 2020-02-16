@@ -5,8 +5,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Stored procedure information.
     /// </summary>
-    public abstract class DbStoredProcedure<TH, TS>
-        where TH : DbConnection
+    public abstract class DbStoredProcedure<TS>
         where TS : DbCommand
     {
         private readonly string name;
@@ -20,13 +19,8 @@ namespace Lit.Db.Model
         }
 
         /// <summary>
-        /// Gets a command with populated parameters.
+        /// Add the parameters to the command.
         /// </summary>
-        public TS GetCommand(TH connection)
-        {
-            return CreateCommand(name, connection);
-        }
-
-        protected abstract TS CreateCommand(string name, TH connection);
+        public abstract void AddParameters(TS command);
     }
 }

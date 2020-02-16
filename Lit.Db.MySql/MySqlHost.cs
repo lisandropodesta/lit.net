@@ -20,9 +20,14 @@ namespace Lit.Db.MySql
             return new MySqlConnection(ConnectionString);
         }
 
-        protected override DbStoredProcedure<MySqlConnection, MySqlCommand> CreateStoredProcedure(string name, MySqlConnection connection)
+        protected override MySqlCommand CreateCommand(string name, MySqlConnection connection)
         {
-            return new MySqlStoredProcedure(name, connection);
+            return new MySqlCommand(name, connection);
+        }
+
+        protected override DbStoredProcedure<MySqlCommand> CreateStoredProcedure(string name, MySqlCommand command)
+        {
+            return new MySqlStoredProcedure(name, command);
         }
     }
 }

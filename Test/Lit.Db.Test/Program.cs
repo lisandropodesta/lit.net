@@ -63,6 +63,8 @@ namespace Lit.Db.Test
                 {
                     p.IntegerValue = 3;
                 });
+
+                MySqlTest.Execute(db);
             }
             catch (Exception x)
             {
