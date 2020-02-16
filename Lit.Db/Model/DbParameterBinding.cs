@@ -15,6 +15,11 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
+        void SetInputParameters(ref string text, object instance);
+
+        /// <summary>
+        /// Assigns input parameters.
+        /// </summary>
         void SetInputParameters(TS cmd, object instance);
 
         /// <summary>
@@ -51,6 +56,26 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
+        public void SetInputParameters(ref string text, object instance)
+        {
+            switch (Mode)
+            {
+                case BindingMode.Scalar:
+                    var value = GetValue(instance);
+                    DbHelper.SetSqlParameter(ref text, parameterName, value.ToString(), Attributes.IsOptional);
+                    break;
+
+                case BindingMode.Class:
+                case BindingMode.List:
+                case BindingMode.Dictionary:
+                default:
+                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+            }
+        }
+
+        /// <summary>
+        /// Assigns input parameters.
+        /// </summary>
         public void SetInputParameters(TS cmd, object instance)
         {
             try
@@ -58,7 +83,7 @@ namespace Lit.Db.Model
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance));
+                        DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance), Attributes.IsOptional);
                         break;
 
                     case BindingMode.Class:

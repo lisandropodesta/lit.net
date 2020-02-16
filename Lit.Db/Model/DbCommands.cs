@@ -23,12 +23,10 @@ namespace Lit.Db.Model
         /// <summary>
         /// Executes a query loading results in a template.
         /// </summary>
-        public T ExecuteQuery<T>(string query)
+        public T ExecuteQuery<T>(string query, Action<T> setup = null)
             where T : new()
         {
-            var template = new T();
-            ExecuteTemplate(query, template, false);
-            return template;
+            return ExecuteTemplate(query, false, setup);
         }
 
         /// <summary>
@@ -37,7 +35,7 @@ namespace Lit.Db.Model
         public T ExecuteTemplate<T>(Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(null, setup);
+            return ExecuteTemplate(null, true, setup);
         }
 
         /// <summary>
@@ -46,10 +44,7 @@ namespace Lit.Db.Model
         public T ExecuteTemplate<T>(string storedProcedureName, Action<T> setup = null)
             where T : new()
         {
-            var template = new T();
-            setup?.Invoke(template);
-            ExecuteTemplate(template, storedProcedureName);
-            return template;
+            return ExecuteTemplate(storedProcedureName, true, setup);
         }
 
         /// <summary>
@@ -57,7 +52,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteTemplate<T>(T template)
         {
-            ExecuteTemplate(template, null);
+            ExecuteTemplate(template, null, true, null);
         }
 
         /// <summary>
@@ -65,14 +60,27 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteTemplate<T>(T template, string storedProcedureName)
         {
-            ExecuteTemplate<T>(storedProcedureName, template, true);
+            ExecuteTemplate(template, storedProcedureName, true, null);
+        }
+
+        /// <summary>
+        /// Initializes and executes a stored procedure or query template.
+        /// </summary>
+        private T ExecuteTemplate<T>(string text, bool isStoredProcedure, Action<T> setup)
+            where T : new()
+        {
+            var template = new T();
+            ExecuteTemplate(template, text, isStoredProcedure, setup);
+            return template;
         }
 
         /// <summary>
         /// Execute a stored procedure or query with a template already initialized.
         /// </summary>
-        private void ExecuteTemplate<T>(string text, T template, bool isStoredProcedure)
+        private void ExecuteTemplate<T>(T template, string text, bool isStoredProcedure, Action<T> setup)
         {
+            setup?.Invoke(template);
+
             var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
 
             if (isStoredProcedure)
@@ -85,6 +93,11 @@ namespace Lit.Db.Model
                         throw new ArgumentException($"Class {typeof(T).Name} has no stored procedure name defined (attribute DbStoredProcedureAttribute)");
                     }
                 }
+            }
+
+            if (!isStoredProcedure)
+            {
+                text = binding.SetInputParameters(text, template);
             }
 
             using (var connection = GetConnectionOpened())

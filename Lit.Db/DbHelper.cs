@@ -14,12 +14,43 @@ namespace Lit.Db
         /// <summary>
         /// Assigns an input parameter by name.
         /// </summary>
-        public static void SetSqlParameter(DbCommand cmd, string paramName, object value)
+        public static void SetSqlParameter(ref string query, string paramName, string value, bool isOptional)
+        {
+            var replaceText = @"{{@" + paramName + @"}}";
+            var found = false;
+            int index;
+
+            do
+            {
+                index = query.IndexOf(replaceText, StringComparison.OrdinalIgnoreCase);
+                if (index >= 0)
+                {
+                    query = query.Substring(0, index) + value + query.Substring(index + replaceText.Length);
+                    found = true;
+                }
+            }
+            while (index >= 0);
+
+            if (!found && !isOptional)
+            {
+                throw new ArgumentException($"Parameter '{paramName}' not found on sql command");
+            }
+        }
+
+        /// <summary>
+        /// Assigns an input parameter by name.
+        /// </summary>
+        public static void SetSqlParameter(DbCommand cmd, string paramName, object value, bool isOptional)
         {
             paramName = "@" + paramName;
 
             if (!cmd.Parameters.Contains(paramName))
             {
+                if (isOptional)
+                {
+                    return;
+                }
+
                 throw new ArgumentException($"Parameter '{paramName}' not found on sql command");
             }
 

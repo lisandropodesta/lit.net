@@ -59,12 +59,12 @@ namespace Lit.Db.Test
                     DbNaming = new MySqlDefaultNaming()
                 };
 
+                MySqlTest.Execute(db);
+
                 var data = db.ExecuteTemplate<Test>(p =>
                 {
                     p.IntegerValue = 3;
                 });
-
-                MySqlTest.Execute(db);
             }
             catch (Exception x)
             {

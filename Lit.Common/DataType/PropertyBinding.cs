@@ -171,6 +171,7 @@ namespace Lit.DataType
             typeof(DateTime),
             typeof(DateTimeOffset),
             typeof(TimeSpan),
+            typeof(string),
             typeof(byte[])
         };
 

@@ -126,6 +126,15 @@ namespace Lit.Db.Model
         }
 
         /// <summary>
+        /// Assigns all input parameters on the command.
+        /// </summary>
+        public string SetInputParameters(string query, object instance)
+        {
+            parameterBindings?.ForEach(b => b.SetInputParameters(ref query, instance));
+            return query;
+        }
+
+        /// <summary>
         /// Assigns all output parameters on the template instance.
         /// </summary>
         public void GetOutputParameters(TS cmd, object instance)

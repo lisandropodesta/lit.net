@@ -10,7 +10,7 @@ namespace Lit.Db
         /// <summary>
         /// Executes a query loading results in a template.
         /// </summary>
-        T ExecuteQuery<T>(string query)
+        T ExecuteQuery<T>(string query, Action<T> setup = null)
             where T : new();
 
         /// <summary>

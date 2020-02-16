@@ -48,15 +48,21 @@ namespace Lit.Db.Test
 
         public class SchemaQuery
         {
+            [DbParameter]
+            public string TableSchema { get; set; }
+
             [DbRecordset]
             public List<SchemaTable> Tables { get; protected set; }
         }
 
         public static void Execute(MySqlHost db)
         {
-            var query = "select * from INFORMATION_SCHEMA.TABLES where table_schema = 'wikialgorithm'";
+            var query = "select * from INFORMATION_SCHEMA.TABLES where table_schema = '{{@table_schema}}'";
 
-            var data = db.ExecuteQuery<SchemaQuery>(query);
+            var data = db.ExecuteQuery<SchemaQuery>(query, p =>
+             {
+                 p.TableSchema = "wikialgorithm";
+             });
 
             foreach (var r in data.Tables)
             {
