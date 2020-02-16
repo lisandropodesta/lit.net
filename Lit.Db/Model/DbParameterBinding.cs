@@ -26,8 +26,9 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db parameter property binding.
     /// </summary>
-    internal class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding<TC>
-        where TC : DbCommand
+    internal class DbParameterBinding<TS, TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding<TS>
+        where TS : DbCommand
+        where TC : class
     {
         private readonly string parameterName;
 
@@ -50,14 +51,14 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
-        public void SetInputParameters(TC cmd, object instance)
+        public void SetInputParameters(TS cmd, object instance)
         {
             try
             {
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        DbHelper.SetSqlParameter(cmd, Attributes.ParameterName, GetValue(instance));
+                        DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance));
                         break;
 
                     case BindingMode.Class:
@@ -79,14 +80,14 @@ namespace Lit.Db.Model
         /// <summary>
         /// Get output parameters.
         /// </summary>
-        public void GetOutputParameters(TC cmd, object instance)
+        public void GetOutputParameters(TS cmd, object instance)
         {
             try
             {
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        SetValue(instance, DbHelper.GetSqlParameter(cmd, Attributes.ParameterName));
+                        SetValue(instance, DbHelper.GetSqlParameter(cmd, parameterName));
                         break;
 
                     case BindingMode.Class:

@@ -16,7 +16,9 @@ namespace Lit.Db.Model
     /// <summary>
     /// Binding to a database property (parameter/field).
     /// </summary>
-    internal abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA> where TC : class where TA : Attribute
+    internal abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA>
+        where TC : class
+        where TA : Attribute
     {
         /// <summary>
         /// Attributes.
@@ -97,7 +99,7 @@ namespace Lit.Db.Model
                             else if (type == typeof(bool))
                             {
                                 value = bool.Parse((string)value);
-                            } 
+                            }
                             else if (IsInteger(type))
                             {
                                 value = long.Parse((string)value);

@@ -110,7 +110,7 @@ namespace Lit.Db.Model
                 }
                 else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
                 {
-                    AddBinding(ref parameterBindings, typeof(DbRecordBinding<,,>), propInfo, pAttr, dbNaming);
+                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,,>), propInfo, pAttr, dbNaming);
                 }
             }
         }

@@ -32,6 +32,9 @@ namespace Lit.Db.Test
         [DbStoredProcedure("test")]
         protected class Test
         {
+            [DbParameter]
+            public int IntegerValue { get; set; }
+
             [DbRecordset(0)]
             public List<Algorithm> Algorithms { get; protected set; }
 
@@ -56,7 +59,10 @@ namespace Lit.Db.Test
                     DbNaming = new MySqlDefaultNaming()
                 };
 
-                var data = db.ExecuteTemplate<Test>();
+                var data = db.ExecuteTemplate<Test>(p =>
+                {
+                    p.IntegerValue = 3;
+                });
             }
             catch (Exception x)
             {
