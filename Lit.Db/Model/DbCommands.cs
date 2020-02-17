@@ -18,7 +18,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Db naming manager
         /// </summary>
-        public IDbNaming DbNaming;
+        public IDbNaming DbNaming { get; set; }
 
         /// <summary>
         /// Executes a query template.

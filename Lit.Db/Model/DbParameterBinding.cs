@@ -9,7 +9,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db parameter binding interface.
     /// </summary>
-    internal interface IDbParameterBinding<TS> : IDbPropertyBinding<DbParameterAttribute>
+    public interface IDbParameterBinding<TS> : IDbPropertyBinding<DbParameterAttribute>
         where TS : DbCommand
     {
         /// <summary>

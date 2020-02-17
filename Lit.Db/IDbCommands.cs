@@ -8,6 +8,11 @@ namespace Lit.Db
     public interface IDbCommands
     {
         /// <summary>
+        /// Naming manager.
+        /// </summary>
+        IDbNaming DbNaming { get; }
+
+        /// <summary>
         /// Executes a query template.
         /// </summary>
         T ExecuteQuery<T>(string query, Action<T> setup = null)

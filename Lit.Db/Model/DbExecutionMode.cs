@@ -3,7 +3,7 @@
     /// <summary>
     /// Execution mode for stored procedure.
     /// </summary>
-    internal enum DbExecutionMode
+    public enum DbExecutionMode
     {
         NonQuery,
 

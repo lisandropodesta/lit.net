@@ -8,8 +8,23 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db field binding interface.
     /// </summary>
-    internal interface IDbFieldBinding : IDbPropertyBinding<DbFieldAttribute>
+    public interface IDbFieldBinding : IDbPropertyBinding<DbFieldAttribute>
     {
+        /// <summary>
+        /// Field name.
+        /// </summary>
+        string FieldName { get; }
+
+        /// <summary>
+        /// Field type.
+        /// </summary>
+        Type FieldType { get; }
+
+        /// <summary>
+        /// Nullable flag.
+        /// </summary>
+        bool IsNullable { get; }
+
         /// <summary>
         /// Get output field.
         /// </summary>
@@ -40,6 +55,21 @@ namespace Lit.Db.Model
         }
 
         #endregion
+
+        /// <summary>
+        /// Field name.
+        /// </summary>
+        public string FieldName => fieldName;
+
+        /// <summary>
+        /// Field type.
+        /// </summary>
+        public Type FieldType => BindingType;
+
+        /// <summary>
+        /// Nullable flag.
+        /// </summary>
+        public bool IsNullable => Attributes.IsOptional;
 
         /// <summary>
         /// Get output field.

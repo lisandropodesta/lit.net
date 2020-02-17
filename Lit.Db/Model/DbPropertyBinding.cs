@@ -8,7 +8,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db property binding.
     /// </summary>
-    internal interface IDbPropertyBinding<TA>
+    public interface IDbPropertyBinding<TA>
     {
         TA Attributes { get; }
     }

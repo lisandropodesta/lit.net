@@ -12,7 +12,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Stored procedure/query template information.
     /// </summary>
-    internal class DbTemplateBinding<TS>
+    public class DbTemplateBinding<TS>
         where TS : DbCommand
     {
         #region Global cache
@@ -79,11 +79,31 @@ namespace Lit.Db.Model
 
         private readonly DbExecutionMode mode;
 
+        /// <summary>
+        /// Parameters.
+        /// </summary>
+        public IReadOnlyList<IDbParameterBinding<TS>> Parameters => parameterBindings;
+
         private readonly List<IDbParameterBinding<TS>> parameterBindings;
+
+        /// <summary>
+        /// Fields.
+        /// </summary>
+        public IReadOnlyList<IDbFieldBinding> Fields => fieldBindings;
 
         private readonly List<IDbFieldBinding> fieldBindings;
 
+        /// <summary>
+        /// Records.
+        /// </summary>
+        public IReadOnlyList<IDbRecordBinding<TS>> Records => recordBindings;
+
         private readonly List<IDbRecordBinding<TS>> recordBindings;
+
+        /// <summary>
+        /// Recordsets.
+        /// </summary>
+        public IReadOnlyList<IDbRecordsetBinding> Recordsets => recordsetBindings;
 
         private readonly List<IDbRecordsetBinding> recordsetBindings;
 

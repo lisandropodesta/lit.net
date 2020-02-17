@@ -7,7 +7,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db recordset binding interface.
     /// </summary>
-    internal interface IDbRecordsetBinding : IDbPropertyBinding<DbRecordsetAttribute>
+    public interface IDbRecordsetBinding : IDbPropertyBinding<DbRecordsetAttribute>
     {
         /// <summary>
         /// Load the current recordset.
