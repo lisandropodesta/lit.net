@@ -17,8 +17,6 @@ namespace Lit.Db.Model
         protected DbStoredProcedureBase(string name, TS command)
             : base(name)
         {
-            command.CommandType = CommandType.StoredProcedure;
-
             DeriveParameters(command);
 
             parameters = new TP[command.Parameters.Count];

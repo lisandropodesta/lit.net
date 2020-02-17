@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Reflection;
@@ -39,11 +40,11 @@ namespace Lit.Db.Model
         #endregion
 
         /// <summary>
-        /// Template kind.
+        /// Command type.
         /// </summary>
-        public DbTemplateKind Kind => kind;
+        public CommandType CommandType => commandType;
 
-        private readonly DbTemplateKind kind;
+        private readonly CommandType commandType;
 
         /// <summary>
         /// Template data type.
@@ -104,13 +105,13 @@ namespace Lit.Db.Model
             if (qattr != null)
             {
                 text = qattr.QueryText;
-                kind = DbTemplateKind.Query;
+                commandType = CommandType.Text;
             }
 
             if (sattr != null)
             {
                 text = sattr.StoredProcedureName;
-                kind = DbTemplateKind.StoredProcedure;
+                commandType = CommandType.StoredProcedure;
             }
 
             foreach (var propInfo in templateType.GetProperties())

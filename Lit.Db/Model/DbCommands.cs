@@ -26,7 +26,7 @@ namespace Lit.Db.Model
         public T ExecuteQuery<T>(string query, Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(query, DbTemplateKind.Query, setup);
+            return ExecuteTemplate(query, CommandType.Text, setup);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Lit.Db.Model
         public T ExecuteQuery<T>(Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(null, DbTemplateKind.Query, setup);
+            return ExecuteTemplate(null, CommandType.Text, setup);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Lit.Db.Model
         public T ExecuteStoredProcedure<T>(string storedProcedureName, Action<T> setup = null)
             where T : new()
         {
-            return ExecuteTemplate(storedProcedureName, DbTemplateKind.StoredProcedure, setup);
+            return ExecuteTemplate(storedProcedureName, CommandType.StoredProcedure, setup);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteStoredProcedure<T>(string storedProcedureName, T template)
         {
-            ExecuteTemplate(template, storedProcedureName, DbTemplateKind.StoredProcedure, null);
+            ExecuteTemplate(template, storedProcedureName, CommandType.StoredProcedure, null);
         }
 
         /// <summary>
@@ -75,24 +75,24 @@ namespace Lit.Db.Model
         /// <summary>
         /// Initializes and executes a stored procedure or query template.
         /// </summary>
-        private T ExecuteTemplate<T>(string text, DbTemplateKind? kind, Action<T> setup)
+        private T ExecuteTemplate<T>(string text, CommandType? commandType, Action<T> setup)
             where T : new()
         {
             var template = new T();
-            ExecuteTemplate(template, text, kind, setup);
+            ExecuteTemplate(template, text, commandType, setup);
             return template;
         }
 
         /// <summary>
         /// Execute a stored procedure or query with a template already initialized.
         /// </summary>
-        private void ExecuteTemplate<T>(T template, string text, DbTemplateKind? kind, Action<T> setup)
+        private void ExecuteTemplate<T>(T template, string text, CommandType? commandType, Action<T> setup)
         {
             setup?.Invoke(template);
 
             var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
 
-            var isStoredProcedure = (kind ?? binding.Kind) == DbTemplateKind.StoredProcedure;
+            var cmdType = commandType ?? binding.CommandType;
 
             if (string.IsNullOrEmpty(text))
             {
@@ -103,16 +103,16 @@ namespace Lit.Db.Model
                 }
             }
 
-            if (!isStoredProcedure)
+            if (cmdType == CommandType.Text)
             {
                 text = binding.SetInputParameters(text, template);
             }
 
             using (var connection = GetConnectionOpened())
             {
-                using (var cmd = GetCommand(text, connection, isStoredProcedure))
+                using (var cmd = GetCommand(text, connection, cmdType))
                 {
-                    if (isStoredProcedure)
+                    if (cmdType == CommandType.StoredProcedure)
                     {
                         binding.SetInputParameters(cmd, template);
                     }
@@ -138,11 +138,12 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets a command attached to the current transaction and ready to be executed.
         /// </summary>
-        private TS GetCommand(string name, TH connection, bool isStoredProcedure)
+        private TS GetCommand(string name, TH connection, CommandType commandType)
         {
             var cmd = CreateCommand(name, connection);
+            cmd.CommandType = commandType;
 
-            if (isStoredProcedure)
+            if (commandType == CommandType.StoredProcedure)
             {
                 AddStoredProcedureParameters(name, cmd);
             }
