@@ -331,7 +331,7 @@ namespace Lit.DataType
         /// <summary>
         /// Finds an attribute in an enum value.
         /// </summary>
-        public static bool GetEnumAttribute<T>(Type enumType, object value, out T attr)
+        public static bool GetEnumAttribute<TAttr>(Type enumType, object value, out TAttr attr) where TAttr : class
         {
             if (enumType != null && enumType.IsEnum && GetEnumAttribute(enumType, Enum.GetName(enumType, value), out attr))
                 return true;

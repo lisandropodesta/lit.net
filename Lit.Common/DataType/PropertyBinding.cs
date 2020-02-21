@@ -16,9 +16,19 @@ namespace Lit.DataType
 
         private readonly BindingMode mode;
 
+        /// <summary>
+        /// Binding type.
+        /// </summary>
         public Type BindingType => bindingType;
 
         private readonly Type bindingType;
+
+        /// <summary>
+        /// Is nullable flag.
+        /// </summary>
+        public bool IsNullable => isNullable;
+
+        private readonly bool isNullable;
 
         private readonly Action<TC, TP> setter;
 
@@ -30,7 +40,7 @@ namespace Lit.DataType
             : base(propInfo)
         {
             bindingType = propInfo.PropertyType;
-            mode = GetBindingMode(ref bindingType);
+            mode = GetBindingMode(ref bindingType, out isNullable);
 
             var gm = propInfo.GetGetMethod(true);
             if (gm != null)
@@ -106,9 +116,11 @@ namespace Lit.DataType
         /// <summary>
         /// Gets the binding kind of a property type.
         /// </summary>
-        public static BindingMode GetBindingMode(ref Type type)
+        public static BindingMode GetBindingMode(ref Type type, out bool isNullable)
         {
-            if (IsDbScalar(type) || type.IsEnum)
+            isNullable = false;
+
+            if (IsScalarType(type))
             {
                 return BindingMode.Scalar;
             }
@@ -120,20 +132,22 @@ namespace Lit.DataType
 
                 if (gdef == typeof(Nullable<>))
                 {
-                    if (IsDbScalar(gtype) || gtype.IsEnum)
+                    isNullable = true;
+
+                    if (IsScalarType(gtype))
                     {
                         type = gtype;
                         return BindingMode.Scalar;
                     }
                 }
-                else if (IsDbGenList(gdef))
+                else if (IsGenericList(gdef))
                 {
                     type = gtype;
                     return BindingMode.List;
                 }
             }
 
-            if (IsDbDictionary(type))
+            if (IsDictionary(type))
             {
                 return BindingMode.Dictionary;
             }
@@ -147,14 +161,14 @@ namespace Lit.DataType
         }
 
         /// <summary>
-        /// Check if the type is a Db scalar type.
+        /// Check if the type is a supported scalar type.
         /// </summary>
-        public static bool IsDbScalar(Type type)
+        public static bool IsScalarType(Type type)
         {
-            return DbScalarTypes.Contains(type);
+            return type.IsEnum || ScalarTypes.Contains(type);
         }
 
-        private static readonly List<Type> DbScalarTypes = new List<Type>
+        private static readonly List<Type> ScalarTypes = new List<Type>
         {
             typeof(bool),
             typeof(char),
@@ -166,7 +180,7 @@ namespace Lit.DataType
 
             typeof(float),
             typeof(double),
-            // typeof(decimal),
+            typeof(decimal),
 
             typeof(DateTime),
             typeof(DateTimeOffset),
@@ -180,10 +194,10 @@ namespace Lit.DataType
         /// </summary>
         public static bool IsInteger(Type type)
         {
-            return DbIntegerTypes.Contains(type);
+            return IntegerTypes.Contains(type);
         }
 
-        private static readonly List<Type> DbIntegerTypes = new List<Type>
+        private static readonly List<Type> IntegerTypes = new List<Type>
         {
             typeof(sbyte), typeof(byte),
             typeof(short), typeof(ushort),
@@ -196,24 +210,24 @@ namespace Lit.DataType
         /// </summary>
         public static bool IsFloatingPoint(Type type)
         {
-            return DbFloatingPointTypes.Contains(type);
+            return FloatingPointTypes.Contains(type);
         }
 
-        private static readonly List<Type> DbFloatingPointTypes = new List<Type>
+        private static readonly List<Type> FloatingPointTypes = new List<Type>
         {
             typeof(float),
             typeof(double)
         };
 
         /// <summary>
-        /// Check if the type is a Db generic list.
+        /// Check if the type is a generic list.
         /// </summary>
-        public static bool IsDbGenList(Type type)
+        public static bool IsGenericList(Type type)
         {
-            return DbGenListTypes.Contains(type);
+            return GenericListTypes.Contains(type);
         }
 
-        private static readonly List<Type> DbGenListTypes = new List<Type>
+        private static readonly List<Type> GenericListTypes = new List<Type>
         {
             typeof(List<>),
             typeof(IList<>),
@@ -226,12 +240,12 @@ namespace Lit.DataType
         /// <summary>
         /// Check if the type is a dictionary.
         /// </summary>
-        public static bool IsDbDictionary(Type type)
+        public static bool IsDictionary(Type type)
         {
-            return DbDictionaryTypes.Contains(type);
+            return DictionaryTypes.Contains(type);
         }
 
-        private static readonly List<Type> DbDictionaryTypes = new List<Type>
+        private static readonly List<Type> DictionaryTypes = new List<Type>
         {
             typeof(Dictionary<string,object>),
             typeof(IDictionary<string,object>)
