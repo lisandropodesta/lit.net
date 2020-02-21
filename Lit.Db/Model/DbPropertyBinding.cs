@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Lit.DataType;
 using Lit.Db.Attributes;
@@ -10,6 +11,14 @@ namespace Lit.Db.Model
     /// </summary>
     public interface IDbPropertyBinding<TA>
     {
+        /// <summary>
+        /// Database data type.
+        /// </summary>
+        DbDataType DataType { get; }
+
+        /// <summary>
+        /// Attributes.
+        /// </summary>
         TA Attributes { get; }
     }
 
@@ -20,6 +29,13 @@ namespace Lit.Db.Model
         where TC : class
         where TA : Attribute
     {
+        /// <summary>
+        /// Database data type.
+        /// </summary>
+        public DbDataType DataType => dataType;
+
+        private readonly DbDataType dataType;
+
         /// <summary>
         /// Attributes.
         /// </summary>
@@ -34,7 +50,25 @@ namespace Lit.Db.Model
         {
             this.attr = attr;
 
-            if (Mode == BindingMode.None)
+            switch (Mode)
+            {
+                case BindingMode.None:
+                default:
+                    dataType = DbDataType.Unknown;
+                    break;
+
+                case BindingMode.Scalar:
+                    dataType = GetDataType(BindingType);
+                    break;
+
+                case BindingMode.Class:
+                case BindingMode.List:
+                case BindingMode.Dictionary:
+                    dataType = DbDataType.Json;
+                    break;
+            }
+
+            if (dataType == DbDataType.Unknown)
             {
                 throw new ArgumentException($"Property {this} of type [{propInfo.PropertyType.Name}] has an unknown binding mode");
             }
@@ -161,5 +195,45 @@ namespace Lit.Db.Model
             enumValue = null;
             return false;
         }
+
+        /// <summary>
+        /// Get supported data type code.
+        /// </summary>
+        private DbDataType GetDataType(Type bindingType)
+        {
+            if (bindingType.IsEnum)
+            {
+                return DbDataType.Enumerated;
+            }
+
+            return dbScalarTypes.TryGetValue(bindingType, out var dataType) ? dataType : DbDataType.Unknown;
+        }
+
+        // Supported scalar types.
+        private static readonly Dictionary<Type, DbDataType> dbScalarTypes = new Dictionary<Type, DbDataType>
+        {
+            { typeof(bool), DbDataType.Boolean },
+            { typeof(char), DbDataType.Char },
+
+            { typeof(sbyte), DbDataType.SInt8 },
+            { typeof(byte), DbDataType.UInt8 },
+            { typeof(short), DbDataType.SInt16 },
+            { typeof(ushort), DbDataType.UInt16 },
+            { typeof(int), DbDataType.SInt32 },
+            { typeof(uint), DbDataType.UInt32 },
+            { typeof(long), DbDataType.SInt64 },
+            { typeof(ulong), DbDataType.UInt64 },
+
+            { typeof(decimal), DbDataType.Decimal },
+            { typeof(float), DbDataType.Float },
+            { typeof(double), DbDataType.Double },
+
+            { typeof(DateTime), DbDataType.DateTime },
+            { typeof(DateTimeOffset), DbDataType.Timestamp },
+            { typeof(TimeSpan), DbDataType.TimeSpan },
+
+            { typeof(string), DbDataType.Text },
+            { typeof(byte[]), DbDataType.Blob }
+        };
     }
 }
