@@ -58,32 +58,13 @@ namespace Lit.Db.Model
         /// </summary>
         public void SetInputParameters(ref string text, object instance)
         {
-            switch (Mode)
-            {
-                case BindingMode.Scalar:
-                    var value = GetValue(instance);
-                    DbHelper.SetSqlParameter(ref text, parameterName, value.ToString(), Attributes.IsOptional);
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                default:
-                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
-            }
-        }
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        public void SetInputParameters(TS cmd, object instance)
-        {
-            try
+            if (Attributes.IsInput)
             {
                 switch (Mode)
                 {
                     case BindingMode.Scalar:
-                        DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance), Attributes.IsOptional);
+                        var value = GetValue(instance);
+                        DbHelper.SetSqlParameter(ref text, parameterName, value.ToString(), Attributes.IsOptional);
                         break;
 
                     case BindingMode.Class:
@@ -93,11 +74,36 @@ namespace Lit.Db.Model
                         throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
                 }
             }
-            catch
+        }
+
+        /// <summary>
+        /// Assigns input parameters.
+        /// </summary>
+        public void SetInputParameters(TS cmd, object instance)
+        {
+            if (Attributes.IsInput)
             {
-                if (!Attributes.IsOptional)
+                try
                 {
-                    throw;
+                    switch (Mode)
+                    {
+                        case BindingMode.Scalar:
+                            DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance), Attributes.IsOptional);
+                            break;
+
+                        case BindingMode.Class:
+                        case BindingMode.List:
+                        case BindingMode.Dictionary:
+                        default:
+                            throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+                    }
+                }
+                catch
+                {
+                    if (!Attributes.IsOptional)
+                    {
+                        throw;
+                    }
                 }
             }
         }
@@ -107,26 +113,29 @@ namespace Lit.Db.Model
         /// </summary>
         public void GetOutputParameters(TS cmd, object instance)
         {
-            try
+            if (Attributes.IsOutput)
             {
-                switch (Mode)
+                try
                 {
-                    case BindingMode.Scalar:
-                        SetValue(instance, DbHelper.GetSqlParameter(cmd, parameterName));
-                        break;
+                    switch (Mode)
+                    {
+                        case BindingMode.Scalar:
+                            SetValue(instance, DbHelper.GetSqlParameter(cmd, parameterName));
+                            break;
 
-                    case BindingMode.Class:
-                    case BindingMode.List:
-                    case BindingMode.Dictionary:
-                    default:
-                        throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+                        case BindingMode.Class:
+                        case BindingMode.List:
+                        case BindingMode.Dictionary:
+                        default:
+                            throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+                    }
                 }
-            }
-            catch
-            {
-                if (!Attributes.IsOptional)
+                catch
                 {
-                    throw;
+                    if (!Attributes.IsOptional)
+                    {
+                        throw;
+                    }
                 }
             }
         }

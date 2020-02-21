@@ -30,6 +30,16 @@ namespace Lit.Db.Attributes
 
         protected readonly bool isOptional;
 
+        /// <summary>
+        /// Is input flag.
+        /// </summary>
+        public bool IsInput => direction == ParameterDirection.Input || direction == ParameterDirection.InputOutput;
+
+        /// <summary>
+        /// Is output flag.
+        /// </summary>
+        public bool IsOutput => direction == ParameterDirection.Output || direction == ParameterDirection.InputOutput;
+
         #region Constructors
 
         public DbParameterAttribute(ParameterDirection direction, bool isOptional = false) : this(null, direction, isOptional) { }
