@@ -67,11 +67,6 @@ namespace Lit.Db.Model
         public Type FieldType => BindingType;
 
         /// <summary>
-        /// Nullable flag.
-        /// </summary>
-        public bool IsNullable => Attributes.IsOptional;
-
-        /// <summary>
         /// Get output field.
         /// </summary>
         public void GetOutputField(DbDataReader reader, object instance)
