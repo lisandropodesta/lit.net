@@ -5,61 +5,62 @@ using Lit.Db.Attributes;
 using Lit.Db.Model;
 using Lit.Db.MySql.Schema.Information;
 
-namespace Lit.Db.MySql.Statements.Queries
+namespace Lit.Db.MySql.Statements
 {
+    /// <summary>
+    /// Single table creation.
+    /// </summary>
     [DbQuery(Template)]
-    public class CreateTable
+    public class CreateTable : DbTemplate
     {
         public const string Template =
-            "CREATE TABLE `{{@table_name}}` (\n" +
+            "CREATE TABLE {{@table_name}} (\n" +
             "  {{@column_definition}}\n" +
             "  {{@table_constraints}}\n" +
             ") ENGINE={{@engine}} DEFAULT CHARSET={{@default_charset}}";
 
         /// <summary>
-        /// Engine.
+        /// Table name.
         /// </summary>
-        [DbParameter]
-        public string Engine { get; set; }
-
-        /// <summary>
-        /// Table name
-        /// </summary>
-        [DbParameter]
+        [DbParameter("table_name")]
         public string TableName { get; set; }
 
         /// <summary>
-        /// Column definition
+        /// Column definition.
         /// </summary>
-        [DbParameter]
-        public string ColumnDefinition { get; set; }
+        [DbParameter("column_definition")]
+        protected string ColumnDefinition { get; set; }
 
         /// <summary>
         /// Table constraints.
         /// </summary>
-        [DbParameter(isOptional: true)]
-        public string TableConstraints { get; set; }
+        [DbParameter("table_constraints")]
+        protected string TableConstraints { get; set; }
+
+        /// <summary>
+        /// Engine.
+        /// </summary>
+        [DbParameter("engine")]
+        public string Engine { get; set; }
 
         /// <summary>
         /// Default charset.
         /// </summary>
-        [DbParameter]
+        [DbParameter("default_charset")]
         public string DefaultCharset { get; set; }
 
         /// <summary>
         /// Statemente execution.
         /// </summary>
-        public CreateTable(IDbCommands db, Engine engine, string tableName, string defaultCharset, Type tableTemplate)
+        public CreateTable(Engine engine, string tableName, string defaultCharset, Type tableTemplate, IDbNaming dbNaming)
         {
             Engine = engine.ToString();
             TableName = tableName;
             DefaultCharset = defaultCharset;
 
-            var bindings = DbTemplateBinding<MySqlCommand>.Get(tableTemplate, db.DbNaming);
+            var bindings = DbTemplateBinding<MySqlCommand>.Get(tableTemplate, dbNaming);
             ColumnDefinition = GetColumnDefinition(tableTemplate, bindings);
             TableConstraints = GetTableConstraints(tableTemplate, bindings);
-
-            db.ExecuteTemplate(this);
         }
 
         private string GetColumnDefinition(Type tableTemplate, DbTemplateBinding<MySqlCommand> bindings)
@@ -93,8 +94,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
         private string GetFieldType(IDbFieldBinding field)
         {
-            // TODO: implement this code!
-            return field.FieldType.Name;
+            return MySqlDataType.Translate(field.DataType);
         }
 
         private string GetNullable(IDbFieldBinding field)
