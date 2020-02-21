@@ -44,6 +44,6 @@ namespace Lit.Db
         /// <summary>
         /// Execute a stored procedure/query template.
         /// </summary>
-        void ExecuteTemplate<T>(T template);
+        void ExecuteTemplate(object template);
     }
 }

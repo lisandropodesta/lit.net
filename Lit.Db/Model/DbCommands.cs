@@ -67,7 +67,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Execute a stored procedure/query template.
         /// </summary>
-        public void ExecuteTemplate<T>(T template)
+        public void ExecuteTemplate(object template)
         {
             ExecuteTemplate(template, null, null, null);
         }
@@ -88,9 +88,11 @@ namespace Lit.Db.Model
         /// </summary>
         private void ExecuteTemplate<T>(T template, string text, CommandType? commandType, Action<T> setup)
         {
+            var type = template?.GetType() ?? typeof(T);
+
             setup?.Invoke(template);
 
-            var binding = DbTemplateBinding<TS>.Get(typeof(T), DbNaming);
+            var binding = DbTemplateBinding<TS>.Get(type, DbNaming);
 
             var cmdType = commandType ?? binding.CommandType;
 
@@ -99,7 +101,7 @@ namespace Lit.Db.Model
                 text = binding.Text;
                 if (string.IsNullOrEmpty(text))
                 {
-                    throw new ArgumentException($"Class {typeof(T).FullName} has no stored procedure / query defined");
+                    throw new ArgumentException($"Class {type.FullName} has no stored procedure / query defined");
                 }
             }
 
