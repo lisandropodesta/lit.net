@@ -58,7 +58,7 @@ namespace Lit.Db.Model
         /// </summary>
         public string Text => text;
 
-        private string text;
+        private readonly string text;
 
         /// <summary>
         /// Recordset referenced count.
@@ -114,8 +114,8 @@ namespace Lit.Db.Model
             this.templateType = templateType;
             mode = DbExecutionMode.NonQuery;
 
-            var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType);
-            var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType);
+            var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType, true);
+            var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType, true);
 
             if (qattr != null && sattr != null)
             {
@@ -134,7 +134,7 @@ namespace Lit.Db.Model
                 commandType = CommandType.StoredProcedure;
             }
 
-            foreach (var propInfo in templateType.GetProperties())
+            foreach (var propInfo in templateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
