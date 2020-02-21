@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lit.Db.Attributes;
-using Lit.Db.MySql;
 
 namespace Lit.Db.Test.MySql
 {
     public static class StoredProcedure
     {
-        public static void Execute(MySqlHost db)
+        public static void Execute(IDbHost db)
         {
             var data = db.ExecuteTemplate<Test>(p =>
             {

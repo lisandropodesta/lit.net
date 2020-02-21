@@ -1,15 +1,14 @@
 ﻿using System;
-using Lit.Db.MySql;
 using Lit.Db.MySql.Schema.Information.Queries;
 
 namespace Lit.Db.Test.MySql
 {
     public static class InformationSchema
     {
-        public static void Load(MySqlHost db)
+        public static void Load(IDbHost db)
         {
             Console.WriteLine("\n  ** TABLES QUERY **");
-            var data = new SchemaTables(db, "wikialgorithm");
+            var data = new SchemaTables("wikialgorithm").Exec(db);
 
             foreach (var r in data.Tables)
             {
@@ -18,11 +17,11 @@ namespace Lit.Db.Test.MySql
 
             Console.WriteLine("\n  ** COLUMNS QUERY **");
 
-            var columnsData = new SchemaColumns(db, "wikialgorithm");
+            var columnsData = new SchemaColumns("wikialgorithm").Exec(db);
 
-            foreach (var c in columnsData.Columns)
+            foreach (var c in columnsData.ColumnsList)
             {
-                Console.WriteLine($"  Table={c.TableName}, Column={c.ColumnName}, DataTye={c.DataType}, ColumnType={c.ColumnType}, Nullable={c.IsNullable}, Key={c.ColumnKey}");
+                Console.WriteLine($"  Table={c.TableName}, Column={c.ColumnName}, DataType={c.DataType}, ColumnType={c.ColumnType}, Nullable={c.IsNullable}, Key={c.ColumnKey}");
             }
         }
     }
