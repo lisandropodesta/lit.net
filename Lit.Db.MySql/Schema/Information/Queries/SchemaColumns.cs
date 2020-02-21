@@ -1,24 +1,18 @@
 ﻿using System.Collections.Generic;
 using Lit.Db.Attributes;
 using Lit.Db.MySql.Schema.Information.Tables;
+using Lit.Db.MySql.Statements;
 
 namespace Lit.Db.MySql.Schema.Information.Queries
 {
-    [DbQuery("select * from INFORMATION_SCHEMA.COLUMNS where table_schema = '{{@schema}}'")]
-    public class SchemaColumns
+    public class SchemaColumns : Select
     {
-        [DbParameter]
-        public string Schema { get; set; }
-
         [DbRecordset]
-        public List<ColumnData> Columns { get; protected set; }
+        public List<ColumnData> ColumnsList { get; protected set; }
 
-        public SchemaColumns() { }
-
-        public SchemaColumns(IDbCommands db, string schema)
+        public SchemaColumns(string schema)
+            : base("INFORMATION_SCHEMA.COLUMNS", $"table_schema = '{schema}'")
         {
-            Schema = schema;
-            db.ExecuteTemplate(this);
         }
     }
 }
