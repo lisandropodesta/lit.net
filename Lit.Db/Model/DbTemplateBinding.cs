@@ -94,6 +94,13 @@ namespace Lit.Db.Model
         private readonly List<IDbFieldBinding> fieldBindings;
 
         /// <summary>
+        /// Columns.
+        /// </summary>
+        public IReadOnlyList<IDbColumnBinding> Columns => columnBindings;
+
+        private readonly List<IDbColumnBinding> columnBindings;
+
+        /// <summary>
         /// Records.
         /// </summary>
         public IReadOnlyList<IDbRecordBinding<TS>> Records => recordBindings;
@@ -116,10 +123,11 @@ namespace Lit.Db.Model
 
             var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType, true);
             var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType, true);
+            var tattr = TypeHelper.GetAttribute<DbTableAttribute>(templateType, true);
 
-            if (qattr != null && sattr != null)
+            if ((qattr != null ? 1 : 0) + (sattr != null ? 1 : 0) + (tattr != null ? 1 : 0) > 1)
             {
-                throw new ArgumentException($"Invalid definition of both, query and stored procedure attributes in class [{templateType.FullName}]");
+                throw new ArgumentException($"Multiple template definition in class [{templateType.FullName}]");
             }
 
             if (qattr != null)
@@ -130,13 +138,23 @@ namespace Lit.Db.Model
 
             if (sattr != null)
             {
-                text = sattr.StoredProcedureName;
+                text = dbNaming.GetStoredProcedureName(templateType, sattr.StoredProcedureName);
                 commandType = CommandType.StoredProcedure;
+            }
+
+            if (tattr != null)
+            {
+                text = dbNaming.GetTableName(templateType, tattr.TableName);
+                commandType = CommandType.TableDirect;
             }
 
             foreach (var propInfo in templateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
+                if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
+                {
+                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,,>), propInfo, cAttr, dbNaming);
+                }
+                else if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
                     mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
@@ -158,9 +176,36 @@ namespace Lit.Db.Model
                     AddBinding(ref parameterBindings, typeof(DbParameterBinding<,,>), propInfo, pAttr, dbNaming);
                 }
             }
+
+            switch (commandType)
+            {
+                case CommandType.StoredProcedure:
+                case CommandType.Text:
+                    if (columnBindings?.Count > 0)
+                    {
+                        throw new ArgumentException($"Invalid definition of DbColumnAttribute in non-table template [{templateType.Name}]");
+                    }
+                    break;
+
+                case CommandType.TableDirect:
+                    if ((recordsetBindings?.Count ?? 0) + (recordBindings?.Count ?? 0) + (parameterBindings?.Count ?? 0) + (fieldBindings?.Count ?? 0) > 0)
+                    {
+                        throw new ArgumentException("Invalid definition of non-DbColumnAttribute in table template [{templateType.Name}]");
+                    }
+                    break;
+            }
         }
 
         #endregion
+
+        /// <summary>
+        /// Finds a column binding.
+        /// </summary>
+        public IDbColumnBinding FindColumn(string propertyName)
+        {
+            var propInfo = templateType.GetProperty(propertyName);
+            return Columns?.FirstOrDefault(i => i.PropertyInfo == propInfo);
+        }
 
         /// <summary>
         /// Assigns all input parameters on the command.

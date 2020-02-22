@@ -4,6 +4,7 @@ using MySql.Data.MySqlClient;
 using Lit.Db.Attributes;
 using Lit.Db.Model;
 using Lit.Db.MySql.Schema.Information;
+using System.Data;
 
 namespace Lit.Db.MySql.Statements
 {
@@ -15,9 +16,21 @@ namespace Lit.Db.MySql.Statements
     {
         public const string Template =
             "CREATE TABLE {{@table_name}} (\n" +
-            "  {{@column_definition}}\n" +
-            "  {{@table_constraints}}\n" +
+            "{{@column_definition}}\n" +
+            "{{@table_constraints}}\n" +
             ") ENGINE={{@engine}} DEFAULT CHARSET={{@default_charset}}";
+
+        public const string NullKey = "NULL";
+
+        public const string NotNullKey = "NOT NULL";
+
+        public const string AutoIncrementKey = "AUTO_INCREMENT";
+
+        public const string PrimaryKeyKey = "PRIMARY KEY";
+
+        public const string UniqueKeyKey = "UNIQUE KEY";
+
+        public const string ReferecencesKey = "REFERENCES";
 
         /// <summary>
         /// Table name.
@@ -52,13 +65,18 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Statemente execution.
         /// </summary>
-        public CreateTable(Engine engine, string tableName, string defaultCharset, Type tableTemplate, IDbNaming dbNaming)
+        public CreateTable(Type tableTemplate, Engine engine, string defaultCharset, IDbNaming dbNaming)
         {
             Engine = engine.ToString();
-            TableName = tableName;
             DefaultCharset = defaultCharset;
 
             var bindings = DbTemplateBinding<MySqlCommand>.Get(tableTemplate, dbNaming);
+            if(bindings.CommandType != CommandType.TableDirect)
+            {
+                throw new ArgumentException($"Invalid table template for type {tableTemplate}");
+            }
+
+            TableName = bindings.Text;
             ColumnDefinition = GetColumnDefinition(tableTemplate, bindings);
             TableConstraints = GetTableConstraints(tableTemplate, bindings);
         }
@@ -68,14 +86,21 @@ namespace Lit.Db.MySql.Statements
             var str = new StringBuilder();
 
             var first = true;
-            foreach (var field in bindings.Fields)
+            foreach (var col in bindings.Columns)
             {
                 if (!first)
                 {
                     str.Append(",\n");
                 }
 
-                str.Append($"`{field.FieldName}` {GetFieldType(field)} {GetNullable(field)} {GetDefault(field)}");
+                str.Append($"  `{col.FieldName}`");
+
+                AddText(str, GetFieldType(col));
+                AddText(str, GetNullable(col));
+                AddText(str, GetDefault(col));
+                AddText(str, GetAutoIncrement(col));
+                AddText(str, GetFieldConstraints(col));
+                AddText(str, GetReferenceDefinition(col));
 
                 first = false;
             }
@@ -92,19 +117,58 @@ namespace Lit.Db.MySql.Statements
             return str.ToString();
         }
 
-        private string GetFieldType(IDbFieldBinding field)
+        private string GetFieldType(IDbColumnBinding column)
         {
-            return MySqlDataType.Translate(field.DataType);
+            return MySqlDataType.Translate(column.DataType);
         }
 
-        private string GetNullable(IDbFieldBinding field)
+        private string GetNullable(IDbColumnBinding column)
         {
-            return field.IsNullable ? "DEFAULT NULL" : "NOT NULL";
+            return column.IsNullable ? NullKey : NotNullKey;
         }
 
-        private object GetDefault(IDbFieldBinding field)
+        private string GetDefault(IDbColumnBinding column)
         {
             // TODO: implement this code!
+            return string.Empty;
+        }
+
+        private string GetAutoIncrement(IDbColumnBinding column)
+        {
+            if (column.IsAutoIncrement)
+            {
+                return AutoIncrementKey;
+            }
+
+            return string.Empty;
+        }
+
+        private string GetFieldConstraints(IDbColumnBinding column)
+        {
+            switch (column.KeyConstraint)
+            {
+                case DbKeyConstraint.None:
+                default:
+                    return string.Empty;
+
+                case DbKeyConstraint.PrimaryKey:
+                    return PrimaryKeyKey;
+
+                case DbKeyConstraint.UniqueKey:
+                    return UniqueKeyKey;
+
+                case DbKeyConstraint.ForeignKey:
+                    return string.Empty;
+            }
+        }
+
+        private string GetReferenceDefinition(IDbColumnBinding column)
+        {
+            if (column.KeyConstraint == DbKeyConstraint.ForeignKey)
+            {
+                return $"{ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} )";
+            }
+
             return string.Empty;
         }
     }

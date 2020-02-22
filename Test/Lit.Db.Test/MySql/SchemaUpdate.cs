@@ -13,7 +13,7 @@ namespace Lit.Db.Test.MySql
             new DropTable("test", true).Exec(db);
 
             Console.WriteLine("\n  ** CREATE TABLE test **");
-            var query = new CreateTable(Engine.InnoDb, "test", "latin1", typeof(User), db.DbNaming).Exec(db);
+            var query = new CreateTable(typeof(User), Engine.InnoDb, "latin1", db.DbNaming).Exec(db);
         }
     }
 }
