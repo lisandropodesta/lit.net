@@ -70,7 +70,7 @@ namespace Lit.Db.MySql.Statements
             Engine = engine.ToString();
             DefaultCharset = defaultCharset;
 
-            var bindings = DbTemplateBinding.Get(tableTemplate, dbNaming);
+            var bindings = DbTemplateCache.Get(tableTemplate, dbNaming);
             if (bindings.CommandType != CommandType.TableDirect)
             {
                 throw new ArgumentException($"Invalid table template for type {tableTemplate}");

@@ -83,7 +83,7 @@ namespace Lit.Db.Model
             {
                 keyConstraint = DbKeyConstraint.ForeignKey;
 
-                var binding = DbTemplateBinding.Get(fk.ForeignTableTemplate, dbNaming);
+                var binding = DbTemplateCache.Get(fk.ForeignTableTemplate, dbNaming);
                 var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
 
                 if (colBinding == null)

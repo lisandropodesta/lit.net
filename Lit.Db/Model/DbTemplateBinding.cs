@@ -14,30 +14,6 @@ namespace Lit.Db.Model
     /// </summary>
     public class DbTemplateBinding
     {
-        #region Global cache
-
-        // Templates cache
-        private static readonly Dictionary<Type, DbTemplateBinding> templateBindings = new Dictionary<Type, DbTemplateBinding>();
-
-        /// <summary>
-        /// Gets the template binding information.
-        /// </summary>
-        public static DbTemplateBinding Get(Type type, IDbNaming dbNaming)
-        {
-            lock (templateBindings)
-            {
-                if (!templateBindings.TryGetValue(type, out var template))
-                {
-                    template = new DbTemplateBinding(type, dbNaming);
-                    templateBindings.Add(type, template);
-                }
-
-                return template;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// Command type.
         /// </summary>
@@ -115,7 +91,7 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        private DbTemplateBinding(Type templateType, IDbNaming dbNaming)
+        internal DbTemplateBinding(Type templateType, IDbNaming dbNaming)
         {
             this.templateType = templateType;
             mode = DbExecutionMode.NonQuery;
