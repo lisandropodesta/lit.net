@@ -1,5 +1,4 @@
-﻿using NLog.Layouts;
-using System;
+﻿using System;
 using System.IO;
 
 namespace Lit.Auditing
