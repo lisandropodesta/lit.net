@@ -38,7 +38,17 @@ namespace Lit.Db.Model
         where TS : DbCommand
         where TC : class
     {
+        /// <summary>
+        /// Field name.
+        /// </summary>
+        public string FieldName => fieldName;
+
         private readonly string fieldName;
+
+        /// <summary>
+        /// Field type.
+        /// </summary>
+        public Type FieldType => BindingType;
 
         #region Constructor
 
@@ -55,16 +65,6 @@ namespace Lit.Db.Model
         }
 
         #endregion
-
-        /// <summary>
-        /// Field name.
-        /// </summary>
-        public string FieldName => fieldName;
-
-        /// <summary>
-        /// Field type.
-        /// </summary>
-        public Type FieldType => BindingType;
 
         /// <summary>
         /// Get output field.

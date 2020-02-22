@@ -9,8 +9,13 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db property binding.
     /// </summary>
-    public interface IDbPropertyBinding<TA>
+    public interface IDbPropertyBinding<TA> : IPropertyBinding
     {
+        /// <summary>
+        /// Property information.
+        /// </summary>
+        PropertyInfo PropertyInfo { get; }
+
         /// <summary>
         /// Database data type.
         /// </summary>

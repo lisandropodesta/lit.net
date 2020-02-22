@@ -28,7 +28,7 @@ namespace Lit.Db.Attributes
 
         public DbFieldAttribute(bool isOptional = false) : this(null, isOptional) { }
 
-        public DbFieldAttribute(string name = null, bool isOptional = false)
+        public DbFieldAttribute(string name, bool isOptional = false)
         {
             this.name = name;
             this.isOptional = isOptional;
