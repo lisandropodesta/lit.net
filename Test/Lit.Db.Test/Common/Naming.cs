@@ -1,4 +1,5 @@
 ﻿using System;
+using Lit.Auditing;
 
 namespace Lit.Db.Test.Common
 {
@@ -9,7 +10,7 @@ namespace Lit.Db.Test.Common
             foreach (var i in itemList)
             {
                 var text = DbNaming.Translate(i.Text, i.Case, i.Id, "id");
-                Console.WriteLine($"  Translated [{i.Text}] into [{text}], with case={i.Case} and ids={i.Id}");
+                Audit.Message($"  Translated [{i.Text}] into [{text}], with case={i.Case} and ids={i.Id}");
                 if (text != i.ExpectedResult)
                 {
                     throw new Exception("Wrong translation");

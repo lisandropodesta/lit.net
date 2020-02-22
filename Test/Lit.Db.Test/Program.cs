@@ -1,4 +1,5 @@
 ﻿using System;
+using Lit.Auditing;
 using Lit.Db.MySql;
 
 namespace Lit.Db.Test
@@ -17,25 +18,27 @@ namespace Lit.Db.Test
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Lit.Db.Test");
+            NLogAudit.Register(AuditType.Debug, AuditTarget.Console, AuditTarget.File);
+
+            Audit.Message("Lit.Db.Test");
 
             try
             {
-                Console.WriteLine("\n\n*** NAMING TEST ***");
+                Audit.Message("\n\n*** NAMING TEST ***");
                 Common.Naming.Execute();
 
-                Console.WriteLine("\n\n*** STORED PROCEDURE TEST ***");
+                Audit.Message("\n\n*** STORED PROCEDURE TEST ***");
                 MySql.StoredProcedure.Execute(db);
 
-                Console.WriteLine("\n\n*** INFORMATION SCHEMA TEST ***");
+                Audit.Message("\n\n*** INFORMATION SCHEMA TEST ***");
                 MySql.InformationSchema.Load(db);
 
-                Console.WriteLine("\n\n*** SCHEMA UPDATE TEST ***");
+                Audit.Message("\n\n*** SCHEMA UPDATE TEST ***");
                 MySql.SchemaUpdate.Execute(tdb);
             }
             catch (Exception x)
             {
-                Console.WriteLine($"Error: {x.Message}");
+                Audit.Error($"Error: {x.Message}");
             }
         }
 

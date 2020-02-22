@@ -8,7 +8,10 @@ namespace Lit.Db.Test.Schema.Tables
         [DbPrimaryKey]
         public int IdUser { get; protected set; }
 
-        [DbColumn]
+        [DbUniqueKey]
         public string NickName { get; protected set; }
+
+        [DbColumn]
+        public string FullName { get; protected set; }
     }
 }

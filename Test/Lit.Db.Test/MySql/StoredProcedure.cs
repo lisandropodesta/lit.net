@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Lit.Auditing;
 using Lit.Db.Attributes;
 
 namespace Lit.Db.Test.MySql
@@ -13,16 +13,16 @@ namespace Lit.Db.Test.MySql
                 p.IntegerValue = 3;
             });
 
-            Console.WriteLine("\n  ** ALGORITHMS **");
+            Audit.Message("\n  ** ALGORITHMS **");
             foreach (var r in data.Algorithms)
             {
-                Console.WriteLine($"  {r.IdAlgorithm}, {r.Name}, {r.InvalidField}");
+                Audit.Message($"  {r.IdAlgorithm}, {r.Name}, {r.InvalidField}");
             }
 
-            Console.WriteLine("\n  ** USERS **");
+            Audit.Message("\n  ** USERS **");
             foreach (var r in data.Users)
             {
-                Console.WriteLine($"  {r.IdUser}, {r.Name}");
+                Audit.Message($"  {r.IdUser}, {r.Name}");
             }
         }
 
