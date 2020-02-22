@@ -10,10 +10,10 @@ namespace Lit.Db.Test.MySql
         public static void Execute(IDbHost db)
         {
             Console.WriteLine("\n  ** DROP TABLE test **");
-            new DropTable("test", true).Exec(db);
+            new DropTable(typeof(User), db.DbNaming).Exec(db);
 
             Console.WriteLine("\n  ** CREATE TABLE test **");
-            var query = new CreateTable(typeof(User), Engine.InnoDb, "latin1", db.DbNaming).Exec(db);
+            var query = new CreateTable(typeof(User), db.DbNaming, Engine.InnoDb, "latin1").Exec(db);
         }
     }
 }

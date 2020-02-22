@@ -1,4 +1,7 @@
-﻿using Lit.Db.Attributes;
+﻿using System;
+using System.Data;
+using Lit.Db.Attributes;
+using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements
 {
@@ -30,6 +33,22 @@ namespace Lit.Db.MySql.Statements
         /// </summary>
         [DbParameter("if_exists")]
         protected string IfExists { get; private set; }
+
+        /// <summary>
+        /// Statemente execution.
+        /// </summary>
+        public DropTable(Type tableTemplate, IDbNaming dbNaming, bool onlyIfExists = false)
+        {
+            var bindings = DbTemplateBinding.Get(tableTemplate, dbNaming);
+            if (bindings.CommandType != CommandType.TableDirect)
+            {
+                throw new ArgumentException($"Invalid table template for type {tableTemplate}");
+            }
+
+            TableName = bindings.Text;
+
+            OnlyIfExists = onlyIfExists;
+        }
 
         /// <summary>
         /// Statemente execution.

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Text;
-using MySql.Data.MySqlClient;
 using Lit.Db.Attributes;
 using Lit.Db.Model;
 using Lit.Db.MySql.Schema.Information;
-using System.Data;
 
 namespace Lit.Db.MySql.Statements
 {
@@ -65,28 +65,42 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Statemente execution.
         /// </summary>
-        public CreateTable(Type tableTemplate, Engine engine, string defaultCharset, IDbNaming dbNaming)
+        public CreateTable(Type tableTemplate, IDbNaming dbNaming, Engine engine, string defaultCharset)
         {
             Engine = engine.ToString();
             DefaultCharset = defaultCharset;
 
-            var bindings = DbTemplateBinding<MySqlCommand>.Get(tableTemplate, dbNaming);
-            if(bindings.CommandType != CommandType.TableDirect)
+            var bindings = DbTemplateBinding.Get(tableTemplate, dbNaming);
+            if (bindings.CommandType != CommandType.TableDirect)
             {
                 throw new ArgumentException($"Invalid table template for type {tableTemplate}");
             }
 
             TableName = bindings.Text;
-            ColumnDefinition = GetColumnDefinition(tableTemplate, bindings);
-            TableConstraints = GetTableConstraints(tableTemplate, bindings);
+            ColumnDefinition = GetColumnDefinition(bindings.Columns);
+            TableConstraints = GetTableConstraints(bindings.Columns);
         }
 
-        private string GetColumnDefinition(Type tableTemplate, DbTemplateBinding<MySqlCommand> bindings)
+        /// <summary>
+        /// Statemente execution.
+        /// </summary>
+        public CreateTable(string tableName, IEnumerable<IDbColumnBinding> columns, Engine engine, string defaultCharset)
+        {
+            Engine = engine.ToString();
+            DefaultCharset = defaultCharset;
+            TableName = tableName;
+            ColumnDefinition = GetColumnDefinition(columns);
+            TableConstraints = GetTableConstraints(columns);
+        }
+
+        #region Property setters
+
+        private string GetColumnDefinition(IEnumerable<IDbColumnBinding> columns)
         {
             var str = new StringBuilder();
 
             var first = true;
-            foreach (var col in bindings.Columns)
+            foreach (var col in columns)
             {
                 if (!first)
                 {
@@ -108,7 +122,7 @@ namespace Lit.Db.MySql.Statements
             return str.ToString();
         }
 
-        private string GetTableConstraints(Type tableTemplate, DbTemplateBinding<MySqlCommand> bindings)
+        private string GetTableConstraints(IEnumerable<IDbColumnBinding> columns)
         {
             var str = new StringBuilder();
 
@@ -171,5 +185,7 @@ namespace Lit.Db.MySql.Statements
 
             return string.Empty;
         }
+        
+        #endregion
     }
 }
