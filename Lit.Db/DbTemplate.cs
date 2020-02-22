@@ -7,27 +7,6 @@ namespace Lit.Db
     /// </summary>
     public class DbTemplate
     {
-        /// <summary>
-        /// Adds a space and a text to a string.
-        /// </summary>
-        protected static void AddText(StringBuilder str, string text, bool space = true)
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                str.Append((space ? " " : string.Empty) + text);
-            }
-        }
-
-        /// <summary>
-        /// Adds a new line and a text to a string.
-        /// </summary>
-        protected static void AddTextLine(StringBuilder str, string text, bool tab = true)
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                AddText(str, "\n" + (tab ? "  " : string.Empty) + text);
-            }
-        }
     }
 
     /// <summary>
@@ -43,6 +22,18 @@ namespace Lit.Db
         {
             db.ExecuteTemplate(instance);
             return instance;
+        }
+
+        /// <summary>
+        /// Append a separated text.
+        /// </summary>
+        public static void ConditionalAppend(this StringBuilder instance, string separator, string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                instance.Append(separator);
+                instance.Append(text);
+            }
         }
     }
 }

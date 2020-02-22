@@ -26,7 +26,15 @@ namespace Lit.Db.MySql.Statements
 
         public const string AutoIncrementKey = "AUTO_INCREMENT";
 
+        public const string KeyKey = "KEY";
+
+        public const string IndexKey = "INDEX";
+
+        public const string ConstraintKey = "CONSTRAINT";
+
         public const string PrimaryKeyKey = "PRIMARY KEY";
+
+        public const string ForeignKeyKey = "FOREIGN KEY";
 
         public const string UniqueKeyKey = "UNIQUE KEY";
 
@@ -99,6 +107,7 @@ namespace Lit.Db.MySql.Statements
         {
             var str = new StringBuilder();
 
+            // Column definition
             var first = true;
             foreach (var col in columns)
             {
@@ -109,14 +118,19 @@ namespace Lit.Db.MySql.Statements
 
                 str.Append($"  `{col.FieldName}`");
 
-                AddText(str, GetFieldType(col));
-                AddText(str, GetNullable(col));
-                AddText(str, GetDefault(col));
-                AddText(str, GetAutoIncrement(col));
-                AddText(str, GetFieldConstraints(col));
-                AddText(str, GetReferenceDefinition(col));
+                str.ConditionalAppend(" ", GetFieldType(col));
+                str.ConditionalAppend(" ", GetNullable(col));
+                str.ConditionalAppend(" ", GetDefault(col));
+                str.ConditionalAppend(" ", GetAutoIncrement(col));
 
                 first = false;
+            }
+
+            // Constraint definition
+            foreach (var col in columns)
+            {
+                str.ConditionalAppend(",\n ", GetColumnIndex(col));
+                str.ConditionalAppend(",\n ", GetColumnConstraints(col));
             }
 
             return str.ToString();
@@ -157,35 +171,53 @@ namespace Lit.Db.MySql.Statements
             return string.Empty;
         }
 
-        private string GetFieldConstraints(IDbColumnBinding column)
+        private string GetColumnIndex(IDbColumnBinding column)
         {
             switch (column.KeyConstraint)
             {
                 case DbKeyConstraint.None:
-                default:
                     return string.Empty;
 
                 case DbKeyConstraint.PrimaryKey:
-                    return PrimaryKeyKey;
+                    return string.Empty;
 
                 case DbKeyConstraint.UniqueKey:
-                    return UniqueKeyKey;
+                    return string.Empty;
 
+                // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
                 case DbKeyConstraint.ForeignKey:
+                    return $"{KeyKey} fk_{TableName}_{column.FieldName}_idx ( {column.FieldName} )";
+
+                default:
                     return string.Empty;
             }
         }
 
-        private string GetReferenceDefinition(IDbColumnBinding column)
+        private string GetColumnConstraints(IDbColumnBinding column)
         {
-            if (column.KeyConstraint == DbKeyConstraint.ForeignKey)
+            switch (column.KeyConstraint)
             {
-                return $"{ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} )";
-            }
+                case DbKeyConstraint.None:
+                    return string.Empty;
 
-            return string.Empty;
+                // [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (key_part,...) [index_option] ...
+                case DbKeyConstraint.PrimaryKey:
+                    return $"{ConstraintKey} {PrimaryKeyKey} ( {column.FieldName} )";
+
+                // [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (key_part,...) [index_option] ...
+                case DbKeyConstraint.UniqueKey:
+                    return $"{ConstraintKey} {UniqueKeyKey} uk_{TableName}_{column.FieldName} ( {column.FieldName} )";
+
+                // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
+                // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
+                case DbKeyConstraint.ForeignKey:
+                    return $"{ConstraintKey} fk_{TableName}_{column.ForeignTable} {ForeignKeyKey} ( {column.FieldName} ) {ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} ) ON DELETE NO ACTION ON UPDATE NO ACTION";
+
+                default:
+                    return string.Empty;
+            }
         }
-        
+
         #endregion
     }
 }
