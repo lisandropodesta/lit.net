@@ -75,10 +75,9 @@ namespace Lit.Db
         /// <summary>
         /// Builds a generic list and loads a recordset in it.
         /// </summary>
-        public static object LoadSqlRecordset<TS>(DbDataReader reader, Type type, int maxCount, IDbNaming dbNaming)
-            where TS : DbCommand
+        public static object LoadSqlRecordset(DbDataReader reader, Type type, int maxCount, IDbNaming dbNaming)
         {
-            var binding = DbTemplateBinding<TS>.Get(type, dbNaming);
+            var binding = DbTemplateBinding.Get(type, dbNaming);
             var listType = typeof(List<>).MakeGenericType(type);
             var result = Activator.CreateInstance(listType);
             var list = result as IList;

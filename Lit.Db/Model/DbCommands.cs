@@ -92,7 +92,7 @@ namespace Lit.Db.Model
 
             setup?.Invoke(template);
 
-            var binding = DbTemplateBinding<TS>.Get(type, DbNaming);
+            var binding = DbTemplateBinding.Get(type, DbNaming);
 
             var cmdType = commandType ?? binding.CommandType;
 

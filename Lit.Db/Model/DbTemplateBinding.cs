@@ -12,24 +12,23 @@ namespace Lit.Db.Model
     /// <summary>
     /// Stored procedure/query template information.
     /// </summary>
-    public class DbTemplateBinding<TS>
-        where TS : DbCommand
+    public class DbTemplateBinding
     {
         #region Global cache
 
         // Templates cache
-        private static readonly Dictionary<Type, DbTemplateBinding<TS>> templateBindings = new Dictionary<Type, DbTemplateBinding<TS>>();
+        private static readonly Dictionary<Type, DbTemplateBinding> templateBindings = new Dictionary<Type, DbTemplateBinding>();
 
         /// <summary>
         /// Gets the template binding information.
         /// </summary>
-        public static DbTemplateBinding<TS> Get(Type type, IDbNaming dbNaming)
+        public static DbTemplateBinding Get(Type type, IDbNaming dbNaming)
         {
             lock (templateBindings)
             {
                 if (!templateBindings.TryGetValue(type, out var template))
                 {
-                    template = new DbTemplateBinding<TS>(type, dbNaming);
+                    template = new DbTemplateBinding(type, dbNaming);
                     templateBindings.Add(type, template);
                 }
 
@@ -82,9 +81,9 @@ namespace Lit.Db.Model
         /// <summary>
         /// Parameters.
         /// </summary>
-        public IReadOnlyList<IDbParameterBinding<TS>> Parameters => parameterBindings;
+        public IReadOnlyList<IDbParameterBinding> Parameters => parameterBindings;
 
-        private readonly List<IDbParameterBinding<TS>> parameterBindings;
+        private readonly List<IDbParameterBinding> parameterBindings;
 
         /// <summary>
         /// Fields.
@@ -103,9 +102,9 @@ namespace Lit.Db.Model
         /// <summary>
         /// Records.
         /// </summary>
-        public IReadOnlyList<IDbRecordBinding<TS>> Records => recordBindings;
+        public IReadOnlyList<IDbRecordBinding> Records => recordBindings;
 
-        private readonly List<IDbRecordBinding<TS>> recordBindings;
+        private readonly List<IDbRecordBinding> recordBindings;
 
         /// <summary>
         /// Recordsets.
@@ -152,28 +151,28 @@ namespace Lit.Db.Model
             {
                 if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
                 {
-                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,,>), propInfo, cAttr, dbNaming);
+                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr, dbNaming);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
                     mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,,>), propInfo, rsAttr, dbNaming);
+                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr, dbNaming);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
                 {
                     mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,,>), propInfo, rAttr, dbNaming);
+                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr, dbNaming);
                 }
                 else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr))
                 {
                     mode = DbExecutionMode.Query;
-                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,,>), propInfo, fAttr, dbNaming);
+                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr, dbNaming);
                 }
                 else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
                 {
-                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,,>), propInfo, pAttr, dbNaming);
+                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr, dbNaming);
                 }
             }
 
@@ -210,7 +209,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns all input parameters on the command.
         /// </summary>
-        public void SetInputParameters(TS cmd, object instance)
+        public void SetInputParameters(DbCommand cmd, object instance)
         {
             parameterBindings?.ForEach(b => b.SetInputParameters(cmd, instance));
         }
@@ -227,7 +226,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns all output parameters on the template instance.
         /// </summary>
-        public void GetOutputParameters(TS cmd, object instance)
+        public void GetOutputParameters(DbCommand cmd, object instance)
         {
             parameterBindings?.ForEach(b => b.GetOutputParameters(cmd, instance));
         }
@@ -301,7 +300,7 @@ namespace Lit.Db.Model
         private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbNaming dbNaming)
             where TI : class
         {
-            var type = genClassType.MakeGenericType(typeof(TS), propertyInfo.DeclaringType, propertyInfo.PropertyType);
+            var type = genClassType.MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType);
             var binding = Activator.CreateInstance(type, new object[] { propertyInfo, attribute, dbNaming });
             return binding as TI;
         }

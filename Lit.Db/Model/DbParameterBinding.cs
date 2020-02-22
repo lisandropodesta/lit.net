@@ -9,8 +9,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db parameter binding interface.
     /// </summary>
-    public interface IDbParameterBinding<TS> : IDbPropertyBinding<DbParameterAttribute>
-        where TS : DbCommand
+    public interface IDbParameterBinding : IDbPropertyBinding<DbParameterAttribute>
     {
         /// <summary>
         /// Assigns input parameters.
@@ -20,19 +19,18 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
-        void SetInputParameters(TS cmd, object instance);
+        void SetInputParameters(DbCommand cmd, object instance);
 
         /// <summary>
         /// Get output parameters.
         /// </summary>
-        void GetOutputParameters(TS cmd, object instance);
+        void GetOutputParameters(DbCommand cmd, object instance);
     }
 
     /// <summary>
     /// Db parameter property binding.
     /// </summary>
-    internal class DbParameterBinding<TS, TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding<TS>
-        where TS : DbCommand
+    internal class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding
         where TC : class
     {
         private readonly string parameterName;
@@ -79,7 +77,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Assigns input parameters.
         /// </summary>
-        public void SetInputParameters(TS cmd, object instance)
+        public void SetInputParameters(DbCommand cmd, object instance)
         {
             if (Attributes.IsInput)
             {
@@ -111,7 +109,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Get output parameters.
         /// </summary>
-        public void GetOutputParameters(TS cmd, object instance)
+        public void GetOutputParameters(DbCommand cmd, object instance)
         {
             if (Attributes.IsOutput)
             {

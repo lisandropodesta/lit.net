@@ -9,8 +9,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db record binding interface.
     /// </summary>
-    public interface IDbRecordBinding<TS> : IDbPropertyBinding<DbRecordAttribute>
-        where TS : DbCommand
+    public interface IDbRecordBinding : IDbPropertyBinding<DbRecordAttribute>
     {
         /// <summary>
         /// Load the current recordset.
@@ -21,8 +20,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db record property binding.
     /// </summary>
-    internal class DbRecordBinding<TS, TC, TP> : DbPropertyBinding<TC, TP, DbRecordAttribute>, IDbRecordBinding<TS>
-        where TS : DbCommand
+    internal class DbRecordBinding<TC, TP> : DbPropertyBinding<TC, TP, DbRecordAttribute>, IDbRecordBinding
         where TC : class
     {
         #region Constructor
@@ -39,7 +37,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void LoadResults(DbDataReader reader, object instance, IDbNaming dbNaming)
         {
-            var list = DbHelper.LoadSqlRecordset<TS>(reader, BindingType, Attributes.AllowMultipleRecords ? 1 : 2, dbNaming) as IList;
+            var list = DbHelper.LoadSqlRecordset(reader, BindingType, Attributes.AllowMultipleRecords ? 1 : 2, dbNaming) as IList;
 
             switch (list.Count)
             {

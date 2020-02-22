@@ -34,8 +34,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db field property binding.
     /// </summary>
-    internal class DbFieldBinding<TS, TC, TP> : DbPropertyBinding<TC, TP, DbFieldAttribute>, IDbFieldBinding
-        where TS : DbCommand
+    internal class DbFieldBinding<TC, TP> : DbPropertyBinding<TC, TP, DbFieldAttribute>, IDbFieldBinding
         where TC : class
     {
         /// <summary>

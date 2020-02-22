@@ -18,8 +18,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db recordset property binding.
     /// </summary>
-    internal class DbRecordsetBinding<TS, TC, TP> : DbPropertyBinding<TC, TP, DbRecordsetAttribute>, IDbRecordsetBinding
-        where TS : DbCommand
+    internal class DbRecordsetBinding<TC, TP> : DbPropertyBinding<TC, TP, DbRecordsetAttribute>, IDbRecordsetBinding
         where TC : class
     {
         #region Constructor
@@ -36,7 +35,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void LoadResults(DbDataReader reader, object instance, IDbNaming dbNaming)
         {
-            var list = DbHelper.LoadSqlRecordset<TS>(reader, BindingType, int.MaxValue, dbNaming);
+            var list = DbHelper.LoadSqlRecordset(reader, BindingType, int.MaxValue, dbNaming);
             SetValue(instance, list);
         }
     }

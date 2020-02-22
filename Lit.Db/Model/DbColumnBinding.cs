@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Data.Common;
 using System.Reflection;
 using Lit.Db.Attributes;
 
@@ -35,8 +33,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db field property binding.
     /// </summary>
-    internal class DbColumnBinding<TS, TC, TP> : DbFieldBinding<TS, TC, TP>, IDbColumnBinding
-        where TS : DbCommand
+    internal class DbColumnBinding<TC, TP> : DbFieldBinding<TC, TP>, IDbColumnBinding
         where TC : class
     {
         /// <summary>
@@ -86,7 +83,7 @@ namespace Lit.Db.Model
             {
                 keyConstraint = DbKeyConstraint.ForeignKey;
 
-                var binding = DbTemplateBinding<TS>.Get(fk.ForeignTableTemplate, dbNaming);
+                var binding = DbTemplateBinding.Get(fk.ForeignTableTemplate, dbNaming);
                 var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
 
                 if (colBinding == null)
