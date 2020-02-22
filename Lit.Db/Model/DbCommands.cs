@@ -110,7 +110,7 @@ namespace Lit.Db.Model
                 text = binding.SetInputParameters(text, template);
             }
 
-            using (var connection = GetConnectionOpened())
+            using (var connection = GetOpenedConnection())
             {
                 using (var cmd = GetCommand(text, connection, cmdType))
                 {
@@ -177,8 +177,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets an opened connection.
         /// </summary>
-        /// <returns></returns>
-        protected TH GetConnectionOpened()
+        protected TH GetOpenedConnection()
         {
             var conn = CreateConnection();
             conn.Open();
