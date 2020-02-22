@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Lit.Ui</AssemblyName>
     <RootNamespace>Lit.Ui</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Lisandro Podesta</Authors>
+    <Company>Lisandro Podesta</Company>
   </PropertyGroup>
 
   <ItemGroup>

@@ -4,6 +4,9 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>Lit.Ui.Wpf</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Lisandro Podesta</Authors>
+    <Company>Lisandro Podesta</Company>
   </PropertyGroup>
 
   <ItemGroup>

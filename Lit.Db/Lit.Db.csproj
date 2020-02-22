@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Lisandro Podesta</Authors>
+    <Company>Lisandro Podesta</Company>
   </PropertyGroup>
 
   <ItemGroup>
