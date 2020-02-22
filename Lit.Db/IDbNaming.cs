@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace Lit.Db
 {
@@ -16,5 +17,20 @@ namespace Lit.Db
         /// Gets a field name.
         /// </summary>
         string GetFieldName(PropertyInfo propInfo, string fieldName);
+
+        /// <summary>
+        /// Gets a stored procedure name.
+        /// </summary>
+        string GetStoredProcedureName(Type template, string spName);
+
+        /// <summary>
+        /// Gets a table name.
+        /// </summary>
+        string GetTableName(Type tableType, string tableName);
+
+        /// <summary>
+        /// Gets a table column name.
+        /// </summary>
+        string GetColumnName(string tableName, PropertyInfo propInfo, string fieldName);
     }
 }

@@ -196,6 +196,30 @@ namespace Lit.Db
         }
 
         /// <summary>
+        /// Gets a stored procedure name.
+        /// </summary>
+        public virtual string GetStoredProcedureName(Type template, string spName)
+        {
+            return TranslateName(TextSource, Scope, template.Name, spName, StoredProceduresCase, Placing.DoNotChange, null);
+        }
+
+        /// <summary>
+        /// Gets a table name.
+        /// </summary>
+        public virtual string GetTableName(Type template, string tableName)
+        {
+            return TranslateName(TextSource, Scope, template.Name, tableName, TablesCase, Placing.DoNotChange, null);
+        }
+
+        /// <summary>
+        /// Gets a table column name.
+        /// </summary>
+        public virtual string GetColumnName(string tableName, PropertyInfo propInfo, string fieldName)
+        {
+            return TranslateName(TextSource, Scope, propInfo.Name, fieldName, FieldsCase, IdPlacing, IdText);
+        }
+
+        /// <summary>
         /// Translates a name.
         /// </summary>
         public static string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, Placing idPlacing, string idText)
