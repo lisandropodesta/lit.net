@@ -12,7 +12,7 @@ namespace Lit.Db.MySql.Statements
     ///     [PARTITION partition_list]
     /// </summary>
     [DbQuery(Template)]
-    public class Select : DbTemplate
+    public class Select : MySqlTemplate
     {
         public const string Template =
             "SELECT {{@rows}} {{@priority}} {{@join_order}}\n" +
@@ -23,8 +23,6 @@ namespace Lit.Db.MySql.Statements
             "{{@having}}\n" +
             "{{@order_by}}\n" +
             "{{@limit}}";
-
-        public const string AllColumns = "*";
 
         /// <summary>
         /// Rows selection option.

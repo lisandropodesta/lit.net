@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Text;
 using Lit.DataType;
 using Lit.Db.Attributes;
@@ -14,35 +13,13 @@ namespace Lit.Db.MySql.Statements
     /// Single table creation.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateTable : DbTemplate
+    public class CreateTable : MySqlTemplate
     {
         public const string Template =
             "CREATE TABLE {{@table_name}} (\n" +
             "{{@column_definition}}\n" +
             "{{@table_constraints}}\n" +
             ") ENGINE={{@engine}} DEFAULT CHARSET={{@default_charset}}";
-
-        public const string NullKey = "NULL";
-
-        public const string NotNullKey = "NOT NULL";
-
-        public const string AutoIncrementKey = "AUTO_INCREMENT";
-
-        public const string KeyKey = "KEY";
-
-        public const string IndexKey = "INDEX";
-
-        public const string ConstraintKey = "CONSTRAINT";
-
-        public const string PrimaryKeyKey = "PRIMARY KEY";
-
-        public const string ForeignKeyKey = "FOREIGN KEY";
-
-        public const string UniqueKeyKey = "UNIQUE KEY";
-
-        public const string ReferecencesKey = "REFERENCES";
-
-        public const string DefaultKey = "DEFAULT";
 
         /// <summary>
         /// Table name.
@@ -75,7 +52,7 @@ namespace Lit.Db.MySql.Statements
         public string DefaultCharset { get; set; }
 
         /// <summary>
-        /// Statemente execution.
+        /// Constructor.
         /// </summary>
         public CreateTable(Type tableTemplate, IDbNaming dbNaming)
         {
@@ -92,7 +69,7 @@ namespace Lit.Db.MySql.Statements
         }
 
         /// <summary>
-        /// Statemente execution.
+        /// Constructor.
         /// </summary>
         public CreateTable(string tableName, IEnumerable<IDbColumnBinding> columns, Engine engine, string defaultCharset)
         {

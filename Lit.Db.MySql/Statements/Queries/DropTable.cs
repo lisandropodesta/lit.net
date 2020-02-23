@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Data;
 using Lit.Db.Attributes;
-using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements
 {
@@ -9,11 +7,9 @@ namespace Lit.Db.MySql.Statements
     /// Single table dropping.
     /// </summary>
     [DbQuery(Template)]
-    public class DropTable : DbTemplate
+    public class DropTable : MySqlTemplate
     {
         public const string Template = "DROP TABLE {{@if_exists}} {{@table_name}}";
-
-        public const string IfExistsKey = "IF EXISTS";
 
         /// <summary>
         /// Table name.
@@ -35,19 +31,17 @@ namespace Lit.Db.MySql.Statements
         protected string IfExists { get; private set; }
 
         /// <summary>
-        /// Statemente execution.
+        /// Constructor.
         /// </summary>
         public DropTable(Type tableTemplate, IDbNaming dbNaming, bool onlyIfExists = false)
         {
             var bindings = DbTemplateCache.GetTable(tableTemplate, dbNaming);
-
             TableName = bindings.Text;
-
             OnlyIfExists = onlyIfExists;
         }
 
         /// <summary>
-        /// Statemente execution.
+        /// Constructor.
         /// </summary>
         public DropTable(string tableName, bool onlyIfExists = false)
         {
