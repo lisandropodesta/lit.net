@@ -147,7 +147,7 @@ namespace Lit.Db.MySql.Statements
 
         private string GetFieldType(IDbColumnBinding column)
         {
-            return MySqlDataType.Translate(column.DataType);
+            return MySqlDataType.Translate(column.DataType, column.FieldType);
         }
 
         private string GetNullable(IDbColumnBinding column)

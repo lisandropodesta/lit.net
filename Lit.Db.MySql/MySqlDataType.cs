@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Text;
+using Lit.DataType;
+using Lit.Db.Attributes;
 using Lit.Db.Model;
 
 namespace Lit.Db.MySql
@@ -67,6 +70,10 @@ namespace Lit.Db.MySql
 
         public const string JsonDataType = @"JSON";
 
+        // Enumerated
+
+        public const string EnumType = @"ENUM";
+
         // Text/blob sizes
 
         public const uint Size256B = 256;
@@ -96,7 +103,7 @@ namespace Lit.Db.MySql
         /// <summary>
         /// Translates a db data type to a MySql data type.
         /// </summary>
-        public static string Translate(DbDataType dataType, ulong? size = null, int? precision = null)
+        public static string Translate(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null)
         {
             switch (dataType)
             {
@@ -164,13 +171,59 @@ namespace Lit.Db.MySql
                     return GetBlobDataType(size);
 
                 case DbDataType.Enumerated:
-                    break;
+                    return GetEnumList(type);
 
                 case DbDataType.Json:
                     return JsonDataType;
             }
 
             throw new ArgumentException($"Type [{dataType}] not supported.");
+        }
+
+        private static string GetEnumList(Type enumType)
+        {
+            return $"{EnumType}({GetEnumValues(enumType)})";
+        }
+
+        private static string GetEnumValues(Type enumType)
+        {
+            var text = new StringBuilder();
+            var any = false;
+            var anyAttr = false;
+
+            foreach (var fieldInfo in enumType.GetFields())
+            {
+                string code;
+                if (TypeHelper.GetAttribute<DbEnumCodeAttribute>(fieldInfo, out var dbCodeAttr))
+                {
+                    if (!anyAttr)
+                    {
+                        anyAttr = true;
+                        text.Clear();
+                        any = false;
+                    }
+
+                    code = dbCodeAttr.Code;
+                }
+                else if (!anyAttr)
+                {
+                    code = fieldInfo.Name;
+                }
+                else
+                {
+                    continue;
+                }
+
+                if (any)
+                {
+                    text.Append(",");
+                }
+
+                text.Append("'" + code + "'");
+                any = true;
+            }
+
+            return text.ToString();
         }
 
         private static string GetTextDataType(ulong? size)
