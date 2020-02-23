@@ -160,7 +160,7 @@ namespace Lit.Db
         /// <summary>
         /// Translates a name.
         /// </summary>
-        public static string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, AffixPlacing idPlacing, string idText)
+        public static string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, AffixPlacing idPlacing, params string[] affixes)
         {
             string name;
 
@@ -193,7 +193,7 @@ namespace Lit.Db
                 || scope == Translation.Configuration && source == Source.Configuration
                 || scope == Translation.Reflection && source == Source.Reflection)
             {
-                name = Name.Translate(name, namingCase, idPlacing, idText);
+                name = Name.Format(name, namingCase, idPlacing, affixes);
             }
 
             return name;

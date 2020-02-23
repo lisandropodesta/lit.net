@@ -9,54 +9,57 @@ namespace Lit.Names
     public static class Name
     {
         /// <summary>
-        /// Translates a name.
+        /// Formats a name.
         /// </summary>
-        public static string Translate(string name, Case namingCase, AffixPlacing idPlacing, string idText)
+        public static string Format(string name, Case namingCase, AffixPlacing affixPlacing, params string[] affixes)
         {
             var words = SplitInWords(name, namingCase);
             var count = words.Length;
 
             var startIndex = 0;
-            if (count > 1 && !string.IsNullOrEmpty(idText))
+            if (count > 1 && affixPlacing != AffixPlacing.DoNotChange && affixes?.Length > 0)
             {
-                switch (idPlacing)
-                {
-                    case AffixPlacing.DoNotChange:
-                    default:
-                        break;
+                var i = IndexOf(affixes, words[0]);
+                var j = IndexOf(affixes, words[count - 1]);
 
+                switch (affixPlacing)
+                {
                     case AffixPlacing.DoNotPlace:
-                        if (string.Compare(words[0], idText, true) != 0)
+                        if (i >= 0)
                         {
                             words[0] = string.Empty;
                         }
-                        if (string.Compare(words[count - 1], idText, true) == 0)
+                        if (j >= 0)
                         {
                             words[count - 1] = string.Empty;
                         }
                         break;
 
                     case AffixPlacing.Prefix:
-                        if (string.Compare(words[0], idText, true) != 0 && string.Compare(words[count - 1], idText, true) == 0)
+                        if (i < 0 && j >= 0)
                         {
                             startIndex = count - 1;
-                            words[startIndex] = idText;
+                            words[startIndex] = affixes[j];
                         }
                         break;
 
                     case AffixPlacing.Sufix:
-                        if (string.Compare(words[0], idText, true) == 0 && string.Compare(words[count - 1], idText, true) != 0)
+                        if (i >= 0 && j < 0)
                         {
                             startIndex = 1;
-                            words[0] = idText;
+                            words[0] = affixes[i];
                         }
                         break;
 
                     case AffixPlacing.Whole:
-                        if (string.Compare(words[0], idText, true) != 0 || string.Compare(words[count - 1], idText, true) == 0)
+                        if (i >= 0)
                         {
-                            return idText;
+                            return affixes[i];
                         };
+                        if (j >= 0)
+                        {
+                            return affixes[j];
+                        }
                         break;
                 }
             }
@@ -257,6 +260,22 @@ namespace Lit.Names
                 default:
                     return string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Get the index of an element.
+        /// </summary>
+        private static int IndexOf(string[] affixes, string text)
+        {
+            for (var index = 0; index < affixes.Length; index++)
+            {
+                if (string.Compare(affixes[index], text, true) == 0)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
     }
 }
