@@ -41,7 +41,7 @@ namespace Lit.Db.Model
             : base(propInfo, attr)
         {
             parameterName = Attributes.ParameterName;
-            parameterName = dbNaming?.GetParameterName(propInfo, parameterName) ?? parameterName;
+            parameterName = dbNaming?.GetParameterName(propInfo.Name, parameterName) ?? parameterName;
 
             if (string.IsNullOrEmpty(parameterName))
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Lit.Db.Architecture;
 using Lit.Names;
 
 namespace Lit.Db
@@ -120,17 +121,17 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        public virtual string GetParameterName(PropertyInfo propInfo, string parameterName)
+        public virtual string GetParameterName(string reflectionName, string parameterName)
         {
-            return TranslateName(TextSource, Scope, propInfo.Name, parameterName, ParametersCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, reflectionName, parameterName, ParametersCase, IdPlacing, IdText);
         }
 
         /// <summary>
         /// Gets a field name.
         /// </summary>
-        public virtual string GetFieldName(PropertyInfo propInfo, string fieldName)
+        public virtual string GetFieldName(string reflectionName, string fieldName)
         {
-            return TranslateName(TextSource, Scope, propInfo.Name, fieldName, FieldsCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, reflectionName, fieldName, FieldsCase, IdPlacing, IdText);
         }
 
         /// <summary>
@@ -144,9 +145,11 @@ namespace Lit.Db
         /// <summary>
         /// Gets a stored procedure name.
         /// </summary>
-        public virtual string GetStoredProcedureName(string spName)
+        public virtual string GetStoredProcedureName(string tableName, StoredProcedureFunction spFunc)
         {
-            return TranslateName(TextSource, Scope, null, spName, StoredProceduresCase, AffixPlacing.DoNotChange, null);
+            DbArchitectureHelper.GetDefaultStoredProcedureAffixes(spFunc, out var prefix, out var suffix);
+            var name = prefix + tableName + suffix;
+            return TranslateName(TextSource, Scope, null, name, StoredProceduresCase, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>

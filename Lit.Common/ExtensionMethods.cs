@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lit.Ui
+namespace Lit
 {
     public static class ExtensionMethods
     {

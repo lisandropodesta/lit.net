@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Lit.Db.Architecture;
 
 namespace Lit.Db
 {
@@ -11,22 +12,22 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        string GetParameterName(PropertyInfo propInfo, string parameterName);
+        string GetParameterName(string reflectionName, string parameterName);
 
         /// <summary>
         /// Gets a field name.
         /// </summary>
-        string GetFieldName(PropertyInfo propInfo, string fieldName);
+        string GetFieldName(string reflectionName, string fieldName);
 
         /// <summary>
         /// Gets a stored procedure name.
         /// </summary>
-        string GetStoredProcedureName(Type template, string spName);
+        string GetStoredProcedureName(Type spTemplate, string spName);
 
         /// <summary>
         /// Gets a stored procedure name.
         /// </summary>
-        string GetStoredProcedureName(string spName);
+        string GetStoredProcedureName(string tableName, StoredProcedureFunction spFunc);
 
         /// <summary>
         /// Gets a table name.

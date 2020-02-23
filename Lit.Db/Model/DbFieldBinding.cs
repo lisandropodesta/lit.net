@@ -55,7 +55,7 @@ namespace Lit.Db.Model
             : base(propInfo, attr)
         {
             fieldName = Attributes.FieldName;
-            fieldName = dbNaming?.GetFieldName(propInfo, fieldName) ?? fieldName;
+            fieldName = dbNaming?.GetFieldName(propInfo.Name, fieldName) ?? fieldName;
 
             if (string.IsNullOrEmpty(fieldName))
             {
