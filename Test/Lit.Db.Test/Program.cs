@@ -38,7 +38,7 @@ namespace Lit.Db.Test
             }
             catch (Exception x)
             {
-                Audit.Error($"Error: {x.Message}");
+                Audit.Error($"Error: {x.Message}.");
             }
         }
 
