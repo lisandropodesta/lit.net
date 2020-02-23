@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Lit.Db\Lit.Db.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Attributes\" />
-  </ItemGroup>
-
 </Project>

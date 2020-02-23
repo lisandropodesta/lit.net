@@ -1,4 +1,4 @@
-﻿namespace Lit.Db.MySql.Schema.Information
+﻿namespace Lit.Db.Custom.MySql
 {
     /// <summary>
     /// Row format definition.

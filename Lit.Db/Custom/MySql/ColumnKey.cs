@@ -1,6 +1,6 @@
 ﻿using Lit.Db.Attributes;
 
-namespace Lit.Db.MySql.Schema.Information
+namespace Lit.Db.Custom.MySql
 {
     /// <summary>
     /// Column key codes definition.

@@ -1,4 +1,5 @@
 ﻿using Lit.Db.Attributes;
+using Lit.Db.Custom.MySql;
 
 namespace Lit.Db.MySql.Schema.Information.Tables
 {
@@ -29,7 +30,7 @@ namespace Lit.Db.MySql.Schema.Information.Tables
         public BooleanCode IsNullable { get; protected set; }
 
         [DbField]
-        public DataType DataType { get; protected set; }
+        public RawDataType DataType { get; protected set; }
 
         [DbField]
         public int? CharacterMaximumLength { get; protected set; }

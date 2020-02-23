@@ -1,11 +1,11 @@
 ﻿using Lit.Db.Attributes;
 
-namespace Lit.Db.MySql.Schema.Information
+namespace Lit.Db.Custom.MySql
 {
     /// <summary>
     /// Data type codes definition.
     /// </summary>
-    public enum DataType
+    public enum RawDataType
     {
         [DbEnumCode("bit")]
         Bit,

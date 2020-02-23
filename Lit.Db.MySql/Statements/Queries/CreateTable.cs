@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using Lit.DataType;
 using Lit.Db.Attributes;
+using Lit.Db.Custom.MySql;
+using Lit.Db.Custom.MySql.Attributes;
 using Lit.Db.Model;
-using Lit.Db.MySql.Schema.Information;
 
 namespace Lit.Db.MySql.Statements
 {
@@ -40,6 +42,8 @@ namespace Lit.Db.MySql.Statements
 
         public const string ReferecencesKey = "REFERENCES";
 
+        public const string DefaultKey = "DEFAULT";
+
         /// <summary>
         /// Table name.
         /// </summary>
@@ -73,10 +77,12 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Statemente execution.
         /// </summary>
-        public CreateTable(Type tableTemplate, IDbNaming dbNaming, Engine engine, string defaultCharset)
+        public CreateTable(Type tableTemplate, IDbNaming dbNaming)
         {
-            Engine = engine.ToString();
-            DefaultCharset = defaultCharset;
+            var tableAttr = TypeHelper.GetAttribute<MySqlTableAttribute>(tableTemplate, true);
+
+            Engine = (tableAttr?.Engine ?? Custom.MySql.Engine.InnoDb).ToString();
+            DefaultCharset = (tableAttr?.DefaultCharset ?? DefaultKey);
 
             var bindings = DbTemplateCache.Get(tableTemplate, dbNaming);
             if (bindings.CommandType != CommandType.TableDirect)
