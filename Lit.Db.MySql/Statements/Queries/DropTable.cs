@@ -39,11 +39,7 @@ namespace Lit.Db.MySql.Statements
         /// </summary>
         public DropTable(Type tableTemplate, IDbNaming dbNaming, bool onlyIfExists = false)
         {
-            var bindings = DbTemplateCache.Get(tableTemplate, dbNaming);
-            if (bindings.CommandType != CommandType.TableDirect)
-            {
-                throw new ArgumentException($"Invalid table template for type {tableTemplate}");
-            }
+            var bindings = DbTemplateCache.GetTable(tableTemplate, dbNaming);
 
             TableName = bindings.Text;
 

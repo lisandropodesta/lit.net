@@ -84,11 +84,7 @@ namespace Lit.Db.MySql.Statements
             Engine = (tableAttr?.Engine ?? Custom.MySql.Engine.InnoDb).ToString();
             DefaultCharset = (tableAttr?.DefaultCharset ?? DefaultKey);
 
-            var bindings = DbTemplateCache.Get(tableTemplate, dbNaming);
-            if (bindings.CommandType != CommandType.TableDirect)
-            {
-                throw new ArgumentException($"Invalid table template for type {tableTemplate}");
-            }
+            var bindings = DbTemplateCache.GetTable(tableTemplate, dbNaming);
 
             TableName = bindings.Text;
             ColumnDefinition = GetColumnDefinition(bindings.Columns);
