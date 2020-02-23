@@ -174,6 +174,14 @@ namespace Lit.Db.Model
         #endregion
 
         /// <summary>
+        /// Resolve foreign keys.
+        /// </summary>
+        internal void ResolveForeignKeys(IDbNaming dbNaming)
+        {
+            columnBindings?.ForEach(binding => binding.ResolveForeignKey(dbNaming));
+        }
+
+        /// <summary>
         /// Finds a column binding.
         /// </summary>
         public IDbColumnBinding FindColumn(string propertyName)

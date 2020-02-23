@@ -23,6 +23,7 @@ namespace Lit.Db
                 {
                     template = new DbTemplateBinding(type, dbNaming);
                     templateBindings.Add(type, template);
+                    template.ResolveForeignKeys(dbNaming);
                 }
 
                 return template;

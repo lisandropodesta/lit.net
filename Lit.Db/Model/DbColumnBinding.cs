@@ -28,6 +28,11 @@ namespace Lit.Db.Model
         /// Foreign column.
         /// </summary>
         string ForeignColumn { get; }
+
+        /// <summary>
+        /// Resolve foreign key.
+        /// </summary>
+        void ResolveForeignKey(IDbNaming dbNaming);
     }
 
     /// <summary>
@@ -55,14 +60,14 @@ namespace Lit.Db.Model
         /// </summary>
         public string ForeignTable => foreignTable;
 
-        private readonly string foreignTable;
+        private string foreignTable;
 
         /// <summary>
         /// Foreign column.
         /// </summary>
         public string ForeignColumn => foreignColumn;
 
-        private readonly string foreignColumn;
+        private string foreignColumn;
 
         #region Constructor
 
@@ -82,17 +87,6 @@ namespace Lit.Db.Model
             else if (attr is DbForeignKeyAttribute fk)
             {
                 keyConstraint = DbKeyConstraint.ForeignKey;
-
-                var binding = DbTemplateCache.Get(fk.ForeignTableTemplate, dbNaming);
-                var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
-
-                if (colBinding == null)
-                {
-                    throw new ArgumentException($"Invalid foreign key definition [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}.{propInfo.Name}]");
-                }
-
-                foreignTable = binding.Text;
-                foreignColumn = dbNaming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
             }
             else if (attr is DbUniqueKeyAttribute)
             {
@@ -105,5 +99,25 @@ namespace Lit.Db.Model
         }
 
         #endregion
+
+        /// <summary>
+        /// Resolve foreign key.
+        /// </summary>
+        public void ResolveForeignKey(IDbNaming dbNaming)
+        {
+            if (Attributes is DbForeignKeyAttribute fk)
+            {
+                var binding = DbTemplateCache.Get(fk.ForeignTableTemplate, dbNaming);
+                var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
+
+                if (colBinding == null)
+                {
+                    throw new ArgumentException($"Invalid foreign key definition [{PropertyInfo.DeclaringType.Namespace}.{PropertyInfo.DeclaringType.Name}.{PropertyInfo.Name}]");
+                }
+
+                foreignTable = binding.Text;
+                foreignColumn = dbNaming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
+            }
+        }
     }
 }
