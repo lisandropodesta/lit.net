@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\Lit.Names\Lit.Names.csproj" />
   </ItemGroup>
 
   <ItemGroup>
