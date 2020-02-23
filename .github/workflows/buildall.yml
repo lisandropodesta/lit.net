@@ -1,0 +1,46 @@
+name: Build and publish all
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+
+    - name: Publish Lit.Common nuget packages
+      run: dotnet nuget push Lit.Common\bin\release\Lit.Common.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Os.Win nuget packages
+      run: dotnet nuget push Lit.Os.Win\bin\release\Lit.Os.Win.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Auditing nuget packages
+      run: dotnet nuget push Lit.Auditing\bin\release\Lit.Auditing.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Auditing.NLog nuget packages
+      run: dotnet nuget push Lit.Auditing.NLog\bin\release\Lit.Auditing.NLog.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Db nuget packages
+      run: dotnet nuget push Lit.Db\bin\release\Lit.Db.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Db.MySql nuget packages
+      run: dotnet nuget push Lit.Db.MySql\bin\release\Lit.Db.MySql.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Db.Sql nuget packages
+      run: dotnet nuget push Lit.Db.Sql\bin\release\Lit.Db.Sql.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Ui nuget packages
+      run: dotnet nuget push Lit.Ui\bin\release\Lit.Ui.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
+
+    - name: Publish Lit.Ui.Wpf nuget packages
+      run: dotnet nuget push Lit.Ui.Wpf\bin\release\Lit.Ui.Wpf.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json
