@@ -142,6 +142,14 @@ namespace Lit.Db
         }
 
         /// <summary>
+        /// Gets a stored procedure name.
+        /// </summary>
+        public virtual string GetStoredProcedureName(string spName)
+        {
+            return TranslateName(TextSource, Scope, null, spName, StoredProceduresCase, AffixPlacing.DoNotChange, null);
+        }
+
+        /// <summary>
         /// Gets a table name.
         /// </summary>
         public virtual string GetTableName(Type template, string tableName)

@@ -24,6 +24,11 @@ namespace Lit.Db
         string GetStoredProcedureName(Type template, string spName);
 
         /// <summary>
+        /// Gets a stored procedure name.
+        /// </summary>
+        string GetStoredProcedureName(string spName);
+
+        /// <summary>
         /// Gets a table name.
         /// </summary>
         string GetTableName(Type tableType, string tableName);
