@@ -211,7 +211,7 @@ namespace Lit.Db.MySql.Statements
                 // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
                 // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
                 case DbKeyConstraint.ForeignKey:
-                    return $"{ConstraintKey} fk_{TableName}_{column.ForeignTable} {ForeignKeyKey} ( {column.FieldName} ) {ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} ) ON DELETE NO ACTION ON UPDATE NO ACTION";
+                    return $"{ConstraintKey} fk_{TableName}_{column.FieldName} {ForeignKeyKey} ( {column.FieldName} ) {ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} ) ON DELETE NO ACTION ON UPDATE NO ACTION";
 
                 default:
                     return string.Empty;
