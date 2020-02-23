@@ -1,21 +1,29 @@
-﻿using Lit.Auditing;
-using Lit.Db.MySql.Schema.Information;
-using Lit.Db.MySql.Statements;
+﻿using System;
+using Lit.Auditing;
+using Lit.Db.Architecture;
 using Lit.Db.Test.Schema.Tables;
 
 namespace Lit.Db.Test.MySql
 {
     public static class SchemaUpdate
     {
-        public static void Execute(IDbHost db)
+        public static void Execute(IDbArchitecture db)
         {
             Audit.Message("\n  ** DROP TABLEs test **");
-            new DropTable(typeof(UserSession), db.DbNaming, true).Exec(db);
-            new DropTable(typeof(User), db.DbNaming, true).Exec(db);
+            db.DropTable(typeof(UserSession), true);
+            db.DropTable(typeof(User), true);
 
             Audit.Message("\n  ** CREATE TABLEs test **");
-            new CreateTable(typeof(User), db.DbNaming, Engine.InnoDb, "latin1").Exec(db);
-            new CreateTable(typeof(UserSession), db.DbNaming, Engine.InnoDb, "latin1").Exec(db);
+            db.CreateTable(typeof(User));
+            db.CreateTable(typeof(UserSession));
+
+            CreateAllStoredProcedures(db, typeof(User));
+            CreateAllStoredProcedures(db, typeof(UserSession));
+        }
+
+        private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
+        {
+            db.CreateStoredProcedure(tableTemplate, StoredProcedureFunction.Get);
         }
     }
 }

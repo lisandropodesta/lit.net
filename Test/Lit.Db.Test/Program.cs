@@ -1,5 +1,6 @@
 ﻿using System;
 using Lit.Auditing;
+using Lit.Db.Architecture;
 using Lit.Db.MySql;
 
 namespace Lit.Db.Test
@@ -14,7 +15,7 @@ namespace Lit.Db.Test
 
         private static readonly IDbHost db = new MySqlHost(wikialgorithmConnectionStr) { DbNaming = naming };
 
-        private static readonly IDbHost tdb = new MySqlHost(testingConnectionStr) { DbNaming = naming };
+        private static readonly IDbArchitecture tdb = new MySqlArchitecture(testingConnectionStr) { DbNaming = naming };
 
         static void Main(string[] args)
         {

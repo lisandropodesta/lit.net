@@ -10,6 +10,9 @@ namespace Lit.Db.Test.Schema
         [DbEnumCode("Deleted")]
         Deleted,
 
+        [DbEnumCode("Hold")]
+        Hold,
+
         [DbEnumCode("Active")]
         Active
     }
