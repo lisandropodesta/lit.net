@@ -25,6 +25,17 @@ namespace Lit.Names
                     default:
                         break;
 
+                    case AffixPlacing.DoNotPlace:
+                        if (string.Compare(words[0], idText, true) != 0)
+                        {
+                            words[0] = string.Empty;
+                        }
+                        if (string.Compare(words[count - 1], idText, true) == 0)
+                        {
+                            words[count - 1] = string.Empty;
+                        }
+                        break;
+
                     case AffixPlacing.Prefix:
                         if (string.Compare(words[0], idText, true) != 0 && string.Compare(words[count - 1], idText, true) == 0)
                         {
@@ -40,6 +51,13 @@ namespace Lit.Names
                             words[0] = idText;
                         }
                         break;
+
+                    case AffixPlacing.Whole:
+                        if (string.Compare(words[0], idText, true) != 0 || string.Compare(words[count - 1], idText, true) == 0)
+                        {
+                            return idText;
+                        };
+                        break;
                 }
             }
 
@@ -47,16 +65,21 @@ namespace Lit.Names
 
             var result = new StringBuilder();
 
+            var first = true;
             for (var index = 0; index < count; index++)
             {
                 var word = words[(index + startIndex) % count];
 
-                if (index > 0)
+                if (!string.IsNullOrEmpty(word))
                 {
-                    result.Append(separator);
-                }
+                    if (!first)
+                    {
+                        result.Append(separator);
+                    }
 
-                result.Append(word);
+                    result.Append(word);
+                    first = false;
+                }
             }
 
             return result.ToString();

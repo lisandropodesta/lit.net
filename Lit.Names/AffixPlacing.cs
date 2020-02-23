@@ -11,6 +11,11 @@
         DoNotChange,
 
         /// <summary>
+        /// Affix not placed.
+        /// </summary>
+        DoNotPlace,
+
+        /// <summary>
         /// Affix at the begining.
         /// </summary>
         Prefix,
@@ -18,6 +23,11 @@
         /// <summary>
         /// Affix at the end.
         /// </summary>
-        Sufix
+        Sufix,
+
+        /// <summary>
+        /// Generates only the affix.
+        /// </summary>
+        Whole
     }
 }
