@@ -48,18 +48,25 @@ namespace Lit.Db.MySql
                 case StoredProcedureFunction.Insert:
                 case StoredProcedureFunction.Update:
                 case StoredProcedureFunction.Set:
+                    break;
+
                 case StoredProcedureFunction.Delete:
+                    new CreateStoredProcedureDelete(tableTemplate, DbNaming).Exec(this);
+                    return;
+
                 default:
-                    throw new NotImplementedException();
+                    break;
             }
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Drop a stored procedure.
         /// </summary>
-        public void DropStoredProcedure(Type tableTemplate, StoredProcedureFunction spFunc, bool onlyIfExists)
+        public void DropStoredProcedure(Type tableTemplate, StoredProcedureFunction spFunc, bool onlyIfExists = false)
         {
-            throw new NotImplementedException();
+            new DropStoredProcedure(tableTemplate, DbNaming, spFunc, onlyIfExists).Exec(this);
         }
     }
 }

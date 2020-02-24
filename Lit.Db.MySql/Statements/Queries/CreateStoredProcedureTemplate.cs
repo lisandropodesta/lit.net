@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Lit.Db.Architecture;
 using Lit.Db.Attributes;
 using Lit.Db.Model;
 
@@ -23,6 +24,43 @@ namespace Lit.Db.MySql.Statements.Queries
         protected string Parameters { get { return parameters.Length == 0 ? "()" : "(\n" + parameters.ToString() + "\n)"; } set { } }
 
         private readonly StringBuilder parameters = new StringBuilder();
+
+        [DbParameter("table_name")]
+        public string TableName { get; set; }
+
+        [DbParameter("primary_key", isOptional: true)]
+        public string PrimaryKey { get; set; }
+
+        [DbParameter("primary_key_param", isOptional: true)]
+        public string PrimaryKeyParam { get; set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        protected CreateStoredProcedureTemplate(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
+        {
+            var binding = DbTemplateCache.GetTable(tableTemplate, dbNaming);
+
+            var pk = binding.Columns.FirstOrDefault(c => IsSelected(c, ParametersSelection.PrimaryKey));
+            if (pk == null)
+            {
+                throw new Exception($"Primary key not found for template table {tableTemplate.FullName}");
+            }
+
+            TableName = binding.Text;
+            Name = dbNaming.GetStoredProcedureName(TableName, function);
+            PrimaryKey = pk.FieldName;
+            PrimaryKeyParam = dbNaming.GetParameterName(pk.FieldName, null);
+
+            Setup(dbNaming, binding, pk);
+        }
+
+        /// <summary>
+        /// Setup the template.
+        /// </summary>
+        protected virtual void Setup(IDbNaming dbNaming, DbTemplateBinding binding, IDbColumnBinding pk)
+        {
+        }
 
         /// <summary>
         /// Parameters seleccion.

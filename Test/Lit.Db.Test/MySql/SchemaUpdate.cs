@@ -23,7 +23,15 @@ namespace Lit.Db.Test.MySql
 
         private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
         {
-            db.CreateStoredProcedure(tableTemplate, StoredProcedureFunction.Get);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
+        }
+
+        private static void CreateStoredProcedure(IDbArchitecture db, Type tableTemplate, StoredProcedureFunction function)
+        {
+            db.DropStoredProcedure(tableTemplate, function, true);
+
+            db.CreateStoredProcedure(tableTemplate, function);
         }
     }
 }
