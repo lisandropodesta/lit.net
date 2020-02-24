@@ -21,6 +21,9 @@ jobs:
     - name: Publish Lit.Common nuget packages
       run: dotnet nuget push Lit.Common\bin\release\Lit.Common.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
+    - name: Publish Lit.Names nuget packages
+      run: dotnet nuget push Lit.Names\bin\release\Lit.Names.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+
     - name: Publish Lit.Os.Win nuget packages
       run: dotnet nuget push Lit.Os.Win\bin\release\Lit.Os.Win.1.0.0.nupkg -k ${{secrets.NUGET_LIT_NET_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
