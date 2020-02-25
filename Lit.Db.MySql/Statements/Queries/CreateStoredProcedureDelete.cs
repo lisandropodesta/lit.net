@@ -16,7 +16,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
             "BEGIN\n" +
             "  DELETE FROM {{@table_name}}\n" +
-            "  WHERE {{@primary_key}} = {{@primary_key_param}};\n" +
+            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
             "END\n";
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         public CreateStoredProcedureDelete(Type tableTemplate, IDbNaming dbNaming) : base(tableTemplate, dbNaming, StoredProcedureFunction.Delete) { }
 
-        protected override void Setup(IDbNaming dbNaming, DbTemplateBinding binding, IDbColumnBinding pk)
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
             AddParameter(pk, ParameterDirection.Input, dbNaming);
         }

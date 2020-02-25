@@ -28,11 +28,11 @@ namespace Lit.Db.MySql.Statements.Queries
         [DbParameter("table_name")]
         public string TableName { get; set; }
 
-        [DbParameter("primary_key", isOptional: true)]
-        public string PrimaryKey { get; set; }
+        [DbParameter("filter_field")]
+        protected string FilterField { get; set; }
 
-        [DbParameter("primary_key_param", isOptional: true)]
-        public string PrimaryKeyParam { get; set; }
+        [DbParameter("filter_param")]
+        protected string FilterParam { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -41,24 +41,25 @@ namespace Lit.Db.MySql.Statements.Queries
         {
             var binding = DbTemplateCache.GetTable(tableTemplate, dbNaming);
 
-            var pk = binding.Columns.FirstOrDefault(c => IsSelected(c, ParametersSelection.PrimaryKey));
+            var pk = FindFirstColumn(binding, ParametersSelection.PrimaryKey);
+
             if (pk == null)
             {
-                throw new Exception($"Primary key not found for template table {tableTemplate.FullName}");
+                throw new Exception($"Primary key not found for table template {tableTemplate.FullName}");
             }
 
             TableName = binding.Text;
             Name = dbNaming.GetStoredProcedureName(TableName, function);
-            PrimaryKey = pk.FieldName;
-            PrimaryKeyParam = dbNaming.GetParameterName(pk.FieldName, null);
+            FilterField = pk.FieldName;
+            FilterParam = dbNaming.GetParameterName(pk.FieldName, null);
 
-            Setup(dbNaming, binding, pk);
+            Setup(tableTemplate, dbNaming, function, binding, pk);
         }
 
         /// <summary>
         /// Setup the template.
         /// </summary>
-        protected virtual void Setup(IDbNaming dbNaming, DbTemplateBinding binding, IDbColumnBinding pk)
+        protected virtual void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
         }
 
@@ -67,11 +68,33 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         protected enum ParametersSelection
         {
+            /// <summary>
+            /// All fields.
+            /// </summary>
             All,
 
+            /// <summary>
+            /// First primary key.
+            /// </summary>
             PrimaryKey,
 
+            /// <summary>
+            /// First unique key.
+            /// </summary>
+            UniqueKey,
+
+            /// <summary>
+            /// All non primary keys.
+            /// </summary>
             NonPrimaryKey
+        }
+
+        /// <summary>
+        /// Get the first column that matches with selection.
+        /// </summary>
+        protected IDbColumnBinding FindFirstColumn(DbTemplateBinding binding, ParametersSelection selection)
+        {
+            return binding.Columns.FirstOrDefault(c => IsSelected(c, selection));
         }
 
         /// <summary>
@@ -127,6 +150,9 @@ namespace Lit.Db.MySql.Statements.Queries
             {
                 case ParametersSelection.PrimaryKey:
                     return column.KeyConstraint == DbKeyConstraint.PrimaryKey;
+
+                case ParametersSelection.UniqueKey:
+                    return column.KeyConstraint == DbKeyConstraint.UniqueKey;
 
                 case ParametersSelection.NonPrimaryKey:
                     return column.KeyConstraint != DbKeyConstraint.PrimaryKey;

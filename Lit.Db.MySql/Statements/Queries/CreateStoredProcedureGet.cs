@@ -19,7 +19,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "  SELECT\n" +
             "    {{@columns}}\n" +
             "  FROM {{@table_name}}\n" +
-            "  WHERE {{@primary_key}} = {{@primary_key_param}};\n" +
+            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
             "END\n";
 
         [DbParameter("columns")]
@@ -30,11 +30,28 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureGet(Type tableTemplate, IDbNaming dbNaming) : base(tableTemplate, dbNaming, StoredProcedureFunction.Get) { }
-
-        protected override void Setup(IDbNaming dbNaming, DbTemplateBinding binding, IDbColumnBinding pk)
+        public CreateStoredProcedureGet(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
+            : base(tableTemplate, dbNaming, function)
         {
-            AddParameter(pk, ParameterDirection.Input, dbNaming);
+        }
+
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
+        {
+            var filterCol = pk;
+
+            if (function == StoredProcedureFunction.GetByCode)
+            {
+                filterCol = FindFirstColumn(binding, ParametersSelection.UniqueKey);
+                if (filterCol == null)
+                {
+                    throw new ArgumentException($"Unable Invalid unique key in table template [{tableTemplate.FullName}]");
+                }
+
+                FilterField = filterCol.FieldName;
+                FilterParam = dbNaming.GetParameterName(FilterField, null);
+            }
+
+            AddParameter(filterCol, ParameterDirection.Input, dbNaming);
             AddColumns(columns, ParametersSelection.All, ",\n    ", binding.Columns);
         }
     }

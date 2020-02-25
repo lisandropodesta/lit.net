@@ -24,6 +24,7 @@ namespace Lit.Db.Test.MySql
         private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
         {
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.GetByCode);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
         }
 
@@ -31,7 +32,14 @@ namespace Lit.Db.Test.MySql
         {
             db.DropStoredProcedure(tableTemplate, function, true);
 
-            db.CreateStoredProcedure(tableTemplate, function);
+            try
+            {
+                db.CreateStoredProcedure(tableTemplate, function);
+            }
+            catch (Exception x)
+            {
+                Audit.Error($"Error: {x.Message}.");
+            }
         }
     }
 }

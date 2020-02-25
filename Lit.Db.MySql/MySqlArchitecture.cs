@@ -40,10 +40,10 @@ namespace Lit.Db.MySql
             switch (spFunc)
             {
                 case StoredProcedureFunction.Get:
-                    new CreateStoredProcedureGet(tableTemplate, DbNaming).Exec(this);
+                case StoredProcedureFunction.GetByCode:
+                    new CreateStoredProcedureGet(tableTemplate, DbNaming, spFunc).Exec(this);
                     return;
 
-                case StoredProcedureFunction.GetByCode:
                 case StoredProcedureFunction.ListAll:
                 case StoredProcedureFunction.Insert:
                 case StoredProcedureFunction.Update:
