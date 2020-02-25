@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data;
-using System.Text;
 using Lit.Db.Architecture;
 using Lit.Db.Attributes;
 using Lit.Db.Model;
@@ -23,9 +22,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "END\n";
 
         [DbParameter("columns")]
-        protected string Columns { get { return columns.Length == 0 ? "*" : columns.ToString(); } set { } }
-
-        private readonly StringBuilder columns = new StringBuilder();
+        protected string Columns { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -52,7 +49,8 @@ namespace Lit.Db.MySql.Statements.Queries
             }
 
             AddParameter(filterCol, ParameterDirection.Input, dbNaming);
-            AddColumns(columns, ParametersSelection.All, ",\n    ", binding.Columns);
+
+            Columns = GetColumns(binding, ParametersSelection.All);
         }
     }
 }

@@ -28,10 +28,10 @@ namespace Lit.Db.MySql.Statements.Queries
         [DbParameter("table_name")]
         public string TableName { get; set; }
 
-        [DbParameter("filter_field")]
+        [DbParameter("filter_field", isOptional: true)]
         protected string FilterField { get; set; }
 
-        [DbParameter("filter_param")]
+        [DbParameter("filter_param", isOptional: true)]
         protected string FilterParam { get; set; }
 
         /// <summary>
@@ -124,6 +124,16 @@ namespace Lit.Db.MySql.Statements.Queries
             var line = $"{GetDirection(direction)} {name} {MySqlDataType.Translate(dataType, fieldType)}";
 
             parameters.Append(separator + line);
+        }
+
+        /// <summary>
+        /// Get list of columns as text.
+        /// </summary>
+        protected string GetColumns(DbTemplateBinding binding, ParametersSelection selection)
+        {
+            var columns = new StringBuilder();
+            AddColumns(columns, selection, ",\n    ", binding.Columns);
+            return columns.ToString();
         }
 
         /// <summary>

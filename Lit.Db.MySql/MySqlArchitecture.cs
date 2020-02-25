@@ -45,6 +45,9 @@ namespace Lit.Db.MySql
                     return;
 
                 case StoredProcedureFunction.ListAll:
+                    new CreateStoredProcedureListAll(tableTemplate, DbNaming).Exec(this);
+                    return;
+
                 case StoredProcedureFunction.Insert:
                 case StoredProcedureFunction.Update:
                 case StoredProcedureFunction.Set:

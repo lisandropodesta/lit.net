@@ -17,6 +17,7 @@ namespace Lit.Db.Test.MySql
             db.CreateTable(typeof(User));
             db.CreateTable(typeof(UserSession));
 
+            Audit.Message("\n  ** CREATE STORED PROCEDURES test **");
             CreateAllStoredProcedures(db, typeof(User));
             CreateAllStoredProcedures(db, typeof(UserSession));
         }
@@ -25,11 +26,14 @@ namespace Lit.Db.Test.MySql
         {
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.GetByCode);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.ListAll);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
         }
 
         private static void CreateStoredProcedure(IDbArchitecture db, Type tableTemplate, StoredProcedureFunction function)
         {
+            Audit.Message($"\n   ** Creating table function [{function}] **");
+
             db.DropStoredProcedure(tableTemplate, function, true);
 
             try
