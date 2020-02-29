@@ -65,7 +65,8 @@ namespace Lit.Db.MySql
                     return;
 
                 case StoredProcedureFunction.Set:
-                    break;
+                    new CreateStoredProcedureSet(tableTemplate, DbNaming).Exec(this);
+                    return;
 
                 case StoredProcedureFunction.Delete:
                     new CreateStoredProcedureDelete(tableTemplate, DbNaming).Exec(this);
