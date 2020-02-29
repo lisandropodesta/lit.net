@@ -44,6 +44,8 @@ namespace Lit.Db.MySql
 
         #endregion
 
+        private int indentationLevel = 1;
+
         /// <summary>
         /// Get MySql direction.
         /// </summary>
@@ -64,6 +66,33 @@ namespace Lit.Db.MySql
                 default:
                     throw new ArgumentException();
             }
+        }
+
+        /// <summary>
+        /// Increments indentation level.
+        /// </summary>
+        protected void Indent()
+        {
+            indentationLevel++;
+        }
+
+        /// <summary>
+        /// Decrements indentation level.
+        /// </summary>
+        protected void Unindent()
+        {
+            if (indentationLevel > 0)
+            {
+                indentationLevel--;
+            }
+        }
+
+        /// <summary>
+        /// Get an indented separator.
+        /// </summary>
+        protected string GetSeparator(string text, int indentationPlus = 0)
+        {
+            return text + new string(' ', (indentationLevel + indentationPlus) * 2);
         }
     }
 }

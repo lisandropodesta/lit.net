@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -119,7 +118,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         public void AddParameter(string name, ParameterDirection direction, DbDataType dataType, Type fieldType = null)
         {
-            var separator = parameters.Length == 0 ? "  " : ",\n  ";
+            var separator = GetSeparator(parameters.Length == 0 ? string.Empty : ",\n");
             var line = $"{GetDirection(direction)} {name} {MySqlDataType.Translate(dataType, fieldType)}";
             parameters.Append(separator + line);
         }
@@ -130,7 +129,8 @@ namespace Lit.Db.MySql.Statements.Queries
         protected string GetParametersNames(DbTemplateBinding binding, ParametersSelection selection, IDbNaming dbNaming)
         {
             var text = new StringBuilder();
-            MapColumns(binding, selection, c => AddParameterName(text, ",\n    ", c, dbNaming));
+            var separator = GetSeparator(",\n", 1);
+            MapColumns(binding, selection, c => AddParameterName(text, separator, c, dbNaming));
             return text.ToString();
         }
 
@@ -148,7 +148,8 @@ namespace Lit.Db.MySql.Statements.Queries
         protected string GetColumnsNames(DbTemplateBinding binding, ParametersSelection selection)
         {
             var text = new StringBuilder();
-            MapColumns(binding, selection, c => AddColumnName(text, ",\n    ", c));
+            var separator = GetSeparator(",\n", 1);
+            MapColumns(binding, selection, c => AddColumnName(text, separator, c));
             return text.ToString();
         }
 
@@ -166,7 +167,8 @@ namespace Lit.Db.MySql.Statements.Queries
         protected string GetFieldsAssignment(DbTemplateBinding binding, ParametersSelection selection, IDbNaming dbNaming)
         {
             var text = new StringBuilder();
-            MapColumns(binding, selection, c => AddFieldAssignment(text, ",\n    ", c, dbNaming));
+            var separator = GetSeparator(",\n", 1);
+            MapColumns(binding, selection, c => AddFieldAssignment(text, separator, c, dbNaming));
             return text.ToString();
         }
 
@@ -197,7 +199,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Check whether if a column matches a selection criteria or not.
         /// </summary>
-        protected bool IsSelected(IDbColumnBinding column, ParametersSelection selection)
+        protected static bool IsSelected(IDbColumnBinding column, ParametersSelection selection)
         {
             switch (selection)
             {
