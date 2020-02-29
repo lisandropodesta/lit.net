@@ -30,6 +30,7 @@ namespace Lit.Db.Architecture
                     break;
 
                 case StoredProcedureFunction.Insert:
+                case StoredProcedureFunction.InsertGet:
                     prefix = "ins_";
                     suffix = string.Empty;
                     break;

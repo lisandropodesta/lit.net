@@ -26,6 +26,11 @@
         Insert,
 
         /// <summary>
+        /// Single record insert and get.
+        /// </summary>
+        InsertGet,
+
+        /// <summary>
         /// Single record update.
         /// </summary>
         Update,
