@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Data;
 using Lit.Db.Architecture;
 using Lit.Db.Attributes;
-using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements.Queries
 {
@@ -10,9 +8,9 @@ namespace Lit.Db.MySql.Statements.Queries
     /// Insert record stored procedure creation template.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateStoredProcedureInsertGet : CreateStoredProcedureTemplate
+    public class CreateStoredProcedureInsertGet : CreateStoredProcedureInsert
     {
-        public const string Template =
+        public new const string Template =
             "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
             "BEGIN\n" +
             "  INSERT INTO {{@table_name}}\n" +
@@ -30,27 +28,12 @@ namespace Lit.Db.MySql.Statements.Queries
             "  WHERE {{@filter_field}} = LAST_INSERT_ID();\n" +
             "END\n";
 
-        [DbParameter("columns")]
-        protected string Columns { get; set; }
-
-        [DbParameter("values")]
-        protected string Values { get; set; }
-
         /// <summary>
         /// Constructor.
         /// </summary>
         public CreateStoredProcedureInsertGet(Type tableTemplate, IDbNaming dbNaming)
             : base(tableTemplate, dbNaming, StoredProcedureFunction.InsertGet)
         {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
-        {
-            AddParameters(binding, ParametersSelection.NonPrimaryKey, ParameterDirection.Input, dbNaming);
-
-            Columns = GetColumnsNames(binding, ParametersSelection.NonPrimaryKey);
-
-            Values = GetParametersNames(binding, ParametersSelection.NonPrimaryKey, dbNaming);
         }
     }
 }
