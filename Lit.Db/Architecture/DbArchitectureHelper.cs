@@ -42,6 +42,7 @@ namespace Lit.Db.Architecture
                     break;
 
                 case StoredProcedureFunction.Set:
+                case StoredProcedureFunction.SetGet:
                     prefix = "set_";
                     suffix = string.Empty;
                     break;

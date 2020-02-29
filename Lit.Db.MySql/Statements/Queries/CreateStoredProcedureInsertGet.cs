@@ -1,6 +1,7 @@
 ﻿using System;
 using Lit.Db.Architecture;
 using Lit.Db.Attributes;
+using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements.Queries
 {
@@ -23,10 +24,13 @@ namespace Lit.Db.MySql.Statements.Queries
             "  );\n" +
             "\n" +
             "  SELECT\n" +
-            "    {{@columns}}\n" +
+            "    {{@result_columns}}\n" +
             "  FROM {{@table_name}}\n" +
             "  WHERE {{@filter_field}} = LAST_INSERT_ID();\n" +
             "END\n";
+
+        [DbParameter("result_columns")]
+        protected string ResultColumns { get; set; }
 
         /// <summary>
         /// Constructor.
@@ -34,6 +38,13 @@ namespace Lit.Db.MySql.Statements.Queries
         public CreateStoredProcedureInsertGet(Type tableTemplate, IDbNaming dbNaming)
             : base(tableTemplate, dbNaming, StoredProcedureFunction.InsertGet)
         {
+        }
+
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
+        {
+            base.Setup(tableTemplate, dbNaming, function, binding, pk);
+
+            ResultColumns = GetColumnsNames(binding, ParametersSelection.All);
         }
     }
 }

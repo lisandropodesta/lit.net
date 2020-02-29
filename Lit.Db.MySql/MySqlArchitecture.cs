@@ -68,6 +68,10 @@ namespace Lit.Db.MySql
                     new CreateStoredProcedureSet(tableTemplate, DbNaming).Exec(this);
                     return;
 
+                case StoredProcedureFunction.SetGet:
+                    new CreateStoredProcedureSetGet(tableTemplate, DbNaming).Exec(this);
+                    return;
+
                 case StoredProcedureFunction.Delete:
                     new CreateStoredProcedureDelete(tableTemplate, DbNaming).Exec(this);
                     return;

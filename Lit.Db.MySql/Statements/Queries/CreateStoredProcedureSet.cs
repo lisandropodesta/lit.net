@@ -24,6 +24,8 @@ namespace Lit.Db.MySql.Statements.Queries
             "    (\n" +
             "      {{@values}}\n" +
             "    );\n" +
+            "\n" +
+            "    SET {{@filter_param}} = LAST_INSERT_ID();\n" +
             "  ELSE\n" +
             "    UPDATE {{@table_name}} SET\n" +
             "      {{@columns_set}}\n" +
@@ -58,7 +60,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            AddParameters(binding, ParametersSelection.NonPrimaryKey, ParameterDirection.Input, dbNaming);
+            AddParameters(binding, ParametersSelection.All, ParameterDirection.Input, dbNaming);
 
             Indent();
 

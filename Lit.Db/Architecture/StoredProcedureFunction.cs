@@ -46,6 +46,11 @@
         Set,
 
         /// <summary>
+        /// Single record insert or update and get.
+        /// </summary>
+        SetGet,
+
+        /// <summary>
         /// Single record delete.
         /// </summary>
         Delete

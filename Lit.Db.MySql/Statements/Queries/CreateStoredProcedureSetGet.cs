@@ -6,17 +6,30 @@ using Lit.Db.Model;
 namespace Lit.Db.MySql.Statements.Queries
 {
     /// <summary>
-    /// Update record stored procedure creation template.
+    /// Set record stored procedure creation template.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateStoredProcedureUpdateGet : CreateStoredProcedureUpdate
+    public class CreateStoredProcedureSetGet : CreateStoredProcedureSet
     {
         public new const string Template =
             "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
             "BEGIN\n" +
-            "  UPDATE {{@table_name}} SET\n" +
-            "    {{@columns_set}}\n" +
-            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "  IF COALESCE( {{@filter_param}}, 0 ) = 0 THEN\n" +
+            "    INSERT INTO {{@table_name}}\n" +
+            "    (\n" +
+            "      {{@columns}}\n" +
+            "    )\n" +
+            "    VALUES\n" +
+            "    (\n" +
+            "      {{@values}}\n" +
+            "    );\n" +
+            "\n" +
+            "    SET {{@filter_param}} = LAST_INSERT_ID();\n" +
+            "  ELSE\n" +
+            "    UPDATE {{@table_name}} SET\n" +
+            "      {{@columns_set}}\n" +
+            "    WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "  END IF;\n" +
             "\n" +
             "  SELECT\n" +
             "    {{@result_columns}}\n" +
@@ -30,16 +43,16 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureUpdateGet(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.UpdateGet)
+        public CreateStoredProcedureSetGet(Type tableTemplate, IDbNaming dbNaming)
+            : base(tableTemplate, dbNaming, StoredProcedureFunction.SetGet)
         {
         }
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            base.Setup(tableTemplate, dbNaming, function, binding, pk);
-
             ResultColumns = GetColumnsNames(binding, ParametersSelection.All);
+
+            base.Setup(tableTemplate, dbNaming, function, binding, pk);
         }
     }
 }
