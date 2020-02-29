@@ -26,6 +26,14 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
+        protected CreateStoredProcedureUpdate(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
+            : base(tableTemplate, dbNaming, function)
+        {
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public CreateStoredProcedureUpdate(Type tableTemplate, IDbNaming dbNaming)
             : base(tableTemplate, dbNaming, StoredProcedureFunction.Update)
         {

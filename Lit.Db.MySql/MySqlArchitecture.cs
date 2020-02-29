@@ -60,6 +60,10 @@ namespace Lit.Db.MySql
                     new CreateStoredProcedureUpdate(tableTemplate, DbNaming).Exec(this);
                     return;
 
+                case StoredProcedureFunction.UpdateGet:
+                    new CreateStoredProcedureUpdateGet(tableTemplate, DbNaming).Exec(this);
+                    return;
+
                 case StoredProcedureFunction.Set:
                     break;
 

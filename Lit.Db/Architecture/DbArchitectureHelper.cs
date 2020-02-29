@@ -36,6 +36,7 @@ namespace Lit.Db.Architecture
                     break;
 
                 case StoredProcedureFunction.Update:
+                case StoredProcedureFunction.UpdateGet:
                     prefix = "upd_";
                     suffix = string.Empty;
                     break;

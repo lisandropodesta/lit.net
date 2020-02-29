@@ -36,6 +36,11 @@
         Update,
 
         /// <summary>
+        /// Single record update and get.
+        /// </summary>
+        UpdateGet,
+
+        /// <summary>
         /// Single record insert or update.
         /// </summary>
         Set,
