@@ -50,7 +50,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
             AddParameter(filterCol, ParameterDirection.Input, dbNaming);
 
-            Columns = GetColumns(binding, ParametersSelection.All);
+            Columns = GetColumnsNames(binding, ParametersSelection.All);
         }
     }
 }

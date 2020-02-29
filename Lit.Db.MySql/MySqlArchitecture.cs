@@ -49,6 +49,9 @@ namespace Lit.Db.MySql
                     return;
 
                 case StoredProcedureFunction.Insert:
+                    new CreateStoredProcedureInsert(tableTemplate, DbNaming).Exec(this);
+                    return;
+
                 case StoredProcedureFunction.Update:
                 case StoredProcedureFunction.Set:
                     break;

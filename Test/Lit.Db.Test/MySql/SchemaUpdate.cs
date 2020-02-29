@@ -26,6 +26,7 @@ namespace Lit.Db.Test.MySql
         {
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.GetByCode);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Insert);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.ListAll);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
         }
