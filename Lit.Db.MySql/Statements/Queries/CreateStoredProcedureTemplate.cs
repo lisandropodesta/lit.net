@@ -102,7 +102,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         protected void AddParameters(DbTemplateBinding binding, ParametersSelection selection, ParameterDirection direction, IDbNaming dbNaming)
         {
-            binding.Columns.Where(c => IsSelected(c, selection)).ForEach(c => AddParameter(c, direction, dbNaming));
+            MapColumns(binding, selection, c => AddParameter(c, direction, dbNaming));
         }
 
         /// <summary>
@@ -130,16 +130,8 @@ namespace Lit.Db.MySql.Statements.Queries
         protected string GetParametersNames(DbTemplateBinding binding, ParametersSelection selection, IDbNaming dbNaming)
         {
             var text = new StringBuilder();
-            AddParametersNames(text, ",\n    ", binding, selection, dbNaming);
+            MapColumns(binding, selection, c => AddParameterName(text, ",\n    ", c, dbNaming));
             return text.ToString();
-        }
-
-        /// <summary>
-        /// Add parameters names.
-        /// </summary>
-        protected void AddParametersNames(StringBuilder text, string separator, DbTemplateBinding binding, ParametersSelection selection, IDbNaming dbNaming)
-        {
-            binding.Columns.Where(c => IsSelected(c, selection)).ForEach(c => AddParameterName(text, separator, c, dbNaming));
         }
 
         /// <summary>
@@ -151,29 +143,13 @@ namespace Lit.Db.MySql.Statements.Queries
         }
 
         /// <summary>
-        /// Get a parameter name.
-        /// </summary>
-        protected string GetParameterName(IDbColumnBinding column, IDbNaming dbNaming)
-        {
-            return dbNaming.GetParameterName(column.FieldName, null);
-        }
-
-        /// <summary>
         /// Get a list of columns names.
         /// </summary>
         protected string GetColumnsNames(DbTemplateBinding binding, ParametersSelection selection)
         {
-            var columns = new StringBuilder();
-            AddColumnsNames(columns, ",\n    ", binding.Columns, selection);
-            return columns.ToString();
-        }
-
-        /// <summary>
-        /// Add columns names.
-        /// </summary>
-        protected void AddColumnsNames(StringBuilder text, string separator, IReadOnlyList<IDbColumnBinding> columns, ParametersSelection selection)
-        {
-            columns.Where(c => IsSelected(c, selection)).ForEach(c => AddColumnName(text, separator, c));
+            var text = new StringBuilder();
+            MapColumns(binding, selection, c => AddColumnName(text, ",\n    ", c));
+            return text.ToString();
         }
 
         /// <summary>
@@ -182,6 +158,40 @@ namespace Lit.Db.MySql.Statements.Queries
         public void AddColumnName(StringBuilder text, string separator, IDbColumnBinding column)
         {
             text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, column.FieldName);
+        }
+
+        /// <summary>
+        /// Get a list of fields assignments.
+        /// </summary>
+        protected string GetFieldsAssignment(DbTemplateBinding binding, ParametersSelection selection, IDbNaming dbNaming)
+        {
+            var text = new StringBuilder();
+            MapColumns(binding, selection, c => AddFieldAssignment(text, ",\n    ", c, dbNaming));
+            return text.ToString();
+        }
+
+        /// <summary>
+        /// Add a field assignment.
+        /// </summary>
+        public void AddFieldAssignment(StringBuilder text, string separator, IDbColumnBinding column, IDbNaming dbNaming)
+        {
+            text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, $"{column.FieldName} = {GetParameterName(column, dbNaming)}");
+        }
+
+        /// <summary>
+        /// Maps an action to every column.
+        /// </summary>
+        protected void MapColumns(DbTemplateBinding binding, ParametersSelection selection, Action<IDbColumnBinding> action)
+        {
+            binding.Columns.Where(c => IsSelected(c, selection)).ForEach(c => action(c));
+        }
+
+        /// <summary>
+        /// Get a parameter name.
+        /// </summary>
+        protected string GetParameterName(IDbColumnBinding column, IDbNaming dbNaming)
+        {
+            return dbNaming.GetParameterName(column.FieldName, null);
         }
 
         /// <summary>
