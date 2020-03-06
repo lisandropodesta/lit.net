@@ -121,6 +121,7 @@ namespace Lit.Db.Model
             {
                 text = dbNaming.GetTableName(templateType, tattr.TableName);
                 commandType = CommandType.TableDirect;
+                mode = DbExecutionMode.Query;
             }
 
             foreach (var propInfo in templateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))

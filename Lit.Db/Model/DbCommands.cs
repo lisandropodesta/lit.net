@@ -52,7 +52,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteStoredProcedure<T>(string storedProcedureName, T template)
         {
-            ExecuteTemplate(template, storedProcedureName, CommandType.StoredProcedure, null);
+            ExecuteTemplate(template, storedProcedureName, CommandType.StoredProcedure);
         }
 
         /// <summary>
@@ -69,31 +69,28 @@ namespace Lit.Db.Model
         /// </summary>
         public void ExecuteTemplate(object template)
         {
-            ExecuteTemplate(template, null, null, null);
+            ExecuteTemplate(template, null, null);
         }
 
         /// <summary>
         /// Initializes and executes a stored procedure or query template.
         /// </summary>
-        private T ExecuteTemplate<T>(string text, CommandType? commandType, Action<T> setup)
+        protected T ExecuteTemplate<T>(string text, CommandType? commandType, Action<T> setup)
             where T : new()
         {
             var template = new T();
-            ExecuteTemplate(template, text, commandType, setup);
+            setup?.Invoke(template);
+            ExecuteTemplate(template, text, commandType);
             return template;
         }
 
         /// <summary>
         /// Execute a stored procedure or query with a template already initialized.
         /// </summary>
-        private void ExecuteTemplate<T>(T template, string text, CommandType? commandType, Action<T> setup)
+        protected void ExecuteTemplate<T>(T template, string text, CommandType? commandType)
         {
             var type = template?.GetType() ?? typeof(T);
-
-            setup?.Invoke(template);
-
             var binding = DbTemplateCache.Get(type, DbNaming);
-
             var cmdType = commandType ?? binding.CommandType;
 
             if (string.IsNullOrEmpty(text))
@@ -140,7 +137,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets a command attached to the current transaction and ready to be executed.
         /// </summary>
-        private TS GetCommand(string name, TH connection, CommandType commandType)
+        protected TS GetCommand(string name, TH connection, CommandType commandType)
         {
             var cmd = CreateCommand(name, connection);
             cmd.CommandType = commandType;
@@ -156,7 +153,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Adds the stored procedure parameters.
         /// </summary>
-        private DbStoredProcedure<TS> AddStoredProcedureParameters(string name, TS command)
+        protected DbStoredProcedure<TS> AddStoredProcedureParameters(string name, TS command)
         {
             lock (storedProcedures)
             {
