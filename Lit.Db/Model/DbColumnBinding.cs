@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.Common;
 using System.Reflection;
+using Lit.DataType;
 using Lit.Db.Attributes;
 
 namespace Lit.Db.Model
@@ -30,9 +32,19 @@ namespace Lit.Db.Model
         string ForeignColumn { get; }
 
         /// <summary>
+        /// Name of the standard stored procedure parameter.
+        /// </summary>
+        string SpParamName { get; }
+
+        /// <summary>
         /// Resolve foreign key.
         /// </summary>
         void ResolveForeignKey(IDbNaming dbNaming);
+
+        /// <summary>
+        /// Assigns input parameters.
+        /// </summary>
+        void SetInputParameters(DbCommand cmd, object instance);
     }
 
     /// <summary>
@@ -69,6 +81,13 @@ namespace Lit.Db.Model
 
         private string foreignColumn;
 
+        /// <summary>
+        /// Name of the related stored procedure parameter.
+        /// </summary>
+        public string SpParamName => spParamName;
+
+        private readonly string spParamName;
+
         #region Constructor
 
         public DbColumnBinding(PropertyInfo propInfo, DbFieldAttribute attr, IDbNaming dbNaming)
@@ -96,6 +115,8 @@ namespace Lit.Db.Model
             {
                 keyConstraint = DbKeyConstraint.None;
             }
+
+            spParamName = dbNaming?.GetParameterName(FieldName, null);
         }
 
         #endregion
@@ -117,6 +138,25 @@ namespace Lit.Db.Model
 
                 foreignTable = binding.Text;
                 foreignColumn = dbNaming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
+            }
+        }
+
+        /// <summary>
+        /// Assigns input parameters.
+        /// </summary>
+        public void SetInputParameters(DbCommand cmd, object instance)
+        {
+            switch (Mode)
+            {
+                case BindingMode.Scalar:
+                    DbHelper.SetSqlParameter(cmd, SpParamName, GetValue(instance), false);
+                    break;
+
+                case BindingMode.Class:
+                case BindingMode.List:
+                case BindingMode.Dictionary:
+                default:
+                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
             }
         }
     }

@@ -26,7 +26,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            AddParameter(pk, ParameterDirection.Input, dbNaming);
+            AddParameter(pk, ParameterDirection.Input);
         }
     }
 }

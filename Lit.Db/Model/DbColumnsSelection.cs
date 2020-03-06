@@ -6,6 +6,11 @@
     public enum DbColumnsSelection
     {
         /// <summary>
+        /// No column.
+        /// </summary>
+        None,
+
+        /// <summary>
         /// All columns.
         /// </summary>
         All,

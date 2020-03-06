@@ -31,6 +31,9 @@ namespace Lit.Db.Model
         {
             switch (selection)
             {
+                case DbColumnsSelection.None:
+                    return false;
+
                 case DbColumnsSelection.PrimaryKey:
                     return column.KeyConstraint == DbKeyConstraint.PrimaryKey;
 

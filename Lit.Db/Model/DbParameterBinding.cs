@@ -12,6 +12,11 @@ namespace Lit.Db.Model
     public interface IDbParameterBinding : IDbPropertyBinding<DbParameterAttribute>
     {
         /// <summary>
+        /// Name of the standard stored procedure parameter.
+        /// </summary>
+        string SpParamName { get; }
+
+        /// <summary>
         /// Assigns input parameters.
         /// </summary>
         void SetInputParameters(ref string text, object instance);
@@ -33,23 +38,28 @@ namespace Lit.Db.Model
     internal class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding
         where TC : class
     {
-        private readonly string parameterName;
-
         #region Constructor
 
         public DbParameterBinding(PropertyInfo propInfo, DbParameterAttribute attr, IDbNaming dbNaming)
             : base(propInfo, attr)
         {
-            parameterName = Attributes.ParameterName;
-            parameterName = dbNaming?.GetParameterName(propInfo.Name, parameterName) ?? parameterName;
+            spParamName = Attributes.ParameterName;
+            spParamName = dbNaming?.GetParameterName(propInfo.Name, spParamName) ?? spParamName;
 
-            if (string.IsNullOrEmpty(parameterName))
+            if (string.IsNullOrEmpty(spParamName))
             {
                 throw new ArgumentException($"Null parameter name in DbParameterBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
         }
 
         #endregion
+
+        /// <summary>
+        /// Name of the standard stored procedure parameter.
+        /// </summary>
+        public string SpParamName => spParamName;
+
+        private readonly string spParamName;
 
         /// <summary>
         /// Assigns input parameters.
@@ -62,7 +72,7 @@ namespace Lit.Db.Model
                 {
                     case BindingMode.Scalar:
                         var value = GetValue(instance);
-                        DbHelper.SetSqlParameter(ref text, parameterName, value.ToString(), Attributes.IsOptional);
+                        DbHelper.SetSqlParameter(ref text, spParamName, value.ToString(), Attributes.IsOptional);
                         break;
 
                     case BindingMode.Class:
@@ -86,7 +96,7 @@ namespace Lit.Db.Model
                     switch (Mode)
                     {
                         case BindingMode.Scalar:
-                            DbHelper.SetSqlParameter(cmd, parameterName, GetValue(instance), Attributes.IsOptional);
+                            DbHelper.SetSqlParameter(cmd, spParamName, GetValue(instance), Attributes.IsOptional);
                             break;
 
                         case BindingMode.Class:
@@ -118,7 +128,7 @@ namespace Lit.Db.Model
                     switch (Mode)
                     {
                         case BindingMode.Scalar:
-                            SetValue(instance, DbHelper.GetSqlParameter(cmd, parameterName));
+                            SetValue(instance, DbHelper.GetSqlParameter(cmd, spParamName));
                             break;
 
                         case BindingMode.Class:

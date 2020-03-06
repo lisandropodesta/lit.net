@@ -45,10 +45,10 @@ namespace Lit.Db.MySql.Statements.Queries
                 }
 
                 FilterField = filterCol.FieldName;
-                FilterParam = dbNaming.GetParameterName(FilterField, null);
+                FilterParam = filterCol.SpParamName;
             }
 
-            AddParameter(filterCol, ParameterDirection.Input, dbNaming);
+            AddParameter(filterCol, ParameterDirection.Input);
 
             Columns = GetColumnsNames(binding, DbColumnsSelection.All);
         }
