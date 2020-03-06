@@ -1,6 +1,6 @@
 ﻿using System;
 using Lit.Auditing;
-using Lit.Db.Architecture;
+using Lit.Db.Framework;
 using Lit.Db.MySql;
 
 namespace Lit.Db.Test

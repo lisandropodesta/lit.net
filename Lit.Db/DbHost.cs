@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data.Common;
-using Lit.Db.Architecture;
+﻿using System.Data.Common;
 using Lit.Db.Model;
 
 namespace Lit.Db

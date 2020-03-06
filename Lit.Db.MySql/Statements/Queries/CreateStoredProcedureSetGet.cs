@@ -1,6 +1,6 @@
 ﻿using System;
-using Lit.Db.Architecture;
 using Lit.Db.Attributes;
+using Lit.Db.Framework;
 using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements.Queries

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Lit.Db.Architecture;
+using Lit.Db.Framework;
 
 namespace Lit.Db
 {

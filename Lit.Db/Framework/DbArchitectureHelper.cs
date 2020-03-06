@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Architecture
+namespace Lit.Db.Framework
 {
     /// <summary>
     /// Db architecture helper.

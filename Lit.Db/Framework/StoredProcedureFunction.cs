@@ -1,4 +1,4 @@
-﻿namespace Lit.Db.Architecture
+﻿namespace Lit.Db.Framework
 {
     /// <summary>
     /// Pre defined stored procedure functions.

@@ -2,8 +2,8 @@
 using System.Data;
 using System.Linq;
 using System.Text;
-using Lit.Db.Architecture;
 using Lit.Db.Attributes;
+using Lit.Db.Framework;
 using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements.Queries
