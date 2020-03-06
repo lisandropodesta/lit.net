@@ -38,7 +38,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
             if (function == StoredProcedureFunction.GetByCode)
             {
-                filterCol = FindFirstColumn(binding, ParametersSelection.UniqueKey);
+                filterCol = binding.FindFirstColumn(DbColumnsSelection.UniqueKey);
                 if (filterCol == null)
                 {
                     throw new ArgumentException($"Unable Invalid unique key in table template [{tableTemplate.FullName}]");
@@ -50,7 +50,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
             AddParameter(filterCol, ParameterDirection.Input, dbNaming);
 
-            Columns = GetColumnsNames(binding, ParametersSelection.All);
+            Columns = GetColumnsNames(binding, DbColumnsSelection.All);
         }
     }
 }

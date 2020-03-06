@@ -49,11 +49,11 @@ namespace Lit.Db.MySql.Statements.Queries
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            AddParameters(binding, ParametersSelection.NonPrimaryKey, ParameterDirection.Input, dbNaming);
+            AddParameters(binding, DbColumnsSelection.NonPrimaryKey, ParameterDirection.Input, dbNaming);
 
-            Columns = GetColumnsNames(binding, ParametersSelection.NonPrimaryKey);
+            Columns = GetColumnsNames(binding, DbColumnsSelection.NonPrimaryKey);
 
-            Values = GetParametersNames(binding, ParametersSelection.NonPrimaryKey, dbNaming);
+            Values = GetParametersNames(binding, DbColumnsSelection.NonPrimaryKey, dbNaming);
         }
     }
 }

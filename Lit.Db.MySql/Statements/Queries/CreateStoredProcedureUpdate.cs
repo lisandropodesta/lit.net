@@ -41,9 +41,9 @@ namespace Lit.Db.MySql.Statements.Queries
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            AddParameters(binding, ParametersSelection.All, ParameterDirection.Input, dbNaming);
+            AddParameters(binding, DbColumnsSelection.All, ParameterDirection.Input, dbNaming);
 
-            ColumnsSet = GetFieldsAssignment(binding, ParametersSelection.NonPrimaryKey, dbNaming);
+            ColumnsSet = GetFieldsAssignment(binding, DbColumnsSelection.NonPrimaryKey, dbNaming);
         }
     }
 }

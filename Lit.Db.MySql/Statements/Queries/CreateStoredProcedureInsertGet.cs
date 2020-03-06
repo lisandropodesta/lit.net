@@ -44,7 +44,7 @@ namespace Lit.Db.MySql.Statements.Queries
         {
             base.Setup(tableTemplate, dbNaming, function, binding, pk);
 
-            ResultColumns = GetColumnsNames(binding, ParametersSelection.All);
+            ResultColumns = GetColumnsNames(binding, DbColumnsSelection.All);
         }
     }
 }

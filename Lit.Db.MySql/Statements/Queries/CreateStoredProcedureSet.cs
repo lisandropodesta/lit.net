@@ -60,15 +60,15 @@ namespace Lit.Db.MySql.Statements.Queries
 
         protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
         {
-            AddParameters(binding, ParametersSelection.All, ParameterDirection.Input, dbNaming);
+            AddParameters(binding, DbColumnsSelection.All, ParameterDirection.Input, dbNaming);
 
             Indent();
 
-            Columns = GetColumnsNames(binding, ParametersSelection.NonPrimaryKey);
+            Columns = GetColumnsNames(binding, DbColumnsSelection.NonPrimaryKey);
 
-            Values = GetParametersNames(binding, ParametersSelection.NonPrimaryKey, dbNaming);
+            Values = GetParametersNames(binding, DbColumnsSelection.NonPrimaryKey, dbNaming);
 
-            ColumnsSet = GetFieldsAssignment(binding, ParametersSelection.NonPrimaryKey, dbNaming);
+            ColumnsSet = GetFieldsAssignment(binding, DbColumnsSelection.NonPrimaryKey, dbNaming);
         }
     }
 }
