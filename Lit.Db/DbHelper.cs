@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
-using Lit.Db.Model;
 
 namespace Lit.Db
 {
