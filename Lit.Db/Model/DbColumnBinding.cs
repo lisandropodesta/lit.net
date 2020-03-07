@@ -90,7 +90,7 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        public DbColumnBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
+        public DbColumnBinding(IDbSetup setup, PropertyInfo propInfo, DbColumnAttribute attr)
             : base(setup, propInfo, attr)
         {
             if (attr is DbPrimaryKeyAttribute pk)

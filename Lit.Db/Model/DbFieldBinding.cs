@@ -52,7 +52,7 @@ namespace Lit.Db.Model
         #region Constructor
 
         public DbFieldBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
-            : base(setup, propInfo, attr)
+            : base(setup, propInfo, attr, attr.IsNullableDefined ? (bool?)attr.IsNullable : null)
         {
             fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.FieldName);
 

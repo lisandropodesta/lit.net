@@ -51,8 +51,8 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        protected DbPropertyBinding(IDbSetup setup, PropertyInfo propInfo, TA attr)
-            : base(propInfo, true, true)
+        protected DbPropertyBinding(IDbSetup setup, PropertyInfo propInfo, TA attr, bool? isNullableForced = null)
+            : base(propInfo, true, true, isNullableForced)
         {
             this.Setup = setup;
             this.attr = attr;

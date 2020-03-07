@@ -35,11 +35,16 @@ namespace Lit.DataType
 
         #region Constructor
 
-        public PropertyBinding(PropertyInfo propInfo, bool getterRequired = false, bool setterRequired = false)
+        public PropertyBinding(PropertyInfo propInfo, bool getterRequired = false, bool setterRequired = false, bool? isNullableForced = null)
             : base(propInfo)
         {
             bindingType = propInfo.PropertyType;
             mode = TypeHelper.GetBindingMode(ref bindingType, out isNullable);
+
+            if (isNullableForced.HasValue)
+            {
+                isNullable = isNullableForced.Value;
+            }
 
             var gm = propInfo.GetGetMethod(true);
             if (gm != null)

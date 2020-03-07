@@ -22,6 +22,18 @@ namespace Lit.Db.Attributes
 
         protected readonly bool isOptional;
 
+        /// <summary>
+        /// IsNullable flag defined flag.
+        /// </summary>
+        public bool IsNullableDefined => isNullable != null;
+
+        /// <summary>
+        /// IsNullable flag.
+        /// </summary>
+        public bool IsNullable { get => isNullable ?? false; set => isNullable = value; }
+
+        private bool? isNullable;
+
         #region Constructors
 
         public DbFieldAttribute() { }

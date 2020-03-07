@@ -19,6 +19,9 @@ namespace Lit.Db.Test.Schema.Tables
         [DbColumn]
         public string FullName { get; set; }
 
+        [DbColumn(IsNullable = true)]
+        public string Address { get; set; }
+
         public User() { }
 
         public User(int id)
