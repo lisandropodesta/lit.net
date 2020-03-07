@@ -45,14 +45,14 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Gets a record by code.
+        /// Finds a record by code.
         /// </summary>
-        public T GetBytCode<T>(string code)
+        public T Find<T>(string code)
             where T : DbTableTemplate, new()
         {
             var record = new T();
             record.SetCode(code);
-            GetByCode(record);
+            Find(record);
             return record;
         }
 
@@ -68,7 +68,7 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Gets a record by id.
+        /// Gets a record by primary key.
         /// </summary>
         public void Get<T>(T record)
         {
@@ -76,11 +76,11 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Gets a record by code.
+        /// Finds a record by unique key.
         /// </summary>
-        public void GetByCode<T>(T record)
+        public void Find<T>(T record)
         {
-            ExecuteTableSp(record, StoredProcedureFunction.GetByCode);
+            ExecuteTableSp(record, StoredProcedureFunction.Find);
         }
 
         /// <summary>
@@ -100,11 +100,11 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Inserts or updates a record.
+        /// Single record store.
         /// </summary>
-        public void Set<T>(T record)
+        public void Store<T>(T record)
         {
-            ExecuteTableSp(record, StoredProcedureFunction.Set);
+            ExecuteTableSp(record, StoredProcedureFunction.Store);
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace Lit.Db.Framework.Entities
                 case StoredProcedureFunction.Delete:
                     return DbColumnsSelection.PrimaryKey;
 
-                case StoredProcedureFunction.GetByCode:
+                case StoredProcedureFunction.Find:
                     return DbColumnsSelection.UniqueKey;
 
                 case StoredProcedureFunction.ListAll:
@@ -184,7 +184,7 @@ namespace Lit.Db.Framework.Entities
                     return DbColumnsSelection.NonPrimaryKey;
 
                 case StoredProcedureFunction.Update:
-                case StoredProcedureFunction.Set:
+                case StoredProcedureFunction.Store:
                     return DbColumnsSelection.All;
 
                 default:

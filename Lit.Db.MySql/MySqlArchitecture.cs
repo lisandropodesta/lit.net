@@ -47,7 +47,7 @@ namespace Lit.Db.MySql
             switch (spFunc)
             {
                 case StoredProcedureFunction.Get:
-                case StoredProcedureFunction.GetByCode:
+                case StoredProcedureFunction.Find:
                     new CreateStoredProcedureGet(tableTemplate, Setup, spFunc).Exec(this);
                     return;
 
@@ -77,14 +77,14 @@ namespace Lit.Db.MySql
                     }
                     return;
 
-                case StoredProcedureFunction.Set:
+                case StoredProcedureFunction.Store:
                     if (!useReadAfterWrite)
                     {
-                        new CreateStoredProcedureSet(tableTemplate, Setup).Exec(this);
+                        new CreateStoredProcedureStore(tableTemplate, Setup).Exec(this);
                     }
                     else
                     {
-                        new CreateStoredProcedureSetGet(tableTemplate, Setup).Exec(this);
+                        new CreateStoredProcedureStoreGet(tableTemplate, Setup).Exec(this);
                     }
                     return;
 

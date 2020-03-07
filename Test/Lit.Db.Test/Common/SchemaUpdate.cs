@@ -25,10 +25,10 @@ namespace Lit.Db.Test.Common
         private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
         {
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
-            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.GetByCode);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Find);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Insert);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Update);
-            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Set);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Store);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.ListAll);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
         }

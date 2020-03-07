@@ -6,14 +6,14 @@
     public enum StoredProcedureFunction
     {
         /// <summary>
-        /// Single record get.
+        /// Single record get by primary key.
         /// </summary>
         Get,
 
         /// <summary>
-        /// Single records get by unique code.
+        /// Single record find by unique key.
         /// </summary>
-        GetByCode,
+        Find,
 
         /// <summary>
         /// List all records.
@@ -31,9 +31,9 @@
         Update,
 
         /// <summary>
-        /// Single record insert or update.
+        /// Single record store.
         /// </summary>
-        Set,
+        Store,
 
         /// <summary>
         /// Single record delete.

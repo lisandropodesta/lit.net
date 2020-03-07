@@ -36,7 +36,7 @@ namespace Lit.Db.MySql.Statements.Queries
         {
             var filterCol = pk;
 
-            if (function == StoredProcedureFunction.GetByCode)
+            if (function == StoredProcedureFunction.Find)
             {
                 filterCol = binding.FindFirstColumn(DbColumnsSelection.UniqueKey);
                 if (filterCol == null)

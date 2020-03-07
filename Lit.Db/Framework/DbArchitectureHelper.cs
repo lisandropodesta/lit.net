@@ -19,8 +19,8 @@ namespace Lit.Db.Framework
                     suffix = string.Empty;
                     break;
 
-                case StoredProcedureFunction.GetByCode:
-                    prefix = "find";
+                case StoredProcedureFunction.Find:
+                    prefix = "fnd";
                     suffix = string.Empty;
                     break;
 
@@ -39,8 +39,8 @@ namespace Lit.Db.Framework
                     suffix = string.Empty;
                     break;
 
-                case StoredProcedureFunction.Set:
-                    prefix = "set";
+                case StoredProcedureFunction.Store:
+                    prefix = "sto";
                     suffix = string.Empty;
                     break;
 

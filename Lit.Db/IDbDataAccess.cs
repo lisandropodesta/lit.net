@@ -21,9 +21,9 @@ namespace Lit.Db
             where T : DbTableTemplate, new();
 
         /// <summary>
-        /// Gets a record by code.
+        /// Finds a record by code.
         /// </summary>
-        T GetBytCode<T>(string code)
+        T Find<T>(string code)
             where T : DbTableTemplate, new();
 
         /// <summary>
@@ -33,14 +33,14 @@ namespace Lit.Db
             where T : DbTableTemplate, new();
 
         /// <summary>
-        /// Gets a record by id.
+        /// Gets a record by primary key.
         /// </summary>
         void Get<T>(T record);
 
         /// <summary>
-        /// Gets a record by code.
+        /// Finds a record by unique key.
         /// </summary>
-        void GetByCode<T>(T record);
+        void Find<T>(T record);
 
         /// <summary>
         /// Inserts a record.
@@ -55,7 +55,7 @@ namespace Lit.Db
         /// <summary>
         /// Inserts or updates a record.
         /// </summary>
-        void Set<T>(T record);
+        void Store<T>(T record);
 
         /// <summary>
         /// Deletes a record.

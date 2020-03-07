@@ -32,7 +32,7 @@ namespace Lit.Db.Test.Common
                 Status = Status.Active
             };
 
-            db.Set(user);
+            db.Store(user);
             Assert(user.IdUser > 0);
 
             user = new User(1);
@@ -40,7 +40,7 @@ namespace Lit.Db.Test.Common
             Assert(user.FullName == "John Nash");
 
             user.NickName = "mck";
-            db.GetByCode(user);
+            db.Find(user);
             Assert(user.FullName == "Mick Doe");
 
             var userList = db.List<User>();
@@ -60,7 +60,7 @@ namespace Lit.Db.Test.Common
                 TimeSpan = TimeSpan.FromTicks(1234567890)
             };
 
-            db.Set(userSession);
+            db.Store(userSession);
             Assert(userSession.IdUserSession > 0);
 
             var userSession2 = new UserSession(userSession.IdUserSession);

@@ -9,7 +9,7 @@ namespace Lit.Db.MySql.Statements.Queries
     /// Set record stored procedure creation template.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateStoredProcedureSetGet : CreateStoredProcedureSet
+    public class CreateStoredProcedureStoreGet : CreateStoredProcedureStore
     {
         public new const string Template =
             "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
@@ -43,8 +43,8 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureSetGet(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Set)
+        public CreateStoredProcedureStoreGet(Type tableTemplate, IDbSetup setup)
+            : base(tableTemplate, setup, StoredProcedureFunction.Store)
         {
         }
 
