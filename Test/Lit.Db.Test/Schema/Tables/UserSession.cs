@@ -12,9 +12,22 @@ namespace Lit.Db.Test.Schema.Tables
         public int IdUserSession { get; protected set; }
 
         [DbForeignKey(typeof(User), nameof(User.IdUser))]
-        public int IdUser { get; protected set; }
+        public int IdUser { get; set; }
 
         [DbColumn]
-        public DateTimeOffset Started { get; protected set; }
+        public DateTimeOffset Started { get; set; }
+
+        [DbColumn]
+        public DateTime DateTime { get; set; }
+
+        [DbColumn]
+        public TimeSpan TimeSpan { get; set; }
+
+        public UserSession() { }
+
+        public UserSession(int id)
+        {
+            IdUserSession = id;
+        }
     }
 }

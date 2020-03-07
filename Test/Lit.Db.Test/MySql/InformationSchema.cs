@@ -1,4 +1,5 @@
 ﻿using Lit.Auditing;
+using Lit.Db.Model;
 using Lit.Db.MySql.Schema.Information.Queries;
 
 namespace Lit.Db.Test.MySql

@@ -1,6 +1,7 @@
 ﻿using System;
 using Lit.Auditing;
 using Lit.Db.Framework;
+using Lit.Db.Model;
 using Lit.Db.MySql;
 using Lit.Db.Test.Common;
 
@@ -12,9 +13,13 @@ namespace Lit.Db.Test
 
         private static readonly IDbNaming naming = new MySqlDefaultNaming();
 
-        private static readonly IDbDataAccess db = new MySqlDataAccess(testingConnectionStr) { DbNaming = naming };
+        private static readonly IDbTranslation translation = new MySqlDefaultTranslation();
 
-        private static readonly IDbArchitecture tdb = new MySqlArchitecture(testingConnectionStr) { DbNaming = naming };
+        private static readonly IDbSetup setup = new DbSetup(naming, translation);
+
+        private static readonly IDbDataAccess db = new MySqlDataAccess(setup, testingConnectionStr);
+
+        private static readonly IDbArchitecture tdb = new MySqlArchitecture(setup, testingConnectionStr);
 
         static void Main(string[] args)
         {

@@ -9,7 +9,7 @@ namespace Lit.Db.Test.Common
     {
         public static void Execute(IDbDataAccess db)
         {
-            Audit.Message("\n  ** USERSs test **");
+            Audit.Message("\n  ** User table test **");
 
             var user = new User
             {
@@ -43,10 +43,34 @@ namespace Lit.Db.Test.Common
             db.GetByCode(user);
             Assert(user.FullName == "Mick Doe");
 
-            var list = db.List<User>();
-            foreach (var u in list)
+            var userList = db.List<User>();
+            foreach (var u in userList)
             {
                 Audit.Message($"  IdUser={u.IdUser}, Status={u.Status}, NickName={u.NickName}, FullName={u.FullName}");
+            }
+
+
+            Audit.Message("\n  ** UserSession table test **");
+
+            var userSession = new UserSession
+            {
+                IdUser = userList[0].IdUser,
+                Started = DateTimeOffset.Now,
+                DateTime = DateTime.Now,
+                TimeSpan = TimeSpan.FromTicks(1234567890)
+            };
+
+            db.Set(userSession);
+            Assert(userSession.IdUserSession > 0);
+
+            var userSession2 = new UserSession(userSession.IdUserSession);
+            db.Get(userSession2);
+            Assert(userSession.IdUser == userSession2.IdUser);
+
+            var sessionList = db.List<UserSession>();
+            foreach (var s in sessionList)
+            {
+                Audit.Message($"  IdUserSession={s.IdUserSession}, IdUser={s.IdUser}, Started={s.Started}, DateTime={s.DateTime}, TimeSpan={s.TimeSpan}");
             }
         }
 
