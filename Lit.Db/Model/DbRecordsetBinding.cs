@@ -12,7 +12,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Load the current recordset.
         /// </summary>
-        void LoadResults(DbDataReader reader, object instance, IDbNaming dbNaming);
+        void LoadResults(DbDataReader reader, object instance);
     }
 
     /// <summary>
@@ -23,8 +23,8 @@ namespace Lit.Db.Model
     {
         #region Constructor
 
-        public DbRecordsetBinding(PropertyInfo propInfo, DbRecordsetAttribute attr, IDbNaming dbNaming)
-            : base(propInfo, attr)
+        public DbRecordsetBinding(IDbSetup setup, PropertyInfo propInfo, DbRecordsetAttribute attr)
+            : base(setup, propInfo, attr)
         {
         }
 
@@ -33,9 +33,9 @@ namespace Lit.Db.Model
         /// <summary>
         /// Load the current recordset.
         /// </summary>
-        public void LoadResults(DbDataReader reader, object instance, IDbNaming dbNaming)
+        public void LoadResults(DbDataReader reader, object instance)
         {
-            var list = DbHelper.LoadSqlRecordset(reader, BindingType, int.MaxValue, dbNaming);
+            var list = DbHelper.LoadSqlRecordset(reader, BindingType, int.MaxValue, Setup);
             SetValue(instance, list);
         }
     }

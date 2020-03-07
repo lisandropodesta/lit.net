@@ -51,11 +51,10 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        public DbFieldBinding(PropertyInfo propInfo, DbFieldAttribute attr, IDbNaming dbNaming)
-            : base(propInfo, attr)
+        public DbFieldBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
+            : base(setup, propInfo, attr)
         {
-            fieldName = Attributes.FieldName;
-            fieldName = dbNaming?.GetFieldName(propInfo.Name, fieldName) ?? fieldName;
+            fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.FieldName);
 
             if (string.IsNullOrEmpty(fieldName))
             {

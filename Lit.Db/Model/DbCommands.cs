@@ -16,9 +16,17 @@ namespace Lit.Db.Model
         private static readonly Dictionary<string, DbStoredProcedure<TS>> storedProcedures = new Dictionary<string, DbStoredProcedure<TS>>();
 
         /// <summary>
-        /// Db naming manager
+        /// Db setup.
         /// </summary>
-        public IDbNaming DbNaming { get; set; }
+        public IDbSetup Setup { get; private set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        protected DbCommands(IDbSetup setup)
+        {
+            Setup = setup;
+        }
 
         /// <summary>
         /// Executes a query template.
@@ -90,7 +98,7 @@ namespace Lit.Db.Model
         protected void ExecuteTemplate<T>(T template, string text, CommandType? commandType)
         {
             var type = template?.GetType() ?? typeof(T);
-            var binding = DbTemplateCache.Get(type, DbNaming);
+            var binding = Setup.GetTemplateBinding(type);
             var cmdType = commandType ?? binding.CommandType;
             var spCmdType = cmdType;
 
@@ -136,7 +144,7 @@ namespace Lit.Db.Model
                         case DbExecutionMode.Query:
                             using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                             {
-                                binding.LoadResults(reader, template, DbNaming);
+                                binding.LoadResults(reader, template);
                             }
                             break;
                     }

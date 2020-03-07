@@ -1,7 +1,6 @@
 ﻿using System.Data.Common;
-using Lit.Db.Model;
 
-namespace Lit.Db
+namespace Lit.Db.Model
 {
     /// <summary>
     /// Database host.
@@ -19,7 +18,7 @@ namespace Lit.Db
 
         #region Constructors
 
-        protected DbHost(string connectionString)
+        protected DbHost(IDbSetup setup, string connectionString) : base(setup)
         {
             this.connectionString = connectionString;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lit.Db.Model;
+using System;
 
 namespace Lit.Db.Framework.Entities
 {

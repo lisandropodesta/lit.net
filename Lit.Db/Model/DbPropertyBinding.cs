@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Lit.DataType;
-using Lit.Db.Attributes;
 
 namespace Lit.Db.Model
 {
@@ -48,11 +47,14 @@ namespace Lit.Db.Model
 
         private readonly TA attr;
 
+        protected readonly IDbSetup Setup;
+
         #region Constructor
 
-        protected DbPropertyBinding(PropertyInfo propInfo, TA attr)
+        protected DbPropertyBinding(IDbSetup setup, PropertyInfo propInfo, TA attr)
             : base(propInfo, true, true)
         {
+            this.Setup = setup;
             this.attr = attr;
 
             switch (Mode)
@@ -86,30 +88,14 @@ namespace Lit.Db.Model
         /// </summary>
         protected override object DecodePropertyValue(TP value)
         {
-            if (value == null)
+            try
             {
-                return DBNull.Value;
+                return Setup.Translation.ToDb(Mode, BindingType, value);
             }
-
-            var type = BindingType;
-
-            switch (Mode)
+            catch
             {
-                case BindingMode.Scalar:
-                    if (TypeHelper.GetEnumAttribute<DbEnumCodeAttribute>(type, value, out var attr))
-                    {
-                        return attr.Code;
-                    }
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                default:
-                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+                throw new ArgumentException($"Unable to decode property {this} of type [{PropertyInfo.PropertyType.Name}] and binding [{BindingType}].");
             }
-
-            return value;
         }
 
         /// <summary>
@@ -117,88 +103,14 @@ namespace Lit.Db.Model
         /// </summary>
         protected override TP EncodePropertyValue(object value)
         {
-            if (value == null || value is DBNull)
+            try
             {
-                return default;
+                return Setup.Translation.FromDb<TP>(Mode, BindingType, value);
             }
-
-            var type = BindingType;
-
-            switch (Mode)
+            catch
             {
-                case BindingMode.Scalar:
-                    if (type != value.GetType())
-                    {
-                        if (value is string)
-                        {
-                            if (type.IsEnum && FindDbEnumCode(type, value as string, out var enumValue))
-                            {
-                                value = enumValue;
-                            }
-                            else if (type == typeof(bool))
-                            {
-                                value = bool.Parse((string)value);
-                            }
-                            else if (IsInteger(type))
-                            {
-                                value = long.Parse((string)value);
-                            }
-                            else if (IsFloatingPoint(type))
-                            {
-                                value = double.Parse((string)value);
-                            }
-                        }
-                        else if (type.IsEnum)
-                        {
-                            value = Enum.Parse(type, value.ToString());
-                        }
-                        else
-                        {
-                            value = Convert.ChangeType(value, type);
-                        }
-                    }
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                    break;
-
-                default:
-                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
+                throw new ArgumentException($"Unable to encode property {this} of type [{PropertyInfo.PropertyType.Name}] and binding [{BindingType}].");
             }
-
-            return (TP)value;
-        }
-
-        /// <summary>
-        /// Finds a db code in an enum type.
-        /// </summary>
-        public static bool FindDbEnumCode(Type enumType, string targetValue, out object enumValue)
-        {
-            if (enumType.IsEnum && targetValue != null)
-            {
-                if (Enum.IsDefined(enumType, targetValue))
-                {
-                    enumValue = Enum.Parse(enumType, targetValue);
-                    return true;
-                }
-
-                foreach (var fieldInfo in enumType.GetFields())
-                {
-                    if (TypeHelper.GetAttribute<DbEnumCodeAttribute>(fieldInfo, out var dbCodeAttr))
-                    {
-                        if (targetValue == dbCodeAttr.Code)
-                        {
-                            enumValue = fieldInfo.GetValue(null);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            enumValue = null;
-            return false;
         }
 
         /// <summary>

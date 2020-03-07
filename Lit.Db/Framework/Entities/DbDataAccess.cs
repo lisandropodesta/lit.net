@@ -16,7 +16,7 @@ namespace Lit.Db.Framework.Entities
 
         #region Constructors
 
-        protected DbDataAccess(string connectionString) : base(connectionString) { }
+        protected DbDataAccess(IDbSetup setup, string connectionString) : base(setup, connectionString) { }
 
         #endregion
 
@@ -140,8 +140,8 @@ namespace Lit.Db.Framework.Entities
         /// </summary>
         protected string GetStoredProcedureName(Type tableTemplate, StoredProcedureFunction spFunc)
         {
-            var binding = DbTemplateCache.GetTable(tableTemplate, DbNaming);
-            return DbNaming.GetStoredProcedureName(binding.Text, spFunc);
+            var binding = Setup.GetTableBinding(tableTemplate);
+            return Setup.Naming.GetStoredProcedureName(binding.Text, spFunc);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace Lit.Db.Framework.Entities
         protected override string GetTableSpName(DbTemplateBinding binding, CommandType cmdType)
         {
             var spFunc = (StoredProcedureFunction)(cmdType - CommandType.TableDirect);
-            return DbNaming.GetStoredProcedureName(binding.Text, spFunc);
+            return Setup.Naming.GetStoredProcedureName(binding.Text, spFunc);
         }
 
         /// <summary>

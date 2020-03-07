@@ -8,9 +8,9 @@ namespace Lit.Db
     public interface IDbCommands
     {
         /// <summary>
-        /// Naming manager.
+        /// Db setup.
         /// </summary>
-        IDbNaming DbNaming { get; }
+        IDbSetup Setup { get; }
 
         /// <summary>
         /// Executes a query template.

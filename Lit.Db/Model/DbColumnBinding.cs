@@ -39,7 +39,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Resolve foreign key.
         /// </summary>
-        void ResolveForeignKey(IDbNaming dbNaming);
+        void ResolveForeignKey();
 
         /// <summary>
         /// Assigns input parameters.
@@ -90,8 +90,8 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        public DbColumnBinding(PropertyInfo propInfo, DbFieldAttribute attr, IDbNaming dbNaming)
-            : base(propInfo, attr, dbNaming)
+        public DbColumnBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
+            : base(setup, propInfo, attr)
         {
             if (attr is DbPrimaryKeyAttribute pk)
             {
@@ -116,7 +116,7 @@ namespace Lit.Db.Model
                 keyConstraint = DbKeyConstraint.None;
             }
 
-            spParamName = dbNaming?.GetParameterName(FieldName, null);
+            spParamName = setup.Naming.GetParameterName(FieldName, null);
         }
 
         #endregion
@@ -124,11 +124,11 @@ namespace Lit.Db.Model
         /// <summary>
         /// Resolve foreign key.
         /// </summary>
-        public void ResolveForeignKey(IDbNaming dbNaming)
+        public void ResolveForeignKey()
         {
             if (Attributes is DbForeignKeyAttribute fk)
             {
-                var binding = DbTemplateCache.Get(fk.ForeignTableTemplate, dbNaming);
+                var binding = Setup.GetTemplateBinding(fk.ForeignTableTemplate);
                 var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
 
                 if (colBinding == null)
@@ -137,7 +137,7 @@ namespace Lit.Db.Model
                 }
 
                 foreignTable = binding.Text;
-                foreignColumn = dbNaming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
+                foreignColumn = Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
             }
         }
 

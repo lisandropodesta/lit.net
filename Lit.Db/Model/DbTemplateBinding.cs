@@ -91,7 +91,7 @@ namespace Lit.Db.Model
 
         #region Constructor
 
-        internal DbTemplateBinding(Type templateType, IDbNaming dbNaming)
+        internal DbTemplateBinding(Type templateType, IDbSetup setup)
         {
             this.templateType = templateType;
             mode = DbExecutionMode.NonQuery;
@@ -113,13 +113,13 @@ namespace Lit.Db.Model
 
             if (sattr != null)
             {
-                text = dbNaming.GetStoredProcedureName(templateType, sattr.StoredProcedureName);
+                text = setup.Naming.GetStoredProcedureName(templateType, sattr.StoredProcedureName);
                 commandType = CommandType.StoredProcedure;
             }
 
             if (tattr != null)
             {
-                text = dbNaming.GetTableName(templateType, tattr.TableName);
+                text = setup.Naming.GetTableName(templateType, tattr.TableName);
                 commandType = CommandType.TableDirect;
                 mode = DbExecutionMode.Query;
             }
@@ -128,28 +128,28 @@ namespace Lit.Db.Model
             {
                 if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
                 {
-                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr, dbNaming);
+                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr, setup);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
                     mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr, dbNaming);
+                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr, setup);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
                 {
                     mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr, dbNaming);
+                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr, setup);
                 }
                 else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr))
                 {
                     mode = DbExecutionMode.Query;
-                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr, dbNaming);
+                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr, setup);
                 }
                 else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
                 {
-                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr, dbNaming);
+                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr, setup);
                 }
             }
 
@@ -177,9 +177,9 @@ namespace Lit.Db.Model
         /// <summary>
         /// Resolve foreign keys.
         /// </summary>
-        internal void ResolveForeignKeys(IDbNaming dbNaming)
+        internal void ResolveForeignKeys()
         {
-            columnBindings?.ForEach(binding => binding.ResolveForeignKey(dbNaming));
+            columnBindings?.ForEach(binding => binding.ResolveForeignKey());
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Load results returned from stored procedure.
         /// </summary>
-        public void LoadResults(DbDataReader reader, object instance, IDbNaming dbNaming)
+        public void LoadResults(DbDataReader reader, object instance)
         {
             var recordsetCount = RecordsetCount;
             if (recordsetCount == 0)
@@ -250,14 +250,14 @@ namespace Lit.Db.Model
                     var rsBinding = recordsetBindings?.FirstOrDefault(b => b.Attributes.Index == index);
                     if (rsBinding != null)
                     {
-                        rsBinding.LoadResults(reader, instance, dbNaming);
+                        rsBinding.LoadResults(reader, instance);
                     }
                     else
                     {
                         var rBinding = recordBindings?.FirstOrDefault(b => b.Attributes.Index == index);
                         if (rBinding != null)
                         {
-                            rBinding.LoadResults(reader, instance, dbNaming);
+                            rBinding.LoadResults(reader, instance);
                         }
                     }
                 }
@@ -267,7 +267,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Adds a binding to a list.
         /// </summary>
-        private TI AddBinding<TI, TAttr>(ref List<TI> list, Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbNaming dbNaming)
+        private TI AddBinding<TI, TAttr>(ref List<TI> list, Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbSetup setup)
             where TI : class
         {
             if (list == null)
@@ -275,7 +275,7 @@ namespace Lit.Db.Model
                 list = new List<TI>();
             }
 
-            var binding = CreateBinding<TI, TAttr>(genClassType, propertyInfo, attribute, dbNaming);
+            var binding = CreateBinding<TI, TAttr>(genClassType, propertyInfo, attribute, setup);
             list.Add(binding);
             return binding;
         }
@@ -283,11 +283,11 @@ namespace Lit.Db.Model
         /// <summary>
         /// Creates a binding.
         /// </summary>
-        private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbNaming dbNaming)
+        private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbSetup setup)
             where TI : class
         {
             var type = genClassType.MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType);
-            var binding = Activator.CreateInstance(type, new object[] { propertyInfo, attribute, dbNaming });
+            var binding = Activator.CreateInstance(type, new object[] { setup, propertyInfo, attribute });
             return binding as TI;
         }
 

@@ -40,11 +40,10 @@ namespace Lit.Db.Model
     {
         #region Constructor
 
-        public DbParameterBinding(PropertyInfo propInfo, DbParameterAttribute attr, IDbNaming dbNaming)
-            : base(propInfo, attr)
+        public DbParameterBinding(IDbSetup setup, PropertyInfo propInfo, DbParameterAttribute attr)
+            : base(setup, propInfo, attr)
         {
-            spParamName = Attributes.ParameterName;
-            spParamName = dbNaming?.GetParameterName(propInfo.Name, spParamName) ?? spParamName;
+            spParamName = setup.Naming.GetParameterName(propInfo.Name, Attributes.ParameterName);
 
             if (string.IsNullOrEmpty(spParamName))
             {
