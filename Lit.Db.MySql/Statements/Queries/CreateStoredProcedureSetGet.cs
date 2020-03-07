@@ -44,7 +44,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// Constructor.
         /// </summary>
         public CreateStoredProcedureSetGet(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.SetGet)
+            : base(tableTemplate, dbNaming, StoredProcedureFunction.Set)
         {
         }
 

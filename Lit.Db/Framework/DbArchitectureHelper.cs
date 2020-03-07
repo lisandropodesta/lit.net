@@ -20,7 +20,7 @@ namespace Lit.Db.Framework
                     break;
 
                 case StoredProcedureFunction.GetByCode:
-                    prefix = "getc";
+                    prefix = "find";
                     suffix = string.Empty;
                     break;
 
@@ -34,28 +34,13 @@ namespace Lit.Db.Framework
                     suffix = string.Empty;
                     break;
 
-                case StoredProcedureFunction.InsertGet:
-                    prefix = "insr";
-                    suffix = string.Empty;
-                    break;
-
                 case StoredProcedureFunction.Update:
                     prefix = "upd";
                     suffix = string.Empty;
                     break;
 
-                case StoredProcedureFunction.UpdateGet:
-                    prefix = "updr";
-                    suffix = string.Empty;
-                    break;
-
                 case StoredProcedureFunction.Set:
                     prefix = "set";
-                    suffix = string.Empty;
-                    break;
-
-                case StoredProcedureFunction.SetGet:
-                    prefix = "setr";
                     suffix = string.Empty;
                     break;
 

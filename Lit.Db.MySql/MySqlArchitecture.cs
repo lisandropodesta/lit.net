@@ -12,9 +12,15 @@ namespace Lit.Db.MySql
     {
         #region Constructors
 
-        public MySqlArchitecture(string connectionString) : base(connectionString) { }
+        public MySqlArchitecture(string connectionString, bool useReadAfterWrite = true)
+            : base(connectionString)
+        {
+            this.useReadAfterWrite = useReadAfterWrite;
+        }
 
         #endregion
+
+        private bool useReadAfterWrite;
 
         /// <summary>
         /// Create a table.
@@ -49,27 +55,36 @@ namespace Lit.Db.MySql
                     return;
 
                 case StoredProcedureFunction.Insert:
-                    new CreateStoredProcedureInsert(tableTemplate, DbNaming).Exec(this);
-                    return;
-
-                case StoredProcedureFunction.InsertGet:
-                    new CreateStoredProcedureInsertGet(tableTemplate, DbNaming).Exec(this);
+                    if (!useReadAfterWrite)
+                    {
+                        new CreateStoredProcedureInsert(tableTemplate, DbNaming).Exec(this);
+                    }
+                    else
+                    {
+                        new CreateStoredProcedureInsertGet(tableTemplate, DbNaming).Exec(this);
+                    }
                     return;
 
                 case StoredProcedureFunction.Update:
-                    new CreateStoredProcedureUpdate(tableTemplate, DbNaming).Exec(this);
-                    return;
-
-                case StoredProcedureFunction.UpdateGet:
-                    new CreateStoredProcedureUpdateGet(tableTemplate, DbNaming).Exec(this);
+                    if (!useReadAfterWrite)
+                    {
+                        new CreateStoredProcedureUpdate(tableTemplate, DbNaming).Exec(this);
+                    }
+                    else
+                    {
+                        new CreateStoredProcedureUpdateGet(tableTemplate, DbNaming).Exec(this);
+                    }
                     return;
 
                 case StoredProcedureFunction.Set:
-                    new CreateStoredProcedureSet(tableTemplate, DbNaming).Exec(this);
-                    return;
-
-                case StoredProcedureFunction.SetGet:
-                    new CreateStoredProcedureSetGet(tableTemplate, DbNaming).Exec(this);
+                    if (!useReadAfterWrite)
+                    {
+                        new CreateStoredProcedureSet(tableTemplate, DbNaming).Exec(this);
+                    }
+                    else
+                    {
+                        new CreateStoredProcedureSetGet(tableTemplate, DbNaming).Exec(this);
+                    }
                     return;
 
                 case StoredProcedureFunction.Delete:

@@ -48,29 +48,14 @@ namespace Lit.Db
         void Insert<T>(T record);
 
         /// <summary>
-        /// Inserts and reads a record.
-        /// </summary>
-        void InsertGet<T>(T record);
-
-        /// <summary>
         /// Updates a record.
         /// </summary>
         void Update<T>(T record);
 
         /// <summary>
-        /// Updates and reads a record.
-        /// </summary>
-        void UpdateGet<T>(T record);
-
-        /// <summary>
         /// Inserts or updates a record.
         /// </summary>
         void Set<T>(T record);
-
-        /// <summary>
-        /// Inserts or updates and reads a record.
-        /// </summary>
-        void SetGet<T>(T record);
 
         /// <summary>
         /// Deletes a record.

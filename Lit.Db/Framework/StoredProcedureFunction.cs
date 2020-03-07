@@ -26,29 +26,14 @@
         Insert,
 
         /// <summary>
-        /// Single record insert and get.
-        /// </summary>
-        InsertGet,
-
-        /// <summary>
         /// Single record update.
         /// </summary>
         Update,
 
         /// <summary>
-        /// Single record update and get.
-        /// </summary>
-        UpdateGet,
-
-        /// <summary>
         /// Single record insert or update.
         /// </summary>
         Set,
-
-        /// <summary>
-        /// Single record insert or update and get.
-        /// </summary>
-        SetGet,
 
         /// <summary>
         /// Single record delete.

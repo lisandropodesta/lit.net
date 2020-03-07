@@ -36,7 +36,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// Constructor.
         /// </summary>
         public CreateStoredProcedureInsertGet(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.InsertGet)
+            : base(tableTemplate, dbNaming, StoredProcedureFunction.Insert)
         {
         }
 

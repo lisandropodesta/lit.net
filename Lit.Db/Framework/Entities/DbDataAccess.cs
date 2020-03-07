@@ -92,14 +92,6 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Inserts and reads a record.
-        /// </summary>
-        public void InsertGet<T>(T record)
-        {
-            ExecuteTableSp(record, StoredProcedureFunction.InsertGet);
-        }
-
-        /// <summary>
         /// Updates a record.
         /// </summary>
         public void Update<T>(T record)
@@ -108,27 +100,11 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Updates and reads a record.
-        /// </summary>
-        public void UpdateGet<T>(T record)
-        {
-            ExecuteTableSp(record, StoredProcedureFunction.UpdateGet);
-        }
-
-        /// <summary>
         /// Inserts or updates a record.
         /// </summary>
         public void Set<T>(T record)
         {
             ExecuteTableSp(record, StoredProcedureFunction.Set);
-        }
-
-        /// <summary>
-        /// Inserts or updates and reads a record.
-        /// </summary>
-        public void SetGet<T>(T record)
-        {
-            ExecuteTableSp(record, StoredProcedureFunction.SetGet);
         }
 
         /// <summary>
@@ -205,13 +181,10 @@ namespace Lit.Db.Framework.Entities
                     return DbColumnsSelection.None;
 
                 case StoredProcedureFunction.Insert:
-                case StoredProcedureFunction.InsertGet:
                     return DbColumnsSelection.NonPrimaryKey;
 
                 case StoredProcedureFunction.Update:
-                case StoredProcedureFunction.UpdateGet:
                 case StoredProcedureFunction.Set:
-                case StoredProcedureFunction.SetGet:
                     return DbColumnsSelection.All;
 
                 default:

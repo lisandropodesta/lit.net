@@ -31,7 +31,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// Constructor.
         /// </summary>
         public CreateStoredProcedureUpdateGet(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.UpdateGet)
+            : base(tableTemplate, dbNaming, StoredProcedureFunction.Update)
         {
         }
 
