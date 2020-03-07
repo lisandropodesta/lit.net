@@ -3,7 +3,7 @@ using Lit.Auditing;
 using Lit.Db.Framework;
 using Lit.Db.Test.Schema.Tables;
 
-namespace Lit.Db.Test.MySql
+namespace Lit.Db.Test.Common
 {
     public static class SchemaUpdate
     {
@@ -26,9 +26,9 @@ namespace Lit.Db.Test.MySql
         {
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.GetByCode);
-            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.InsertGet);
-            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.UpdateGet);
-            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.SetGet);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Insert);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Update);
+            CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Set);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.ListAll);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Delete);
         }

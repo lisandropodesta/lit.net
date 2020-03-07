@@ -2,7 +2,7 @@
 using Lit.Auditing;
 using Lit.Db.Attributes;
 
-namespace Lit.Db.Test.MySql
+namespace Lit.Db.Test.Common
 {
     public static class StoredProcedure
     {

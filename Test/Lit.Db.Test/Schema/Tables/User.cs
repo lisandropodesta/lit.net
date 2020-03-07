@@ -14,9 +14,16 @@ namespace Lit.Db.Test.Schema.Tables
         public Status Status { get; set; }
 
         [DbUniqueKey]
-        public string NickName { get; protected set; }
+        public string NickName { get; set; }
 
         [DbColumn]
-        public string FullName { get; protected set; }
+        public string FullName { get; set; }
+
+        public User() { }
+
+        public User(int id)
+        {
+            IdUser = id;
+        }
     }
 }
