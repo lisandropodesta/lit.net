@@ -1,5 +1,6 @@
 ﻿using System;
 using Lit.Db.Framework;
+using Lit.Db.Model;
 using Lit.Db.MySql.Statements;
 using Lit.Db.MySql.Statements.Queries;
 
@@ -12,8 +13,8 @@ namespace Lit.Db.MySql
     {
         #region Constructors
 
-        public MySqlArchitecture(string connectionString, bool useReadAfterWrite = true)
-            : base(connectionString)
+        public MySqlArchitecture(IDbSetup setup, string connectionString, bool useReadAfterWrite = true)
+            : base(setup, connectionString)
         {
             this.useReadAfterWrite = useReadAfterWrite;
         }
@@ -27,7 +28,7 @@ namespace Lit.Db.MySql
         /// </summary>
         public void CreateTable(Type tableTemplate)
         {
-            new CreateTable(tableTemplate, DbNaming).Exec(this);
+            new CreateTable(tableTemplate, Setup).Exec(this);
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace Lit.Db.MySql
         /// </summary>
         public void DropTable(Type tableTemplate, bool onlyIfExists)
         {
-            new DropTable(tableTemplate, DbNaming, onlyIfExists).Exec(this);
+            new DropTable(tableTemplate, Setup, onlyIfExists).Exec(this);
         }
 
         /// <summary>
@@ -47,48 +48,48 @@ namespace Lit.Db.MySql
             {
                 case StoredProcedureFunction.Get:
                 case StoredProcedureFunction.GetByCode:
-                    new CreateStoredProcedureGet(tableTemplate, DbNaming, spFunc).Exec(this);
+                    new CreateStoredProcedureGet(tableTemplate, Setup, spFunc).Exec(this);
                     return;
 
                 case StoredProcedureFunction.ListAll:
-                    new CreateStoredProcedureListAll(tableTemplate, DbNaming).Exec(this);
+                    new CreateStoredProcedureListAll(tableTemplate, Setup).Exec(this);
                     return;
 
                 case StoredProcedureFunction.Insert:
                     if (!useReadAfterWrite)
                     {
-                        new CreateStoredProcedureInsert(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureInsert(tableTemplate, Setup).Exec(this);
                     }
                     else
                     {
-                        new CreateStoredProcedureInsertGet(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureInsertGet(tableTemplate, Setup).Exec(this);
                     }
                     return;
 
                 case StoredProcedureFunction.Update:
                     if (!useReadAfterWrite)
                     {
-                        new CreateStoredProcedureUpdate(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureUpdate(tableTemplate, Setup).Exec(this);
                     }
                     else
                     {
-                        new CreateStoredProcedureUpdateGet(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureUpdateGet(tableTemplate, Setup).Exec(this);
                     }
                     return;
 
                 case StoredProcedureFunction.Set:
                     if (!useReadAfterWrite)
                     {
-                        new CreateStoredProcedureSet(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureSet(tableTemplate, Setup).Exec(this);
                     }
                     else
                     {
-                        new CreateStoredProcedureSetGet(tableTemplate, DbNaming).Exec(this);
+                        new CreateStoredProcedureSetGet(tableTemplate, Setup).Exec(this);
                     }
                     return;
 
                 case StoredProcedureFunction.Delete:
-                    new CreateStoredProcedureDelete(tableTemplate, DbNaming).Exec(this);
+                    new CreateStoredProcedureDelete(tableTemplate, Setup).Exec(this);
                     return;
 
                 default:
@@ -103,7 +104,7 @@ namespace Lit.Db.MySql
         /// </summary>
         public void DropStoredProcedure(Type tableTemplate, StoredProcedureFunction spFunc, bool onlyIfExists = false)
         {
-            new DropStoredProcedure(tableTemplate, DbNaming, spFunc, onlyIfExists).Exec(this);
+            new DropStoredProcedure(tableTemplate, Setup, spFunc, onlyIfExists).Exec(this);
         }
     }
 }

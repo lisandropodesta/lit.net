@@ -33,9 +33,9 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Constructor.
         /// </summary>
-        public DropTable(Type tableTemplate, IDbNaming dbNaming, bool onlyIfExists = false)
+        public DropTable(Type tableTemplate, IDbSetup setup, bool onlyIfExists = false)
         {
-            var bindings = DbTemplateCache.GetTable(tableTemplate, dbNaming);
+            var bindings = setup.GetTableBinding(tableTemplate);
             TableName = bindings.Text;
             OnlyIfExists = onlyIfExists;
         }

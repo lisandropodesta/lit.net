@@ -35,9 +35,9 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CreateStoredProcedureTemplate(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
+        protected CreateStoredProcedureTemplate(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function)
         {
-            var binding = DbTemplateCache.GetTable(tableTemplate, dbNaming);
+            var binding = setup.GetTableBinding(tableTemplate);
 
             var pk = binding.FindFirstColumn(DbColumnsSelection.PrimaryKey);
 
@@ -47,11 +47,11 @@ namespace Lit.Db.MySql.Statements.Queries
             }
 
             TableName = binding.Text;
-            Name = dbNaming.GetStoredProcedureName(TableName, function);
+            Name = setup.Naming.GetStoredProcedureName(TableName, function);
             FilterField = pk.FieldName;
             FilterParam = pk.SpParamName;
 
-            Setup(tableTemplate, dbNaming, function, binding, pk);
+            Setup(tableTemplate, setup.Naming, function, binding, pk);
         }
 
         /// <summary>

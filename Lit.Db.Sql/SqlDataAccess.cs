@@ -12,7 +12,7 @@ namespace Lit.Db.Sql
     {
         #region Constructors
 
-        public SqlDataAccess(string connectionString) : base(connectionString) { }
+        public SqlDataAccess(IDbSetup setup, string connectionString) : base(setup, connectionString) { }
 
         #endregion
 

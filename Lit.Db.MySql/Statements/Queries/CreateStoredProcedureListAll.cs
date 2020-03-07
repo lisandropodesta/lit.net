@@ -25,8 +25,8 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureListAll(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.ListAll)
+        public CreateStoredProcedureListAll(Type tableTemplate, IDbSetup setup)
+            : base(tableTemplate, setup, StoredProcedureFunction.ListAll)
         {
         }
 

@@ -12,7 +12,7 @@ namespace Lit.Db.MySql
     {
         #region Constructors
 
-        public MySqlDataAccess(string connectionString) : base(connectionString) { }
+        public MySqlDataAccess(IDbSetup setup, string connectionString) : base(setup, connectionString) { }
 
         #endregion
 

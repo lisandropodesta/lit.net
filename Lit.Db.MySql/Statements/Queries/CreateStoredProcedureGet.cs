@@ -27,8 +27,8 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureGet(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
-            : base(tableTemplate, dbNaming, function)
+        public CreateStoredProcedureGet(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function)
+            : base(tableTemplate, setup, function)
         {
         }
 

@@ -54,14 +54,14 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateTable(Type tableTemplate, IDbNaming dbNaming)
+        public CreateTable(Type tableTemplate, IDbSetup setup)
         {
             var tableAttr = TypeHelper.GetAttribute<MySqlTableAttribute>(tableTemplate, true);
 
             Engine = (tableAttr?.Engine ?? Custom.MySql.Engine.InnoDb).ToString();
             DefaultCharset = (tableAttr?.DefaultCharset ?? DefaultKey);
 
-            var bindings = DbTemplateCache.GetTable(tableTemplate, dbNaming);
+            var bindings = setup.GetTableBinding(tableTemplate);
 
             TableName = bindings.Text;
             ColumnDefinition = GetColumnDefinition(bindings.Columns);

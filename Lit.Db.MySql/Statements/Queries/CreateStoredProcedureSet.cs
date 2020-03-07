@@ -45,16 +45,16 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CreateStoredProcedureSet(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function)
-            : base(tableTemplate, dbNaming, function)
+        protected CreateStoredProcedureSet(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function)
+            : base(tableTemplate, setup, function)
         {
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureSet(Type tableTemplate, IDbNaming dbNaming)
-            : base(tableTemplate, dbNaming, StoredProcedureFunction.Set)
+        public CreateStoredProcedureSet(Type tableTemplate, IDbSetup setup)
+            : base(tableTemplate, setup, StoredProcedureFunction.Set)
         {
         }
 
