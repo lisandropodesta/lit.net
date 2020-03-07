@@ -25,7 +25,7 @@ namespace Lit.Db.MySql.Statements.Queries
         public CreateStoredProcedureDelete(Type tableTemplate, IDbSetup setup)
             : base(tableTemplate, setup, StoredProcedureFunction.Delete) { }
 
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTableBinding binding, IDbColumnBinding pk)
         {
             AddParameter(pk, ParameterDirection.Input);
         }

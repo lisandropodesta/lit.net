@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace Lit.Db.Model
 {
@@ -9,8 +8,11 @@ namespace Lit.Db.Model
     /// </summary>
     public class DbSetup : IDbSetup
     {
-        // Templates cache
-        private readonly Dictionary<Type, DbTemplateBinding> templateBindings = new Dictionary<Type, DbTemplateBinding>();
+        // Table binding cache
+        private readonly Dictionary<Type, DbTableBinding> tableBindings = new Dictionary<Type, DbTableBinding>();
+
+        // Stored procedure binding cache
+        private readonly Dictionary<Type, DbCommandBinding> commandBindings = new Dictionary<Type, DbCommandBinding>();
 
         #region Constructor
 
@@ -33,34 +35,37 @@ namespace Lit.Db.Model
         public IDbTranslation Translation { get; private set; }
 
         /// <summary>
-        /// Gets a table template.
+        /// Gets a table binding.
         /// </summary>
-        public DbTemplateBinding GetTableBinding(Type type)
+        public DbTableBinding GetTableBinding(Type type)
         {
-            var binding = GetTemplateBinding(type);
-            if (binding.CommandType != CommandType.TableDirect)
+            lock (tableBindings)
             {
-                throw new ArgumentException($"Invalid table template on type [{type.FullName}]");
-            }
+                if (!tableBindings.TryGetValue(type, out var binding))
+                {
+                    binding = new DbTableBinding(type, this);
+                    tableBindings.Add(type, binding);
+                    binding.ResolveForeignKeys();
+                }
 
-            return binding;
+                return binding;
+            }
         }
 
         /// <summary>
-        /// Gets the template binding information.
+        /// Gets a command binding.
         /// </summary>
-        public DbTemplateBinding GetTemplateBinding(Type type)
+        public DbCommandBinding GetCommandBinding(Type type)
         {
-            lock (templateBindings)
+            lock (commandBindings)
             {
-                if (!templateBindings.TryGetValue(type, out var template))
+                if (!commandBindings.TryGetValue(type, out var binding))
                 {
-                    template = new DbTemplateBinding(type, this);
-                    templateBindings.Add(type, template);
-                    template.ResolveForeignKeys();
+                    binding = new DbCommandBinding(type, this);
+                    commandBindings.Add(type, binding);
                 }
 
-                return template;
+                return binding;
             }
         }
     }

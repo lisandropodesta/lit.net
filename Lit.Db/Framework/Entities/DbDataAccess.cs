@@ -121,7 +121,7 @@ namespace Lit.Db.Framework.Entities
         public List<T> List<T>()
         {
             var template = new DbRecordsListSp<T>();
-            var spName = GetStoredProcedureName(typeof(T), StoredProcedureFunction.ListAll);
+            var spName = GetTableSpName(typeof(T), StoredProcedureFunction.ListAll);
             ExecuteTemplate(template, spName, CommandType.StoredProcedure);
             return template.Result;
         }
@@ -131,34 +131,46 @@ namespace Lit.Db.Framework.Entities
         /// </summary>
         protected void ExecuteTableSp(object record, StoredProcedureFunction spFunc)
         {
-            var cmdType = (CommandType)((int)CommandType.TableDirect + spFunc);
-            ExecuteTemplate(record, null, cmdType);
+            var type = record.GetType();
+            var binding = Setup.GetTableBinding(type);
+            var spName = GetTableSpName(binding, spFunc);
+
+            using (var connection = GetOpenedConnection())
+            {
+                using (var cmd = GetCommand(spName, connection, CommandType.StoredProcedure))
+                {
+                    SetTableSpInputParameters(binding, cmd, record, spFunc);
+
+                    using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                    {
+                        binding.LoadResults(reader, record);
+                    }
+                }
+            }
         }
 
         /// <summary>
         /// Get standard stored procedure name.
         /// </summary>
-        protected string GetStoredProcedureName(Type tableTemplate, StoredProcedureFunction spFunc)
+        protected string GetTableSpName(Type tableTemplate, StoredProcedureFunction spFunc)
         {
             var binding = Setup.GetTableBinding(tableTemplate);
-            return Setup.Naming.GetStoredProcedureName(binding.Text, spFunc);
+            return GetTableSpName(binding, spFunc);
         }
 
         /// <summary>
         /// Table stored procedure resolving.
         /// </summary>
-        protected override string GetTableSpName(DbTemplateBinding binding, CommandType cmdType)
+        protected string GetTableSpName(DbTableBinding binding, StoredProcedureFunction spFunc)
         {
-            var spFunc = (StoredProcedureFunction)(cmdType - CommandType.TableDirect);
-            return Setup.Naming.GetStoredProcedureName(binding.Text, spFunc);
+            return Setup.Naming.GetStoredProcedureName(binding.TableName, spFunc);
         }
 
         /// <summary>
         /// Set table stored procedure parameters.
         /// </summary>
-        protected override void SetTableSpInputParameters<T>(DbTemplateBinding binding, DbCommand cmd, T instance, CommandType cmdType)
+        protected void SetTableSpInputParameters<T>(DbTableBinding binding, DbCommand cmd, T instance, StoredProcedureFunction spFunc)
         {
-            var spFunc = (StoredProcedureFunction)(cmdType - CommandType.TableDirect);
             var columns = GetTableSpParameters(spFunc);
             binding.MapColumns(columns, c => c.SetInputParameters(cmd, instance));
         }

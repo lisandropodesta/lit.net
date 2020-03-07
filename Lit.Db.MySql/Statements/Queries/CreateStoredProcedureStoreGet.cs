@@ -48,7 +48,7 @@ namespace Lit.Db.MySql.Statements.Queries
         {
         }
 
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTableBinding binding, IDbColumnBinding pk)
         {
             ResultColumns = GetColumnsNames(binding, DbColumnsSelection.All);
 

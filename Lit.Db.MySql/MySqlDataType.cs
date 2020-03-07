@@ -196,8 +196,6 @@ namespace Lit.Db.MySql
                 default:
                     throw new NotImplementedException();
             }
-
-            return value;
         }
 
         /// <summary>

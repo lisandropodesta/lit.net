@@ -76,7 +76,7 @@ namespace Lit.Db
         /// </summary>
         public static object LoadSqlRecordset(DbDataReader reader, Type type, int maxCount, IDbSetup setup)
         {
-            var binding = setup.GetTemplateBinding(type);
+            var binding = setup.GetCommandBinding(type);
             var listType = typeof(List<>).MakeGenericType(type);
             var result = Activator.CreateInstance(listType);
             var list = result as IList;

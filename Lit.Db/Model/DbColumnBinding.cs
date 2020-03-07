@@ -128,7 +128,7 @@ namespace Lit.Db.Model
         {
             if (Attributes is DbForeignKeyAttribute fk)
             {
-                var binding = Setup.GetTemplateBinding(fk.ForeignTableTemplate);
+                var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
                 var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
 
                 if (colBinding == null)
@@ -136,7 +136,7 @@ namespace Lit.Db.Model
                     throw new ArgumentException($"Invalid foreign key definition [{PropertyInfo.DeclaringType.Namespace}.{PropertyInfo.DeclaringType.Name}.{PropertyInfo.Name}]");
                 }
 
-                foreignTable = binding.Text;
+                foreignTable = binding.TableName;
                 foreignColumn = Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
             }
         }

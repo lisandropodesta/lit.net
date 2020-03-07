@@ -63,7 +63,7 @@ namespace Lit.Db.MySql.Statements
 
             var bindings = setup.GetTableBinding(tableTemplate);
 
-            TableName = bindings.Text;
+            TableName = bindings.TableName;
             ColumnDefinition = GetColumnDefinition(bindings.Columns);
             TableConstraints = GetTableConstraints(bindings.Columns);
         }

@@ -35,7 +35,7 @@ namespace Lit.Db.MySql.Statements.Queries
         public DropStoredProcedure(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function, bool onlyIfExists = false)
         {
             var binding = setup.GetTableBinding(tableTemplate);
-            Name = setup.Naming.GetStoredProcedureName(binding.Text, function);
+            Name = setup.Naming.GetStoredProcedureName(binding.TableName, function);
             OnlyIfExists = onlyIfExists;
         }
 

@@ -19,13 +19,13 @@ namespace Lit.Db
         IDbTranslation Translation { get; }
 
         /// <summary>
-        /// Gets a table template.
+        /// Gets a table binding.
         /// </summary>
-        DbTemplateBinding GetTableBinding(Type type);
+        DbTableBinding GetTableBinding(Type type);
 
         /// <summary>
-        /// Gets the template binding information.
+        /// Gets a command binding.
         /// </summary>
-        DbTemplateBinding GetTemplateBinding(Type type);
+        DbCommandBinding GetCommandBinding(Type type);
     }
 }

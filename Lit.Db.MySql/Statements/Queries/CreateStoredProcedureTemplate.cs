@@ -46,7 +46,7 @@ namespace Lit.Db.MySql.Statements.Queries
                 throw new Exception($"Primary key not found for table template {tableTemplate.FullName}");
             }
 
-            TableName = binding.Text;
+            TableName = binding.TableName;
             Name = setup.Naming.GetStoredProcedureName(TableName, function);
             FilterField = pk.FieldName;
             FilterParam = pk.SpParamName;
@@ -57,14 +57,14 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Setup the template.
         /// </summary>
-        protected virtual void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTemplateBinding binding, IDbColumnBinding pk)
+        protected virtual void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTableBinding binding, IDbColumnBinding pk)
         {
         }
 
         /// <summary>
         /// Add table columns as parameters.
         /// </summary>
-        protected void AddParameters(DbTemplateBinding binding, DbColumnsSelection selection, ParameterDirection direction)
+        protected void AddParameters(DbTableBinding binding, DbColumnsSelection selection, ParameterDirection direction)
         {
             binding.MapColumns(selection, c => AddParameter(c, direction));
         }
@@ -90,7 +90,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Get a list of parameters names.
         /// </summary>
-        protected string GetParametersNames(DbTemplateBinding binding, DbColumnsSelection selection)
+        protected string GetParametersNames(DbTableBinding binding, DbColumnsSelection selection)
         {
             var text = new StringBuilder();
             var separator = GetSeparator(",\n", 1);
@@ -109,7 +109,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Get a list of columns names.
         /// </summary>
-        protected string GetColumnsNames(DbTemplateBinding binding, DbColumnsSelection selection)
+        protected string GetColumnsNames(DbTableBinding binding, DbColumnsSelection selection)
         {
             var text = new StringBuilder();
             var separator = GetSeparator(",\n", 1);
@@ -128,7 +128,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Get a list of fields assignments.
         /// </summary>
-        protected string GetFieldsAssignment(DbTemplateBinding binding, DbColumnsSelection selection)
+        protected string GetFieldsAssignment(DbTableBinding binding, DbColumnsSelection selection)
         {
             var text = new StringBuilder();
             var separator = GetSeparator(",\n", 1);
