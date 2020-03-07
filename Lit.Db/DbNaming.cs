@@ -82,6 +82,11 @@ namespace Lit.Db
         public AffixPlacing IdPlacing;
 
         /// <summary>
+        /// Stored procedure affix.
+        /// </summary>
+        public AffixPlacing StoredProcedureAffix;
+
+        /// <summary>
         /// Naming case for stored procedures parameters.
         /// </summary>
         public Case ParametersCase;
@@ -111,7 +116,7 @@ namespace Lit.Db
         {
             TextSource = Source.Default;
             Scope = Translation.Reflection;
-            IdPlacing = idPlacing;
+            IdPlacing = StoredProcedureAffix = idPlacing;
             ParametersCase = StoredProceduresCase = FieldsCase = TablesCase = namingCase;
             IdText = idText;
         }
@@ -143,13 +148,37 @@ namespace Lit.Db
         }
 
         /// <summary>
-        /// Gets a stored procedure name.
+        /// Gets a table stored procedure name.
         /// </summary>
         public virtual string GetStoredProcedureName(string tableName, StoredProcedureFunction spFunc)
         {
-            DbArchitectureHelper.GetDefaultStoredProcedureAffixes(spFunc, out var prefix, out var suffix);
-            var name = prefix + tableName + suffix;
+            GetStoredProcedureAffixes(spFunc, out var prefix, out var suffix);
+
+            string name;
+            switch (StoredProcedureAffix)
+            {
+                case AffixPlacing.Prefix:
+                    name = Concat(prefix, suffix, tableName);
+                    break;
+
+                case AffixPlacing.Sufix:
+                    name = Concat(tableName, prefix, suffix);
+                    break;
+
+                default:
+                    name = Concat(prefix, tableName, suffix);
+                    break;
+            }
+
             return TranslateName(TextSource, Scope, null, name, StoredProceduresCase, AffixPlacing.DoNotChange, null);
+        }
+
+        /// <summary>
+        /// Get table stored procedure affixes.
+        /// </summary>
+        protected virtual void GetStoredProcedureAffixes(StoredProcedureFunction spFunc, out string prefix, out string suffix)
+        {
+            DbArchitectureHelper.GetDefaultStoredProcedureAffixes(spFunc, out prefix, out suffix);
         }
 
         /// <summary>
@@ -208,6 +237,16 @@ namespace Lit.Db
             }
 
             return name;
+        }
+
+        private static string Concat(string a, string b, string c)
+        {
+            return Concat(a, Concat(b, c));
+        }
+
+        private static string Concat(string a, string b)
+        {
+            return a + (!string.IsNullOrEmpty(a) && !string.IsNullOrEmpty(b) ? "_" : string.Empty) + b;
         }
     }
 }

@@ -222,6 +222,7 @@ namespace Lit.Db.Model
         public void GetOutputFields(DbDataReader reader, object instance)
         {
             fieldBindings?.ForEach(b => b.GetOutputField(reader, instance));
+            columnBindings?.ForEach(c => c.GetOutputField(reader, instance));
         }
 
         /// <summary>

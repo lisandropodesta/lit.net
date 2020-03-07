@@ -92,6 +92,7 @@ namespace Lit.Db.Model
             var type = template?.GetType() ?? typeof(T);
             var binding = DbTemplateCache.Get(type, DbNaming);
             var cmdType = commandType ?? binding.CommandType;
+            var spCmdType = cmdType;
 
             if (string.IsNullOrEmpty(text))
             {
@@ -106,14 +107,23 @@ namespace Lit.Db.Model
             {
                 text = binding.SetInputParameters(text, template);
             }
+            else if (cmdType > CommandType.TableDirect)
+            {
+                text = GetTableSpName(binding, cmdType);
+                spCmdType = CommandType.StoredProcedure;
+            }
 
             using (var connection = GetOpenedConnection())
             {
-                using (var cmd = GetCommand(text, connection, cmdType))
+                using (var cmd = GetCommand(text, connection, spCmdType))
                 {
                     if (cmdType == CommandType.StoredProcedure)
                     {
                         binding.SetInputParameters(cmd, template);
+                    }
+                    else if (cmdType > CommandType.TableDirect)
+                    {
+                        SetTableSpInputParameters(binding, cmd, template, cmdType);
                     }
 
                     switch (binding.Mode)
@@ -179,6 +189,22 @@ namespace Lit.Db.Model
             var conn = CreateConnection();
             conn.Open();
             return conn;
+        }
+
+        /// <summary>
+        /// Table stored procedure resolving.
+        /// </summary>
+        protected virtual string GetTableSpName(DbTemplateBinding binding, CommandType cmdType)
+        {
+            throw new ArgumentException("Unable to run table query in DbHost.");
+        }
+
+        /// <summary>
+        /// Set table stored procedure parameters.
+        /// </summary>
+        protected virtual void SetTableSpInputParameters<T>(DbTemplateBinding binding, DbCommand cmd, T template, CommandType cmdType)
+        {
+            throw new ArgumentException("Unable to run table query in DbHost.");
         }
 
         protected abstract TH CreateConnection();

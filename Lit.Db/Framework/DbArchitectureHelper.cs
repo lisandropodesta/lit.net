@@ -15,40 +15,52 @@ namespace Lit.Db.Framework
             switch (spFunc)
             {
                 case StoredProcedureFunction.Get:
-                    prefix = "get_";
+                    prefix = "get";
                     suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.GetByCode:
-                    prefix = "get_";
-                    suffix = "_by_code";
+                    prefix = "getc";
+                    suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.ListAll:
-                    prefix = "lst_";
+                    prefix = "lst";
                     suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.Insert:
+                    prefix = "ins";
+                    suffix = string.Empty;
+                    break;
+
                 case StoredProcedureFunction.InsertGet:
-                    prefix = "ins_";
+                    prefix = "insr";
                     suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.Update:
+                    prefix = "upd";
+                    suffix = string.Empty;
+                    break;
+
                 case StoredProcedureFunction.UpdateGet:
-                    prefix = "upd_";
+                    prefix = "updr";
                     suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.Set:
+                    prefix = "set";
+                    suffix = string.Empty;
+                    break;
+
                 case StoredProcedureFunction.SetGet:
-                    prefix = "set_";
+                    prefix = "setr";
                     suffix = string.Empty;
                     break;
 
                 case StoredProcedureFunction.Delete:
-                    prefix = "del_";
+                    prefix = "del";
                     suffix = string.Empty;
                     break;
 

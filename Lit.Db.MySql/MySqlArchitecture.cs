@@ -8,7 +8,7 @@ namespace Lit.Db.MySql
     /// <summary>
     /// MySql db architecture access.
     /// </summary>
-    public class MySqlArchitecture : MySqlHost, IDbArchitecture
+    public class MySqlArchitecture : MySqlDataAccess, IDbArchitecture
     {
         #region Constructors
 

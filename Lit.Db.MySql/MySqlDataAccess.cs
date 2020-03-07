@@ -1,17 +1,18 @@
 ﻿using MySql.Data.MySqlClient;
 using Lit.Db.Model;
 using Lit.Db.MySql.Model;
+using Lit.Db.Framework.Entities;
 
 namespace Lit.Db.MySql
 {
     /// <summary>
-    /// MySql host.
+    /// MySql data access.
     /// </summary>
-    public class MySqlHost : DbHost<MySqlConnection, MySqlCommand>
+    public class MySqlDataAccess : DbDataAccess<MySqlConnection, MySqlCommand>
     {
         #region Constructors
 
-        public MySqlHost(string connectionString) : base(connectionString) { }
+        public MySqlDataAccess(string connectionString) : base(connectionString) { }
 
         #endregion
 

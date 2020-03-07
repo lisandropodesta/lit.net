@@ -1,17 +1,18 @@
 ﻿using System.Data.SqlClient;
+using Lit.Db.Framework.Entities;
 using Lit.Db.Model;
 using Lit.Db.Sql.Model;
 
 namespace Lit.Db.Sql
 {
     /// <summary>
-    /// Sql host.
+    /// Sql data access.
     /// </summary>
-    public class SqlHost : DbHost<SqlConnection, SqlCommand>
+    public class SqlDataAccess : DbDataAccess<SqlConnection, SqlCommand>
     {
         #region Constructors
 
-        public SqlHost(string connectionString) : base(connectionString) { }
+        public SqlDataAccess(string connectionString) : base(connectionString) { }
 
         #endregion
 

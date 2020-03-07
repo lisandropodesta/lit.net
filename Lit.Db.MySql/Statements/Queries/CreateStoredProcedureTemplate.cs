@@ -10,7 +10,7 @@ namespace Lit.Db.MySql.Statements.Queries
     /// <summary>
     /// MySql create stored procedure template.
     /// </summary>
-    public abstract partial class CreateStoredProcedureTemplate : MySqlTemplate
+    public abstract class CreateStoredProcedureTemplate : MySqlTemplate
     {
         /// <summary>
         /// Stored procedure name.
