@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Lit.DataType
 {
-    public static class TypeHelper
+    public static partial class TypeHelper
     {
         /// <summary>
         /// Get a list of properties having a custom attribute with their values.

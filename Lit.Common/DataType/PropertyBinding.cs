@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace Lit.DataType
@@ -40,7 +39,7 @@ namespace Lit.DataType
             : base(propInfo)
         {
             bindingType = propInfo.PropertyType;
-            mode = GetBindingMode(ref bindingType, out isNullable);
+            mode = TypeHelper.GetBindingMode(ref bindingType, out isNullable);
 
             var gm = propInfo.GetGetMethod(true);
             if (gm != null)
@@ -110,147 +109,5 @@ namespace Lit.DataType
         {
             return value != null ? (TP)value : default;
         }
-
-        #region Public static methods
-
-        /// <summary>
-        /// Gets the binding kind of a property type.
-        /// </summary>
-        public static BindingMode GetBindingMode(ref Type type, out bool isNullable)
-        {
-            isNullable = false;
-
-            if (IsScalarType(type))
-            {
-                return BindingMode.Scalar;
-            }
-
-            if (type.IsGenericType && type.GetGenericArguments().Length == 1)
-            {
-                var gdef = type.GetGenericTypeDefinition();
-                var gtype = type.GetGenericArguments()[0];
-
-                if (gdef == typeof(Nullable<>))
-                {
-                    isNullable = true;
-
-                    if (IsScalarType(gtype))
-                    {
-                        type = gtype;
-                        return BindingMode.Scalar;
-                    }
-                }
-                else if (IsGenericList(gdef))
-                {
-                    type = gtype;
-                    return BindingMode.List;
-                }
-            }
-
-            if (IsDictionary(type))
-            {
-                return BindingMode.Dictionary;
-            }
-
-            if (type.IsClass && !type.IsInterface)
-            {
-                return BindingMode.Class;
-            }
-
-            return BindingMode.None;
-        }
-
-        /// <summary>
-        /// Check if the type is a supported scalar type.
-        /// </summary>
-        public static bool IsScalarType(Type type)
-        {
-            return type.IsEnum || ScalarTypes.Contains(type);
-        }
-
-        private static readonly List<Type> ScalarTypes = new List<Type>
-        {
-            typeof(bool),
-            typeof(char),
-
-            typeof(sbyte), typeof(byte),
-            typeof(short), typeof(ushort),
-            typeof(int), typeof(uint),
-            typeof(long), typeof(ulong),
-
-            typeof(float),
-            typeof(double),
-            typeof(decimal),
-
-            typeof(DateTime),
-            typeof(DateTimeOffset),
-            typeof(TimeSpan),
-            typeof(string),
-            typeof(byte[])
-        };
-
-        /// <summary>
-        /// Check if the type is an integer type.
-        /// </summary>
-        public static bool IsInteger(Type type)
-        {
-            return IntegerTypes.Contains(type);
-        }
-
-        private static readonly List<Type> IntegerTypes = new List<Type>
-        {
-            typeof(sbyte), typeof(byte),
-            typeof(short), typeof(ushort),
-            typeof(int), typeof(uint),
-            typeof(long), typeof(ulong)
-        };
-
-        /// <summary>
-        /// Check if the type is a floating point type.
-        /// </summary>
-        public static bool IsFloatingPoint(Type type)
-        {
-            return FloatingPointTypes.Contains(type);
-        }
-
-        private static readonly List<Type> FloatingPointTypes = new List<Type>
-        {
-            typeof(float),
-            typeof(double)
-        };
-
-        /// <summary>
-        /// Check if the type is a generic list.
-        /// </summary>
-        public static bool IsGenericList(Type type)
-        {
-            return GenericListTypes.Contains(type);
-        }
-
-        private static readonly List<Type> GenericListTypes = new List<Type>
-        {
-            typeof(List<>),
-            typeof(IList<>),
-            typeof(IReadOnlyList<>),
-            typeof(ICollection<>),
-            typeof(IReadOnlyCollection<>),
-            typeof(IEnumerable<>)
-        };
-
-        /// <summary>
-        /// Check if the type is a dictionary.
-        /// </summary>
-        public static bool IsDictionary(Type type)
-        {
-            return DictionaryTypes.Contains(type);
-        }
-
-        private static readonly List<Type> DictionaryTypes = new List<Type>
-        {
-            typeof(Dictionary<string,object>),
-            typeof(IDictionary<string,object>)
-        };
-
-        #endregion
     }
 }
