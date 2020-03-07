@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlClient;
 using Lit.Db.Model;
 
-namespace Lit.Db.Sql.Model
+namespace Lit.Db.Sql
 {
     /// <summary>
     /// Stored procedure information.

@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using Lit.Db.Model;
 
-namespace Lit.Db.MySql.Model
+namespace Lit.Db.MySql
 {
     /// <summary>
     /// Stored procedure information.
