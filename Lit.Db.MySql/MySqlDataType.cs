@@ -8,6 +8,8 @@ namespace Lit.Db.MySql
 {
     public static class MySqlDataType
     {
+        #region Constants
+
         // Boolean
 
         public const string BooleanDataType = @"BOOLEAN";
@@ -100,6 +102,104 @@ namespace Lit.Db.MySql
             LessThan4GB
         }
 
+        #endregion
+
+        /// <summary>
+        /// Translates a native value to a MySql value.
+        /// </summary>
+        public static object TranslateToDb(DbDataType dataType, Type type, object value)
+        {
+            switch (dataType)
+            {
+                case DbDataType.Unknown:
+                    return DBNull.Value;
+
+                case DbDataType.Boolean:
+                case DbDataType.Char:
+                case DbDataType.UInt8:
+                case DbDataType.SInt8:
+                case DbDataType.UInt16:
+                case DbDataType.SInt16:
+                case DbDataType.UInt24:
+                case DbDataType.SInt24:
+                case DbDataType.UInt32:
+                case DbDataType.SInt32:
+                case DbDataType.UInt64:
+                case DbDataType.SInt64:
+                case DbDataType.Decimal:
+                case DbDataType.Float:
+                case DbDataType.Double:
+                case DbDataType.Text:
+                case DbDataType.Blob:
+                case DbDataType.Enumerated:
+                    return DbTranslation.ScalarToDb(type, value);
+
+                case DbDataType.DateTime:
+                    return value;
+
+                case DbDataType.Timestamp:
+                    return ((DateTimeOffset)value).DateTime;
+
+                case DbDataType.TimeSpan:
+                    return ((TimeSpan)value).Ticks;
+
+                case DbDataType.Time:
+                case DbDataType.Date:
+                case DbDataType.Json:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Translates a MySql value to a native value.
+        /// </summary>
+        public static object TranslateFromDb(DbDataType dataType, Type type, object value)
+        {
+            switch (dataType)
+            {
+                case DbDataType.Unknown:
+                case DbDataType.Boolean:
+                case DbDataType.Char:
+                case DbDataType.UInt8:
+                case DbDataType.SInt8:
+                case DbDataType.UInt16:
+                case DbDataType.SInt16:
+                case DbDataType.UInt24:
+                case DbDataType.SInt24:
+                case DbDataType.UInt32:
+                case DbDataType.SInt32:
+                case DbDataType.UInt64:
+                case DbDataType.SInt64:
+                case DbDataType.Decimal:
+                case DbDataType.Float:
+                case DbDataType.Double:
+                case DbDataType.Text:
+                case DbDataType.Blob:
+                case DbDataType.Enumerated:
+                    return DbTranslation.ScalarFromDb(type, value);
+
+                case DbDataType.DateTime:
+                    return value;
+
+                case DbDataType.Timestamp:
+                    return new DateTimeOffset((DateTime)value);
+
+                case DbDataType.TimeSpan:
+                    return new TimeSpan((long)value);
+
+                case DbDataType.Json:
+                    return value;
+
+                case DbDataType.Time:
+                case DbDataType.Date:
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return value;
+        }
+
         /// <summary>
         /// Translates a db data type to a MySql data type.
         /// </summary>
@@ -159,10 +259,10 @@ namespace Lit.Db.MySql
                     return DateTimeDataType;
 
                 case DbDataType.Timestamp:
-                    return TimestampDataType;
+                    return DateTimeDataType;
 
                 case DbDataType.TimeSpan:
-                    throw new NotImplementedException("TimeSpan data type.");
+                    return Int64DataType;
 
                 case DbDataType.Text:
                     return $"{GetTextDataType(size)}({size ?? 255})";

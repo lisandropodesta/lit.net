@@ -90,7 +90,12 @@ namespace Lit.Db.Model
         {
             try
             {
-                return Setup.Translation.ToDb(Mode, BindingType, value);
+                if (value == null)
+                {
+                    return DBNull.Value;
+                }
+
+                return Setup.Translation.ToDb(dataType, BindingType, value);
             }
             catch
             {
@@ -105,7 +110,12 @@ namespace Lit.Db.Model
         {
             try
             {
-                return Setup.Translation.FromDb<TP>(Mode, BindingType, value);
+                if (value == null || value is DBNull)
+                {
+                    return default;
+                }
+
+                return (TP)Setup.Translation.FromDb(dataType, BindingType, value);
             }
             catch
             {

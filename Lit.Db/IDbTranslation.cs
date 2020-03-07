@@ -12,11 +12,11 @@ namespace Lit.Db
         /// <summary>
         /// Translates a C# value into a DB value.
         /// </summary>
-        object ToDb<T>(BindingMode Mode, Type dstType, T value);
+        object ToDb(DbDataType dataType, Type type, object value);
 
         /// <summary>
         /// Translates a DB value into a C# value.
         /// </summary>
-        T FromDb<T>(BindingMode Mode, Type srcType, object value);
+        object FromDb(DbDataType dataType, Type type, object value);
     }
 }

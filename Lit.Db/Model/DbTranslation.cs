@@ -4,94 +4,67 @@ using Lit.Db.Attributes;
 
 namespace Lit.Db.Model
 {
-    public class DbTranslation : IDbTranslation
+    public abstract class DbTranslation : IDbTranslation
     {
         /// <summary>
         /// Encodes a C# value into a DB value.
         /// </summary>
-        public virtual object ToDb<T>(BindingMode Mode, Type dstType, T value)
-        {
-            if (value == null)
-            {
-                return DBNull.Value;
-            }
-
-            switch (Mode)
-            {
-                case BindingMode.Scalar:
-                    if (TypeHelper.GetEnumAttribute<DbEnumCodeAttribute>(dstType, value, out var attr))
-                    {
-                        return attr.Code;
-                    }
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                default:
-                    throw new NotImplementedException();
-            }
-
-            return value;
-        }
+        public abstract object ToDb(DbDataType dataType, Type type, object value);
 
         /// <summary>
         /// Decodes a DB value into a C# value.
         /// </summary>
-        public virtual T FromDb<T>(BindingMode Mode, Type srcType, object value)
+        public abstract object FromDb(DbDataType dataType, Type type, object value);
+
+        /// <summary>
+        /// Translates a common scalar to DB.
+        /// </summary>
+        public static object ScalarToDb(Type type, object value)
         {
-            if (value == null || value is DBNull)
+            return TypeHelper.GetEnumAttribute<DbEnumCodeAttribute>(type, value, out var attr) ? attr.Code : value;
+        }
+
+        /// <summary>
+        /// Translates a common scalar from DB.
+        /// </summary>
+        public static object ScalarFromDb(Type type, object value)
+        {
+            if (type == value.GetType())
             {
-                return default;
+                return value;
             }
 
-            var type = srcType;
-
-            switch (Mode)
+            if (value is string)
             {
-                case BindingMode.Scalar:
-                    if (type != value.GetType())
-                    {
-                        if (value is string)
-                        {
-                            if (type.IsEnum && FindDbEnumCode(type, value as string, out var enumValue))
-                            {
-                                value = enumValue;
-                            }
-                            else if (type == typeof(bool))
-                            {
-                                value = bool.Parse((string)value);
-                            }
-                            else if (TypeHelper.IsInteger(type))
-                            {
-                                value = long.Parse((string)value);
-                            }
-                            else if (TypeHelper.IsFloatingPoint(type))
-                            {
-                                value = double.Parse((string)value);
-                            }
-                        }
-                        else if (type.IsEnum)
-                        {
-                            value = Enum.Parse(type, value.ToString());
-                        }
-                        else
-                        {
-                            value = Convert.ChangeType(value, type);
-                        }
-                    }
-                    break;
+                if (type.IsEnum && FindDbEnumCode(type, value as string, out var enumValue))
+                {
+                    return enumValue;
+                }
 
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                    break;
+                if (type == typeof(bool))
+                {
+                    return bool.Parse((string)value);
+                }
 
-                default:
-                    throw new NotImplementedException();
+                if (TypeHelper.IsInteger(type))
+                {
+                    return long.Parse((string)value);
+                }
+
+                if (TypeHelper.IsFloatingPoint(type))
+                {
+                    return double.Parse((string)value);
+                }
+
+                return value;
             }
 
-            return (T)value;
+            if (type.IsEnum)
+            {
+                return Enum.Parse(type, value.ToString());
+            }
+
+            return Convert.ChangeType(value, type);
         }
 
         /// <summary>
