@@ -85,7 +85,7 @@ namespace Lit.DataType
         }
 
         /// <summary>
-        /// Sets the binding value to an instances.
+        /// Sets the binding value to an instance.
         /// </summary>
         public void SetValue(object instance, object value)
         {

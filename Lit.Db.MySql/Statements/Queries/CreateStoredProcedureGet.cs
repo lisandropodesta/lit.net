@@ -41,7 +41,7 @@ namespace Lit.Db.MySql.Statements.Queries
                 filterCol = binding.FindFirstColumn(DbColumnsSelection.UniqueKey);
                 if (filterCol == null)
                 {
-                    throw new ArgumentException($"Unable Invalid unique key in table template [{tableTemplate.FullName}]");
+                    throw new ArgumentException($"Invalid unique key in table template [{tableTemplate.FullName}]");
                 }
 
                 FilterField = filterCol.FieldName;
