@@ -3,6 +3,7 @@ using System.Text;
 using Lit.DataType;
 using Lit.Db.Attributes;
 using Lit.Db.Model;
+using Newtonsoft.Json;
 
 namespace Lit.Db.MySql
 {
@@ -52,21 +53,21 @@ namespace Lit.Db.MySql
 
         public const string TinyTextDataType = @"TINYTEXT";
 
-        public const string TextDataType = "@TEXT";
+        public const string TextDataType = @"TEXT";
 
         public const string MediumTextDataType = @"MEDIUMTEXT";
 
-        public const string LongTextDataType = "@LONGTEXT";
+        public const string LongTextDataType = @"LONGTEXT";
 
         // Blob
 
         public const string TinyBlobDataType = @"TINYBLOB";
 
-        public const string BlobDataType = "@BLOB";
+        public const string BlobDataType = @"BLOB";
 
         public const string MediumBlobDataType = @"MEDIUMBLOB";
 
-        public const string LongBlobDataType = "@LONGBLOB";
+        public const string LongBlobDataType = @"LONGBLOB";
 
         // Objects / Json
 
@@ -143,9 +144,11 @@ namespace Lit.Db.MySql
                 case DbDataType.TimeSpan:
                     return ((TimeSpan)value).Ticks;
 
+                case DbDataType.Json:
+                    return JsonConvert.SerializeObject(value, Formatting.None);
+
                 case DbDataType.Time:
                 case DbDataType.Date:
-                case DbDataType.Json:
                 default:
                     throw new NotImplementedException();
             }
@@ -189,7 +192,7 @@ namespace Lit.Db.MySql
                     return new TimeSpan((long)value);
 
                 case DbDataType.Json:
-                    return value;
+                    return JsonConvert.DeserializeObject((string)value, type);
 
                 case DbDataType.Time:
                 case DbDataType.Date:
@@ -272,7 +275,9 @@ namespace Lit.Db.MySql
                     return GetEnumList(type);
 
                 case DbDataType.Json:
-                    return JsonDataType;
+                    // NOTE: Json parameters throw an exception when running MySqlCommandBuilder.DeriveParameters so this implementation uses TEXT instead of JSON data type.
+                    //return JsonDataType;
+                    return TextDataType;
             }
 
             throw new ArgumentException($"Type [{dataType}] not supported.");
