@@ -25,12 +25,12 @@ namespace Lit.Db.Attributes
         /// <summary>
         /// IsNullable flag defined flag.
         /// </summary>
-        public bool IsNullableDefined => isNullable != null;
+        public virtual bool IsNullableDefined => isNullable != null;
 
         /// <summary>
         /// IsNullable flag.
         /// </summary>
-        public bool IsNullable { get => isNullable ?? false; set => isNullable = value; }
+        public virtual bool IsNullable { get => isNullable ?? false; set => isNullable = value; }
 
         private bool? isNullable;
 

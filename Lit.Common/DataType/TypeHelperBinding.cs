@@ -10,12 +10,13 @@ namespace Lit.DataType
         /// </summary>
         public static BindingMode GetBindingMode(ref Type type, out bool isNullable)
         {
-            isNullable = false;
-
             if (TypeHelper.IsScalarType(type))
             {
+                isNullable = type == typeof(string);
                 return BindingMode.Scalar;
             }
+
+            isNullable = true;
 
             if (type.IsGenericType && type.GetGenericArguments().Length == 1)
             {
@@ -24,8 +25,6 @@ namespace Lit.DataType
 
                 if (gdef == typeof(Nullable<>))
                 {
-                    isNullable = true;
-
                     if (TypeHelper.IsScalarType(gtype))
                     {
                         type = gtype;

@@ -8,6 +8,19 @@ namespace Lit.Db.Attributes
     [AttributeUsage(AttributeTargets.Property)]
     public class DbPrimaryKeyAttribute : DbColumnAttribute
     {
+        /// <summary>
+        /// IsNullable flag defined flag.
+        /// </summary>
+        public override bool IsNullableDefined => true;
+
+        /// <summary>
+        /// IsNullable flag.
+        /// </summary>
+        public override bool IsNullable => false;
+
+        /// <summary>
+        /// AutoIncrement flag.
+        /// </summary>
         public bool AutoIncrement { get; set; }
 
         #region Constructors
