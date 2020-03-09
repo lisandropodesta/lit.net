@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Lit.Db.Attributes;
 using Lit.Db.Custom.MySql.Attributes;
 
@@ -18,10 +19,16 @@ namespace Lit.Db.Test.Schema.Tables
         public DateTimeOffset Started { get; set; }
 
         [DbColumn]
+        public DateTimeOffset? Finished { get; set; }
+
+        [DbColumn]
         public DateTime DateTime { get; set; }
 
         [DbColumn]
         public TimeSpan TimeSpan { get; set; }
+
+        [DbColumn]
+        public Dictionary<string, object> Attributes { get; set; }
 
         public UserSession() { }
 

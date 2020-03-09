@@ -2,6 +2,7 @@
 using Lit.Db.Test.Schema;
 using Lit.Db.Test.Schema.Tables;
 using System;
+using System.Collections.Generic;
 
 namespace Lit.Db.Test.Common
 {
@@ -57,7 +58,15 @@ namespace Lit.Db.Test.Common
                 IdUser = userList[0].IdUser,
                 Started = DateTimeOffset.Now,
                 DateTime = DateTime.Now,
-                TimeSpan = TimeSpan.FromTicks(1234567890)
+                TimeSpan = TimeSpan.FromTicks(1234567890),
+                Attributes = new Dictionary<string, object>
+                {
+                    { "Number", 123 },
+                    { "Text", "hello" },
+                    { "Bool", true },
+                    { "Null", null },
+                    { "Array", new[] { 1, 2, 3 } }
+                }
             };
 
             db.Store(userSession);

@@ -43,6 +43,8 @@ namespace Lit.Db.Test
 
                 Audit.Message("\n\n*** DATA ACCESS TEST ***");
                 DataAccess.Execute(db);
+
+                Audit.Message("\n\n*** TEST FINISHED OK ***");
             }
             catch (Exception x)
             {

@@ -12,14 +12,17 @@ namespace Lit.Db.Test.Common
             Audit.Message("\n  ** DROP TABLEs test **");
             db.DropTable(typeof(UserSession), true);
             db.DropTable(typeof(User), true);
+            db.DropTable(typeof(StatusConnection), true);
 
             Audit.Message("\n  ** CREATE TABLEs test **");
             db.CreateTable(typeof(User));
             db.CreateTable(typeof(UserSession));
+            db.CreateTable(typeof(StatusConnection));
 
             Audit.Message("\n  ** CREATE STORED PROCEDURES test **");
             CreateAllStoredProcedures(db, typeof(User));
             CreateAllStoredProcedures(db, typeof(UserSession));
+            CreateAllStoredProcedures(db, typeof(StatusConnection));
         }
 
         private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
