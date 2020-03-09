@@ -20,15 +20,16 @@ namespace Lit.Db.Attributes
 
         #region Constructors
 
-        public DbForeignKeyAttribute(Type tableTemplate, string propertyName)
+        public DbForeignKeyAttribute(Type tableTemplate, string propertyName = null)
         {
             ForeignTableTemplate = tableTemplate;
             ForeignColumnProperty = propertyName;
         }
 
-        public DbForeignKeyAttribute(string name, Type tableTemplate, string propertyName) : base(name)
+        public DbForeignKeyAttribute(string name, Type tableTemplate, string propertyName = null) : base(name)
         {
             ForeignTableTemplate = tableTemplate;
+            ForeignColumnProperty = propertyName;
         }
 
         #endregion

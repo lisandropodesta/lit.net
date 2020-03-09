@@ -128,7 +128,8 @@ namespace Lit.Db.Model
             if (Attributes is DbForeignKeyAttribute fk)
             {
                 var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
-                var colBinding = binding?.FindColumn(fk.ForeignColumnProperty);
+                var colBinding = !string.IsNullOrEmpty(fk.ForeignColumnProperty) ? binding.FindColumn(fk.ForeignColumnProperty)
+                    : binding.FindFirstColumn(DbColumnsSelection.PrimaryKey);
 
                 if (colBinding == null)
                 {

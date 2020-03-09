@@ -12,7 +12,7 @@ namespace Lit.Db.Test.Schema.Tables
         [DbPrimaryKey]
         public int IdUserSession { get; protected set; }
 
-        [DbForeignKey(typeof(User), nameof(User.IdUser))]
+        [DbForeignKey(typeof(User))]
         public int IdUser { get; set; }
 
         [DbColumn]

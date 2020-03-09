@@ -11,7 +11,7 @@ namespace Lit.Db.Test.Schema.Tables
         [DbPrimaryKey]
         public int IdConnection { get; protected set; }
 
-        [DbForeignKey(typeof(UserSession), nameof(UserSession.IdUserSession))]
+        [DbForeignKey(typeof(UserSession))]
         public int IdUserSession { get; set; }
 
         [DbUniqueKey(IsNullable = false)]
