@@ -43,7 +43,7 @@ jobs:
     - name: Publish Lit.Auditing.NLog nuget packages
       uses: rohith/publish-nuget@v2
       with:
-        PROJECT_FILE_PATH: Lit.Auditing.NLog\Lit.Audition.NLog.csproj
+        PROJECT_FILE_PATH: Lit.Auditing.NLog\Lit.Auditing.NLog.csproj
 
     - name: Publish Lit.Db nuget packages
       uses: rohith/publish-nuget@v2
