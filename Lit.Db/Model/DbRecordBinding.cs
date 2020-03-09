@@ -53,5 +53,21 @@ namespace Lit.Db.Model
                     throw new ArgumentException($"Stored procedure returned more than one record and a single one was expected, at index {Attributes.Index}");
             }
         }
+
+        /// <summary>
+        /// Value decoding from property type.
+        /// </summary>
+        protected override object DecodePropertyValue(TP value)
+        {
+            return value;
+        }
+
+        /// <summary>
+        /// Value encoding to property type.
+        /// </summary>
+        protected override TP EncodePropertyValue(object value)
+        {
+            return value != null ? (TP)value : default;
+        }
     }
 }

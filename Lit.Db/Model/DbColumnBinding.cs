@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.Common;
 using System.Reflection;
-using Lit.DataType;
 using Lit.Db.Attributes;
 
 namespace Lit.Db.Model
@@ -146,18 +145,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void SetInputParameters(DbCommand cmd, object instance)
         {
-            switch (Mode)
-            {
-                case BindingMode.Scalar:
-                    DbHelper.SetSqlParameter(cmd, SpParamName, GetValue(instance), false);
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                default:
-                    throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
-            }
+            DbHelper.SetSqlParameter(cmd, SpParamName, GetValue(instance), false);
         }
     }
 }

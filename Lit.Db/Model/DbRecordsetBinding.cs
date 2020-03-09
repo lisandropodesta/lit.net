@@ -38,5 +38,21 @@ namespace Lit.Db.Model
             var list = DbHelper.LoadSqlRecordset(reader, BindingType, int.MaxValue, Setup);
             SetValue(instance, list);
         }
+
+        /// <summary>
+        /// Value decoding from property type.
+        /// </summary>
+        protected override object DecodePropertyValue(TP value)
+        {
+            return value;
+        }
+
+        /// <summary>
+        /// Value encoding to property type.
+        /// </summary>
+        protected override TP EncodePropertyValue(object value)
+        {
+            return value != null ? (TP)value : default;
+        }
     }
 }

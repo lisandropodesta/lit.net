@@ -67,19 +67,8 @@ namespace Lit.Db.Model
         {
             if (Attributes.IsInput)
             {
-                switch (Mode)
-                {
-                    case BindingMode.Scalar:
-                        var value = GetValue(instance);
-                        DbHelper.SetSqlParameter(ref text, spParamName, value.ToString(), Attributes.IsOptional);
-                        break;
-
-                    case BindingMode.Class:
-                    case BindingMode.List:
-                    case BindingMode.Dictionary:
-                    default:
-                        throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
-                }
+                var value = GetValue(instance);
+                DbHelper.SetSqlParameter(ref text, spParamName, value.ToString(), Attributes.IsOptional);
             }
         }
 
@@ -92,18 +81,7 @@ namespace Lit.Db.Model
             {
                 try
                 {
-                    switch (Mode)
-                    {
-                        case BindingMode.Scalar:
-                            DbHelper.SetSqlParameter(cmd, spParamName, GetValue(instance), Attributes.IsOptional);
-                            break;
-
-                        case BindingMode.Class:
-                        case BindingMode.List:
-                        case BindingMode.Dictionary:
-                        default:
-                            throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
-                    }
+                    DbHelper.SetSqlParameter(cmd, spParamName, GetValue(instance), Attributes.IsOptional);
                 }
                 catch
                 {
@@ -124,18 +102,7 @@ namespace Lit.Db.Model
             {
                 try
                 {
-                    switch (Mode)
-                    {
-                        case BindingMode.Scalar:
-                            SetValue(instance, DbHelper.GetSqlParameter(cmd, spParamName));
-                            break;
-
-                        case BindingMode.Class:
-                        case BindingMode.List:
-                        case BindingMode.Dictionary:
-                        default:
-                            throw new ArgumentException($"Property {this} of type [{PropertyInfo.PropertyType.Name}] has a unsupported binding {BindingType}.");
-                    }
+                    SetValue(instance, DbHelper.GetSqlParameter(cmd, spParamName));
                 }
                 catch
                 {
