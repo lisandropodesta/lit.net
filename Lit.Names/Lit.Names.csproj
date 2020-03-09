@@ -5,6 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>Lisandro Podesta</Company>
     <Authors>Lisandro Podesta</Authors>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
 </Project>
