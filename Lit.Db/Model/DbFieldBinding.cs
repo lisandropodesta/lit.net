@@ -16,16 +16,6 @@ namespace Lit.Db.Model
         string FieldName { get; }
 
         /// <summary>
-        /// Field type.
-        /// </summary>
-        Type FieldType { get; }
-
-        /// <summary>
-        /// Nullable flag.
-        /// </summary>
-        bool IsNullable { get; }
-
-        /// <summary>
         /// Get output field.
         /// </summary>
         void GetOutputField(DbDataReader reader, object instance);
@@ -52,9 +42,9 @@ namespace Lit.Db.Model
         #region Constructor
 
         public DbFieldBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
-            : base(setup, propInfo, attr, attr.IsNullableDefined ? (bool?)attr.IsNullable : null)
+            : base(setup, propInfo, attr, null)
         {
-            fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.FieldName);
+            fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
 
             if (string.IsNullOrEmpty(fieldName))
             {

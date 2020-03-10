@@ -8,8 +8,23 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db field binding interface.
     /// </summary>
-    public interface IDbColumnBinding : IDbFieldBinding
+    public interface IDbColumnBinding : IDbPropertyBinding<DbColumnAttribute>
     {
+        /// <summary>
+        /// Field name.
+        /// </summary>
+        string FieldName { get; }
+
+        /// <summary>
+        /// Field type.
+        /// </summary>
+        Type FieldType { get; }
+
+        /// <summary>
+        /// Nullable flag.
+        /// </summary>
+        bool IsNullable { get; }
+
         /// <summary>
         /// Key constraint.
         /// </summary>
@@ -41,6 +56,11 @@ namespace Lit.Db.Model
         void ResolveForeignKey();
 
         /// <summary>
+        /// Get output field.
+        /// </summary>
+        void GetOutputField(DbDataReader reader, object instance);
+
+        /// <summary>
         /// Assigns input parameters.
         /// </summary>
         void SetInputParameters(DbCommand cmd, object instance);
@@ -49,9 +69,21 @@ namespace Lit.Db.Model
     /// <summary>
     /// Db field property binding.
     /// </summary>
-    internal class DbColumnBinding<TC, TP> : DbFieldBinding<TC, TP>, IDbColumnBinding
+    internal class DbColumnBinding<TC, TP> : DbPropertyBinding<TC, TP, DbColumnAttribute>, IDbColumnBinding
         where TC : class
     {
+        /// <summary>
+        /// Field name.
+        /// </summary>
+        public string FieldName => fieldName;
+
+        private readonly string fieldName;
+
+        /// <summary>
+        /// Field type.
+        /// </summary>
+        public Type FieldType => BindingType;
+
         /// <summary>
         /// Key constraint.
         /// </summary>
@@ -90,8 +122,15 @@ namespace Lit.Db.Model
         #region Constructor
 
         public DbColumnBinding(IDbSetup setup, PropertyInfo propInfo, DbColumnAttribute attr)
-            : base(setup, propInfo, attr)
+            : base(setup, propInfo, attr, attr.IsNullableDefined ? (bool?)attr.IsNullable : null)
         {
+            fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
+
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                throw new ArgumentException($"Null field name in DbColumnBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
+            }
+
             if (attr is DbPrimaryKeyAttribute pk)
             {
                 keyConstraint = DbKeyConstraint.PrimaryKey;
@@ -139,6 +178,14 @@ namespace Lit.Db.Model
                 foreignTable = binding.TableName;
                 foreignColumn = Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
             }
+        }
+
+        /// <summary>
+        /// Get output field.
+        /// </summary>
+        public void GetOutputField(DbDataReader reader, object instance)
+        {
+            SetValue(instance, reader[fieldName]);
         }
 
         /// <summary>

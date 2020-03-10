@@ -9,9 +9,9 @@ namespace Lit.Db.Attributes
     public class DbFieldAttribute : Attribute
     {
         /// <summary>
-        /// Name of the field.
+        /// Name at DB.
         /// </summary>
-        public string FieldName => name;
+        public string DbName => name;
 
         protected readonly string name;
 
@@ -21,18 +21,6 @@ namespace Lit.Db.Attributes
         public bool IsOptional => isOptional;
 
         protected readonly bool isOptional;
-
-        /// <summary>
-        /// IsNullable flag defined flag.
-        /// </summary>
-        public virtual bool IsNullableDefined => isNullable != null;
-
-        /// <summary>
-        /// IsNullable flag.
-        /// </summary>
-        public virtual bool IsNullable { get => isNullable ?? false; set => isNullable = value; }
-
-        private bool? isNullable;
 
         #region Constructors
 
