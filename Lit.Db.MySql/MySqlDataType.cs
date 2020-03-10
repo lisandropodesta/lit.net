@@ -297,7 +297,7 @@ namespace Lit.Db.MySql
             foreach (var fieldInfo in enumType.GetFields())
             {
                 string code;
-                if (TypeHelper.GetAttribute<DbEnumCodeAttribute>(fieldInfo, out var dbCodeAttr))
+                if (TypeHelper.GetAttribute<IDbCode>(fieldInfo, out var dbCodeAttr))
                 {
                     if (!anyAttr)
                     {

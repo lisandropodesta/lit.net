@@ -10,7 +10,10 @@ namespace Lit.Db.Test.Schema.Tables
     public class UserSession
     {
         [DbPrimaryKey]
-        public int IdUserSession { get; set; }
+        public long IdUserSession { get; set; }
+
+        [DbForeignKey(typeof(UserSession))]
+        public long? IdPrevUserSession { get; set; }
 
         [DbForeignKey(typeof(User))]
         public int IdUser { get; set; }
@@ -30,12 +33,12 @@ namespace Lit.Db.Test.Schema.Tables
         [DbColumn]
         public Dictionary<string, object> Attributes { get; set; }
 
-        [DbColumn(16777216)]
+        [DbColumn(16777215)]
         public string LongText { get; set; }
 
         public UserSession() { }
 
-        public UserSession(int id)
+        public UserSession(long id)
         {
             IdUserSession = id;
         }

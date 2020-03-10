@@ -21,7 +21,7 @@ namespace Lit.Db.Model
         /// </summary>
         public static object ScalarToDb(Type type, object value)
         {
-            return TypeHelper.GetEnumAttribute<DbEnumCodeAttribute>(type, value, out var attr) ? attr.Code : value;
+            return TypeHelper.GetEnumAttribute<IDbCode>(type, value, out var attr) ? attr.Code : value;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Lit.Db.Model
 
                 foreach (var fieldInfo in enumType.GetFields())
                 {
-                    if (TypeHelper.GetAttribute<DbEnumCodeAttribute>(fieldInfo, out var dbCodeAttr))
+                    if (TypeHelper.GetAttribute<IDbCode>(fieldInfo, out var dbCodeAttr))
                     {
                         if (targetValue == dbCodeAttr.Code)
                         {

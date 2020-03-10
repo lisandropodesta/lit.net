@@ -6,10 +6,10 @@ namespace Lit.Db.Attributes
     /// Enumerated type code.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class DbEnumCodeAttribute : Attribute
+    public class DbEnumCodeAttribute : Attribute, IDbCode
     {
         /// <summary>
-        /// Code string.
+        /// String code.
         /// </summary>
         public string Code => code;
 
