@@ -8,7 +8,7 @@ namespace Lit.Db.Test.Schema.Tables
     public class User
     {
         [DbPrimaryKey]
-        public int IdUser { get; protected set; }
+        public int IdUser { get; set; }
 
         [DbColumn]
         public Status Status { get; set; }

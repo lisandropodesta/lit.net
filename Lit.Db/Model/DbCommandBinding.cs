@@ -116,7 +116,8 @@ namespace Lit.Db.Model
                     AssertRecordsetIndex(rsAttr.Index);
                     AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr, setup);
                 }
-                else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr))
+                else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
+                    || TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr) && (fAttr = new DbFieldAttribute(cAttr.DbName)) != null)
                 {
                     mode = DbExecutionMode.Query;
                     AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr, setup);

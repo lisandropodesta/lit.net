@@ -36,12 +36,17 @@ namespace Lit.Db.Attributes
 
         public DbColumnAttribute() { }
 
-        public DbColumnAttribute(ulong? size)
+        public DbColumnAttribute(ulong size)
         {
             Size = size;
         }
 
-        public DbColumnAttribute(string name, ulong? size = null)
+        public DbColumnAttribute(string name)
+        {
+            this.name = name;
+        }
+
+        public DbColumnAttribute(string name, ulong size)
         {
             this.name = name;
             Size = size;

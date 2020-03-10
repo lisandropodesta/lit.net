@@ -66,7 +66,8 @@ namespace Lit.Db.Test.Common
                     { "Bool", true },
                     { "Null", null },
                     { "Array", new[] { 1, 2, 3 } }
-                }
+                },
+                LongText = "long text!"
             };
 
             db.Store(userSession);

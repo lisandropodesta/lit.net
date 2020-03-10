@@ -266,7 +266,7 @@ namespace Lit.Db.MySql
                     return Int64DataType;
 
                 case DbDataType.Text:
-                    return $"{GetTextDataType(size)}({size ?? 255})";
+                    return $"{GetTextDataType(size)}{GetTextSize(size)}";
 
                 case DbDataType.Blob:
                     return GetBlobDataType(size);
@@ -349,6 +349,21 @@ namespace Lit.Db.MySql
                 case SizeQualifier.LessThan4GB:
                     return LongTextDataType;
             }
+        }
+
+        private static string GetTextSize(ulong? size)
+        {
+            if (!size.HasValue)
+            {
+                return "(255)";
+            }
+
+            if (size.Value < Size256B)
+            {
+                return $"({size.Value})";
+            }
+
+            return string.Empty;
         }
 
         private static string GetBlobDataType(ulong? size)
