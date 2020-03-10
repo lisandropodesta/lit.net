@@ -113,13 +113,13 @@ namespace Lit.Db.Model
                     return false;
 
                 case DbColumnsSelection.PrimaryKey:
-                    return column.KeyConstraint == DbKeyConstraint.PrimaryKey;
+                    return column.KeyConstraint == DbKeyConstraint.PrimaryKey || column.KeyConstraint == DbKeyConstraint.PrimaryForeignKey;
 
                 case DbColumnsSelection.UniqueKey:
                     return column.KeyConstraint == DbKeyConstraint.UniqueKey;
 
                 case DbColumnsSelection.NonPrimaryKey:
-                    return column.KeyConstraint != DbKeyConstraint.PrimaryKey;
+                    return column.KeyConstraint != DbKeyConstraint.PrimaryKey && column.KeyConstraint != DbKeyConstraint.PrimaryForeignKey;
 
                 case DbColumnsSelection.All:
                 default:

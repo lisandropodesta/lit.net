@@ -110,6 +110,7 @@ namespace Lit.Db.MySql.Statements
             {
                 str.ConditionalAppend(",\n ", GetColumnIndex(col));
                 str.ConditionalAppend(",\n ", GetColumnConstraints(col));
+                str.ConditionalAppend(",\n ", GetColumnForeignKeyConstraints(col));
             }
 
             return str.ToString();
@@ -126,7 +127,7 @@ namespace Lit.Db.MySql.Statements
 
         private string GetFieldType(IDbColumnBinding column)
         {
-            return MySqlDataType.Translate(column.DataType, column.FieldType);
+            return MySqlDataType.Translate(column.DataType, column.FieldType, column.FieldSize);
         }
 
         private string GetNullable(IDbColumnBinding column)
@@ -154,19 +155,14 @@ namespace Lit.Db.MySql.Statements
         {
             switch (column.KeyConstraint)
             {
-                case DbKeyConstraint.None:
-                    return string.Empty;
-
-                case DbKeyConstraint.PrimaryKey:
-                    return string.Empty;
-
-                case DbKeyConstraint.UniqueKey:
-                    return string.Empty;
-
                 // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
+                case DbKeyConstraint.PrimaryForeignKey:
                 case DbKeyConstraint.ForeignKey:
                     return $"{KeyKey} fk_{TableName}_{column.FieldName}_idx ( {column.FieldName} )";
 
+                case DbKeyConstraint.None:
+                case DbKeyConstraint.PrimaryKey:
+                case DbKeyConstraint.UniqueKey:
                 default:
                     return string.Empty;
             }
@@ -176,22 +172,35 @@ namespace Lit.Db.MySql.Statements
         {
             switch (column.KeyConstraint)
             {
-                case DbKeyConstraint.None:
-                    return string.Empty;
-
                 // [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (key_part,...) [index_option] ...
                 case DbKeyConstraint.PrimaryKey:
+                case DbKeyConstraint.PrimaryForeignKey:
                     return $"{ConstraintKey} {PrimaryKeyKey} ( {column.FieldName} )";
 
                 // [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (key_part,...) [index_option] ...
                 case DbKeyConstraint.UniqueKey:
                     return $"{ConstraintKey} {UniqueKeyKey} uk_{TableName}_{column.FieldName} ( {column.FieldName} )";
 
+                case DbKeyConstraint.ForeignKey:
+                case DbKeyConstraint.None:
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private string GetColumnForeignKeyConstraints(IDbColumnBinding column)
+        {
+            switch (column.KeyConstraint)
+            {
                 // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
                 // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
+                case DbKeyConstraint.PrimaryForeignKey:
                 case DbKeyConstraint.ForeignKey:
                     return $"{ConstraintKey} fk_{TableName}_{column.FieldName} {ForeignKeyKey} ( {column.FieldName} ) {ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} ) ON DELETE NO ACTION ON UPDATE NO ACTION";
 
+                case DbKeyConstraint.None:
+                case DbKeyConstraint.PrimaryKey:
+                case DbKeyConstraint.UniqueKey:
                 default:
                     return string.Empty;
             }

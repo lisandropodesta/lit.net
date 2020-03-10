@@ -21,7 +21,7 @@ namespace Lit.Db.Attributes
         /// <summary>
         /// AutoIncrement flag.
         /// </summary>
-        public bool AutoIncrement { get; set; }
+        public bool AutoIncrement { get; private set; }
 
         #region Constructors
 

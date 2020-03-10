@@ -16,6 +16,11 @@ namespace Lit.Db.Attributes
         protected readonly string name;
 
         /// <summary>
+        /// Size at DB.
+        /// </summary>
+        public ulong? Size { get; private set; }
+
+        /// <summary>
         /// IsNullable flag defined flag.
         /// </summary>
         public virtual bool IsNullableDefined => isNullable != null;
@@ -31,9 +36,15 @@ namespace Lit.Db.Attributes
 
         public DbColumnAttribute() { }
 
-        public DbColumnAttribute(string name)
+        public DbColumnAttribute(ulong? size)
+        {
+            Size = size;
+        }
+
+        public DbColumnAttribute(string name, ulong? size = null)
         {
             this.name = name;
+            Size = size;
         }
 
         #endregion

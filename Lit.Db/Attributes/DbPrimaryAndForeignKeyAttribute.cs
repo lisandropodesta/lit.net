@@ -3,10 +3,10 @@
 namespace Lit.Db.Attributes
 {
     /// <summary>
-    /// Primary key attributes definition.
+    /// Simultaneous primary and foreign key attributes definition.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class DbForeignKeyAttribute : DbColumnAttribute, IDbForeignKeyAttribute
+    public class DbPrimaryAndForeignKeyAttribute : DbPrimaryKeyAttribute, IDbForeignKeyAttribute
     {
         /// <summary>
         /// Foreign table template.
@@ -20,13 +20,13 @@ namespace Lit.Db.Attributes
 
         #region Constructors
 
-        public DbForeignKeyAttribute(Type tableTemplate, string propertyName = null)
+        public DbPrimaryAndForeignKeyAttribute(Type tableTemplate, string propertyName = null) : base(false)
         {
             ForeignTableTemplate = tableTemplate;
             ForeignColumnProperty = propertyName;
         }
 
-        public DbForeignKeyAttribute(string name, Type tableTemplate, string propertyName = null) : base(name)
+        public DbPrimaryAndForeignKeyAttribute(string name, Type tableTemplate, string propertyName = null) : base(name, false)
         {
             ForeignTableTemplate = tableTemplate;
             ForeignColumnProperty = propertyName;

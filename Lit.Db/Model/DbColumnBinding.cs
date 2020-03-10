@@ -21,6 +21,11 @@ namespace Lit.Db.Model
         Type FieldType { get; }
 
         /// <summary>
+        /// Field size.
+        /// </summary>
+        ulong? FieldSize { get; }
+
+        /// <summary>
         /// Nullable flag.
         /// </summary>
         bool IsNullable { get; }
@@ -85,6 +90,13 @@ namespace Lit.Db.Model
         public Type FieldType => BindingType;
 
         /// <summary>
+        /// Field size.
+        /// </summary>
+        public ulong? FieldSize => fieldSize;
+
+        private readonly ulong? fieldSize;
+
+        /// <summary>
         /// Key constraint.
         /// </summary>
         public DbKeyConstraint KeyConstraint => keyConstraint;
@@ -125,6 +137,7 @@ namespace Lit.Db.Model
             : base(setup, propInfo, attr, attr.IsNullableDefined ? (bool?)attr.IsNullable : null)
         {
             fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
+            fieldSize = attr.Size;
 
             if (string.IsNullOrEmpty(fieldName))
             {
@@ -133,15 +146,22 @@ namespace Lit.Db.Model
 
             if (attr is DbPrimaryKeyAttribute pk)
             {
-                keyConstraint = DbKeyConstraint.PrimaryKey;
-                isAutoIncrement = pk.AutoIncrement;
-
                 if (IsNullable)
                 {
                     throw new ArgumentException($"Primary key can not be nullable on property [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}.{propInfo.Name}]");
                 }
+
+                if (attr is DbPrimaryAndForeignKeyAttribute)
+                {
+                    keyConstraint = DbKeyConstraint.PrimaryForeignKey;
+                }
+                else
+                {
+                    keyConstraint = DbKeyConstraint.PrimaryKey;
+                    isAutoIncrement = pk.AutoIncrement;
+                }
             }
-            else if (attr is DbForeignKeyAttribute fk)
+            else if (attr is DbForeignKeyAttribute)
             {
                 keyConstraint = DbKeyConstraint.ForeignKey;
             }
@@ -164,7 +184,7 @@ namespace Lit.Db.Model
         /// </summary>
         public void ResolveForeignKey()
         {
-            if (Attributes is DbForeignKeyAttribute fk)
+            if (Attributes is IDbForeignKeyAttribute fk)
             {
                 var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
                 var colBinding = !string.IsNullOrEmpty(fk.ForeignColumnProperty) ? binding.FindColumn(fk.ForeignColumnProperty)

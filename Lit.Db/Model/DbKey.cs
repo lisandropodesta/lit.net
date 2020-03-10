@@ -6,6 +6,8 @@
 
         PrimaryKey,
 
+        PrimaryForeignKey,
+
         UniqueKey,
 
         ForeignKey
