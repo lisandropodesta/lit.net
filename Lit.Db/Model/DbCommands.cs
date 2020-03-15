@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lit.Auditing;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -120,24 +121,32 @@ namespace Lit.Db.Model
             {
                 using (var cmd = GetCommand(text, connection, spCmdType))
                 {
-                    if (cmdType == CommandType.StoredProcedure)
+                    try
                     {
-                        binding.SetInputParameters(cmd, template);
+                        if (cmdType == CommandType.StoredProcedure)
+                        {
+                            binding.SetInputParameters(cmd, template);
+                        }
+
+                        switch (binding.Mode)
+                        {
+                            case DbExecutionMode.NonQuery:
+                                cmd.ExecuteNonQuery();
+                                binding.GetOutputParameters(cmd, template);
+                                break;
+
+                            case DbExecutionMode.Query:
+                                using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                                {
+                                    binding.LoadResults(reader, template);
+                                }
+                                break;
+                        }
                     }
-
-                    switch (binding.Mode)
+                    catch (Exception x)
                     {
-                        case DbExecutionMode.NonQuery:
-                            cmd.ExecuteNonQuery();
-                            binding.GetOutputParameters(cmd, template);
-                            break;
-
-                        case DbExecutionMode.Query:
-                            using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
-                            {
-                                binding.LoadResults(reader, template);
-                            }
-                            break;
+                        Audit.Exception(x, $"Executing: {text}");
+                        throw;
                     }
                 }
             }

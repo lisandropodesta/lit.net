@@ -6,72 +6,6 @@ using Lit.Db.Attributes;
 namespace Lit.Db.Model
 {
     /// <summary>
-    /// Db field binding interface.
-    /// </summary>
-    public interface IDbColumnBinding : IDbPropertyBinding<DbColumnAttribute>
-    {
-        /// <summary>
-        /// Field name.
-        /// </summary>
-        string FieldName { get; }
-
-        /// <summary>
-        /// Field type.
-        /// </summary>
-        Type FieldType { get; }
-
-        /// <summary>
-        /// Field size.
-        /// </summary>
-        ulong? FieldSize { get; }
-
-        /// <summary>
-        /// Nullable flag.
-        /// </summary>
-        bool IsNullable { get; }
-
-        /// <summary>
-        /// Key constraint.
-        /// </summary>
-        DbKeyConstraint KeyConstraint { get; }
-
-        /// <summary>
-        /// Auto increment flag.
-        /// </summary>
-        bool IsAutoIncrement { get; }
-
-        /// <summary>
-        /// Foreign table.
-        /// </summary>
-        string ForeignTable { get; }
-
-        /// <summary>
-        /// Foreign column.
-        /// </summary>
-        string ForeignColumn { get; }
-
-        /// <summary>
-        /// Name of the standard stored procedure parameter.
-        /// </summary>
-        string SpParamName { get; }
-
-        /// <summary>
-        /// Resolve foreign key.
-        /// </summary>
-        void ResolveForeignKey();
-
-        /// <summary>
-        /// Get output field.
-        /// </summary>
-        void GetOutputField(DbDataReader reader, object instance);
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        void SetInputParameters(DbCommand cmd, object instance);
-    }
-
-    /// <summary>
     /// Db field property binding.
     /// </summary>
     internal class DbColumnBinding<TC, TP> : DbPropertyBinding<TC, TP, DbColumnAttribute>, IDbColumnBinding
@@ -180,24 +114,12 @@ namespace Lit.Db.Model
         #endregion
 
         /// <summary>
-        /// Resolve foreign key.
+        /// Assign foreign key.
         /// </summary>
-        public void ResolveForeignKey()
+        public void AssignForeignKey(string foreignTable, string foreignColumn)
         {
-            if (Attributes is IDbForeignKeyAttribute fk)
-            {
-                var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
-                var colBinding = !string.IsNullOrEmpty(fk.ForeignColumnProperty) ? binding.FindColumn(fk.ForeignColumnProperty)
-                    : binding.FindFirstColumn(DbColumnsSelection.PrimaryKey);
-
-                if (colBinding == null)
-                {
-                    throw new ArgumentException($"Invalid foreign key definition [{PropertyInfo.DeclaringType.Namespace}.{PropertyInfo.DeclaringType.Name}.{PropertyInfo.Name}]");
-                }
-
-                foreignTable = binding.TableName;
-                foreignColumn = Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
-            }
+            this.foreignTable = foreignTable;
+            this.foreignColumn = foreignColumn;
         }
 
         /// <summary>

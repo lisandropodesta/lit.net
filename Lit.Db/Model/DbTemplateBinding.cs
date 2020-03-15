@@ -7,7 +7,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Template information.
     /// </summary>
-    public abstract class DbTemplateBinding
+    internal abstract class DbTemplateBinding
     {
         /// <summary>
         /// Template data type.
@@ -16,11 +16,14 @@ namespace Lit.Db.Model
 
         private readonly Type templateType;
 
+        protected readonly IDbSetup Setup;
+
         #region Constructor
 
         protected DbTemplateBinding(Type templateType, IDbSetup setup)
         {
             this.templateType = templateType;
+            Setup = setup;
         }
 
         #endregion

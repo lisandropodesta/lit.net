@@ -5,17 +5,6 @@ using Lit.Db.Attributes;
 namespace Lit.Db.Model
 {
     /// <summary>
-    /// Db recordset binding interface.
-    /// </summary>
-    public interface IDbRecordsetBinding : IDbPropertyBinding<DbRecordsetAttribute>
-    {
-        /// <summary>
-        /// Load the current recordset.
-        /// </summary>
-        void LoadResults(DbDataReader reader, object instance);
-    }
-
-    /// <summary>
     /// Db recordset property binding.
     /// </summary>
     internal class DbRecordsetBinding<TC, TP> : DbPropertyBinding<TC, TP, DbRecordsetAttribute>, IDbRecordsetBinding

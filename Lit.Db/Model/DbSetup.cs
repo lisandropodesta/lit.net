@@ -9,10 +9,10 @@ namespace Lit.Db.Model
     public class DbSetup : IDbSetup
     {
         // Table binding cache
-        private readonly Dictionary<Type, DbTableBinding> tableBindings = new Dictionary<Type, DbTableBinding>();
+        private readonly Dictionary<Type, IDbTableBinding> tableBindings = new Dictionary<Type, IDbTableBinding>();
 
         // Stored procedure binding cache
-        private readonly Dictionary<Type, DbCommandBinding> commandBindings = new Dictionary<Type, DbCommandBinding>();
+        private readonly Dictionary<Type, IDbCommandBinding> commandBindings = new Dictionary<Type, IDbCommandBinding>();
 
         #region Constructor
 
@@ -37,7 +37,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets a table binding.
         /// </summary>
-        public DbTableBinding GetTableBinding(Type type)
+        public IDbTableBinding GetTableBinding(Type type)
         {
             lock (tableBindings)
             {
@@ -55,7 +55,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Gets a command binding.
         /// </summary>
-        public DbCommandBinding GetCommandBinding(Type type)
+        public IDbCommandBinding GetCommandBinding(Type type)
         {
             lock (commandBindings)
             {

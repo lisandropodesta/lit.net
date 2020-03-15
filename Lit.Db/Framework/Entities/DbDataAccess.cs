@@ -161,7 +161,7 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Table stored procedure resolving.
         /// </summary>
-        protected string GetTableSpName(DbTableBinding binding, StoredProcedureFunction spFunc)
+        protected string GetTableSpName(IDbTableBinding binding, StoredProcedureFunction spFunc)
         {
             return Setup.Naming.GetStoredProcedureName(binding.TableName, spFunc);
         }
@@ -169,7 +169,7 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Set table stored procedure parameters.
         /// </summary>
-        protected void SetTableSpInputParameters<T>(DbTableBinding binding, DbCommand cmd, T instance, StoredProcedureFunction spFunc)
+        protected void SetTableSpInputParameters<T>(IDbTableBinding binding, DbCommand cmd, T instance, StoredProcedureFunction spFunc)
         {
             var columns = GetTableSpParameters(spFunc);
             binding.MapColumns(columns, c => c.SetInputParameters(cmd, instance));

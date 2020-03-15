@@ -12,7 +12,7 @@ namespace Lit.Db.Model
     /// <summary>
     /// Stored procedure/query template information.
     /// </summary>
-    public class DbCommandBinding : DbTemplateBinding
+    internal class DbCommandBinding : DbTemplateBinding, IDbCommandBinding
     {
         /// <summary>
         /// Command type.

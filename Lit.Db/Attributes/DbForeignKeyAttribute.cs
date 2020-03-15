@@ -26,9 +26,9 @@ namespace Lit.Db.Attributes
             ForeignColumnProperty = propertyName;
         }
 
-        public DbForeignKeyAttribute(string name, Type tableTemplate, string propertyName = null) : base(name)
+        public DbForeignKeyAttribute(string name, Type foreignTableTemplate, string propertyName = null) : base(name)
         {
-            ForeignTableTemplate = tableTemplate;
+            ForeignTableTemplate = foreignTableTemplate;
             ForeignColumnProperty = propertyName;
         }
 

@@ -6,27 +6,6 @@ using Lit.DataType;
 namespace Lit.Db.Model
 {
     /// <summary>
-    /// Db property binding.
-    /// </summary>
-    public interface IDbPropertyBinding<TA> : IPropertyBinding
-    {
-        /// <summary>
-        /// Property information.
-        /// </summary>
-        PropertyInfo PropertyInfo { get; }
-
-        /// <summary>
-        /// Database data type.
-        /// </summary>
-        DbDataType DataType { get; }
-
-        /// <summary>
-        /// Attributes.
-        /// </summary>
-        TA Attributes { get; }
-    }
-
-    /// <summary>
     /// Binding to a database property (parameter/field).
     /// </summary>
     internal abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA>

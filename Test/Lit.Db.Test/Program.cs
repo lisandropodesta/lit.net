@@ -51,6 +51,5 @@ namespace Lit.Db.Test
                 Audit.Error($"Error: {x.Message}.");
             }
         }
-
     }
 }

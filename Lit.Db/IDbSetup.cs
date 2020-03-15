@@ -21,11 +21,11 @@ namespace Lit.Db
         /// <summary>
         /// Gets a table binding.
         /// </summary>
-        DbTableBinding GetTableBinding(Type type);
+        IDbTableBinding GetTableBinding(Type type);
 
         /// <summary>
         /// Gets a command binding.
         /// </summary>
-        DbCommandBinding GetCommandBinding(Type type);
+        IDbCommandBinding GetCommandBinding(Type type);
     }
 }

@@ -39,7 +39,7 @@ namespace Lit.Db.MySql.Statements.Queries
         {
         }
 
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, DbTableBinding binding, IDbColumnBinding pk)
+        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
         {
             AddParameters(binding, DbColumnsSelection.All, ParameterDirection.Input);
 
