@@ -10,6 +10,7 @@ namespace Lit.Db.Test.Common
         public static void Execute(IDbArchitecture db)
         {
             Audit.Message("\n  ** DROP TABLEs test **");
+            db.DropTable(typeof(Folder), true);
             db.DropTable(typeof(UserSession), true);
             db.DropTable(typeof(User), true);
             db.DropTable(typeof(StatusConnection), true);
@@ -18,6 +19,7 @@ namespace Lit.Db.Test.Common
             db.CreateTable(typeof(User));
             db.CreateTable(typeof(UserSession));
             db.CreateTable(typeof(StatusConnection));
+            db.CreateTable(typeof(Folder));
 
             Audit.Message("\n  ** CREATE STORED PROCEDURES test **");
             CreateAllStoredProcedures(db, typeof(User));

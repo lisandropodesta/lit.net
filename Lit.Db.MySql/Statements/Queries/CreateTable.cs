@@ -65,7 +65,7 @@ namespace Lit.Db.MySql.Statements
 
             TableName = bindings.TableName;
             ColumnDefinition = GetColumnDefinition(bindings.Columns);
-            TableConstraints = GetTableConstraints(bindings.Columns);
+            TableConstraints = GetTableConstraints(bindings);
         }
 
         /// <summary>
@@ -77,7 +77,6 @@ namespace Lit.Db.MySql.Statements
             DefaultCharset = defaultCharset;
             TableName = tableName;
             ColumnDefinition = GetColumnDefinition(columns);
-            TableConstraints = GetTableConstraints(columns);
         }
 
         #region Property setters
@@ -109,20 +108,82 @@ namespace Lit.Db.MySql.Statements
             foreach (var col in columns)
             {
                 str.ConditionalAppend(",\n ", GetColumnIndex(col));
-                str.ConditionalAppend(",\n ", GetColumnConstraints(col));
-                str.ConditionalAppend(",\n ", GetColumnForeignKeyConstraints(col));
+                str.ConditionalAppend(",\n ", GetColumnConstraint(col));
+                str.ConditionalAppend(",\n ", GetColumnForeignKeyConstraint(col));
             }
 
             return str.ToString();
         }
 
-        private string GetTableConstraints(IEnumerable<IDbColumnBinding> columns)
+        private string GetTableConstraints(IDbTableBinding table)
         {
             var str = new StringBuilder();
 
-            // TODO: implement this code!
+            if (table.PrimaryKey != null)
+            {
+                str.Append(",\n");
+                str.Append($"{ConstraintKey} {PrimaryKeyKey} ( {GetKeyColumns(table, table.PrimaryKey, ", ", "`")} )");
+            }
+
+            if (table.ForeignKeys.Count > 0)
+            {
+                foreach (var fk in table.ForeignKeys)
+                {
+                    str.Append(",\n");
+                    str.Append($"{ConstraintKey} fk_{TableName}_{GetKeyColumns(table, fk, "_")} {ForeignKeyKey} ( {GetKeyColumns(table, fk, ", ", "`")} ) {ReferecencesKey} {fk.ForeignTable} ( {ColumnsList(fk.ForeignColumns)} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
+                }
+            }
+
+            if (table.UniqueKeys.Count > 0)
+            {
+                foreach (var uk in table.UniqueKeys)
+                {
+                    str.Append(",\n");
+                    str.Append($"{ConstraintKey} {UniqueKeyKey} uk_{TableName}_{GetKeyColumns(table, uk, "_")}_idx ( {GetKeyColumns(table, uk, ", ", "`")} )");
+                }
+            }
+
+            if (table.Indexes.Count > 0)
+            {
+                foreach (var idx in table.Indexes)
+                {
+                    str.Append(",\n");
+                    str.Append($"{IndexKey} {TableName}_{GetKeyColumns(table, idx, "_")}_idx ( {GetKeyColumns(table, idx, ", ", "`")} )");
+                }
+            }
 
             return str.ToString();
+        }
+
+        private string GetKeyColumns(IDbTableBinding table, IDbTableKeyAttribute key, string separator, string surround = null)
+        {
+            var columns = string.Empty;
+
+            foreach (var name in key.FieldNames)
+            {
+                var col = table.FindColumn(name);
+                if (col == null)
+                {
+                    throw new ArgumentException($"Invalid key column {name} in table [{table.TableName}]");
+                }
+
+                var fieldName = col.FieldName;
+                columns += (!string.IsNullOrEmpty(columns) ? separator : string.Empty) + surround + fieldName + surround;
+            }
+
+            return columns;
+        }
+
+        private string ColumnsList(string[] columns)
+        {
+            var text = string.Empty;
+
+            foreach (var name in columns)
+            {
+                text += (!string.IsNullOrEmpty(text) ? ", " : string.Empty) + "`" + name + "`";
+            }
+
+            return text;
         }
 
         private string GetFieldType(IDbColumnBinding column)
@@ -168,7 +229,7 @@ namespace Lit.Db.MySql.Statements
             }
         }
 
-        private string GetColumnConstraints(IDbColumnBinding column)
+        private string GetColumnConstraint(IDbColumnBinding column)
         {
             switch (column.KeyConstraint)
             {
@@ -188,7 +249,7 @@ namespace Lit.Db.MySql.Statements
             }
         }
 
-        private string GetColumnForeignKeyConstraints(IDbColumnBinding column)
+        private string GetColumnForeignKeyConstraint(IDbColumnBinding column)
         {
             switch (column.KeyConstraint)
             {
