@@ -402,22 +402,27 @@ namespace Lit.DataType
         /// </summary>
         public static TAttr GetAttribute<TAttr>(Type type, bool inherit = false) where TAttr : class
         {
-            if (type != null)
+            var attrs = type?.GetTypeInfo().GetCustomAttributes(inherit);
+            if (attrs != null)
             {
-                var attrs = type.GetTypeInfo().GetCustomAttributes(inherit);
-                if (attrs != null)
+                foreach (var attr in attrs)
                 {
-                    foreach (var attr in attrs)
+                    if (attr is TAttr)
                     {
-                        if (attr is TAttr)
-                        {
-                            return attr as TAttr;
-                        }
+                        return attr as TAttr;
                     }
                 }
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Get an attribute from a type.
+        /// </summary>
+        public static IEnumerable<TAttr> GetAttributes<TAttr>(Type type, bool inherit = false) where TAttr : class
+        {
+            return type?.GetTypeInfo().GetCustomAttributes(inherit).Where(a => a is TAttr).Cast<TAttr>();
         }
 
         /// <summary>
