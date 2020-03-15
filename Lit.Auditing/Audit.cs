@@ -1,4 +1,6 @@
-﻿namespace Lit.Auditing
+﻿using System;
+
+namespace Lit.Auditing
 {
     /// <summary>
     /// Audit manager.
@@ -45,6 +47,14 @@
         public static void Error(string text)
         {
             audit?.Error(text);
+        }
+
+        /// <summary>
+        /// Log an exception.
+        /// </summary>
+        public static void Exception(Exception x, string text)
+        {
+            audit?.Exception(x, text);
         }
     }
 }

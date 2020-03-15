@@ -1,4 +1,6 @@
-﻿namespace Lit.Auditing
+﻿using System;
+
+namespace Lit.Auditing
 {
     /// <summary>
     /// Audit interface.
@@ -24,6 +26,11 @@
         /// Proces an error.
         /// </summary>
         void Error(string text);
+
+        /// <summary>
+        /// Proces an exception.
+        /// </summary>
+        void Exception(Exception x, string text);
 
         /// <summary>
         /// Process a fatal error.

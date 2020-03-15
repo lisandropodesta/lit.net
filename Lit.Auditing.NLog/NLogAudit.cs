@@ -90,6 +90,14 @@ namespace Lit.Auditing
         }
 
         /// <summary>
+        /// Proces an exception.
+        /// </summary>
+        public void Exception(Exception x, string text)
+        {
+            logger.Error(x, text);
+        }
+
+        /// <summary>
         /// Process a fatal error.
         /// </summary>
         public void FatalError(string text)
