@@ -32,6 +32,11 @@ namespace Lit.Db.Attributes
 
         private bool? isNullable;
 
+        /// <summary>
+        /// AutoIncrement flag.
+        /// </summary>
+        public bool AutoIncrement { get; set; }
+
         #region Constructors
 
         public DbColumnAttribute() { }

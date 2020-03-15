@@ -78,7 +78,9 @@ namespace Lit.Db.Model
                 throw new ArgumentException($"Null field name in DbColumnBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
 
-            if (attr is DbPrimaryKeyAttribute pk)
+            isAutoIncrement = attr.AutoIncrement;
+
+            if (attr is DbPrimaryKeyAttribute)
             {
                 if (IsNullable)
                 {
@@ -92,7 +94,6 @@ namespace Lit.Db.Model
                 else
                 {
                     keyConstraint = DbKeyConstraint.PrimaryKey;
-                    isAutoIncrement = pk.AutoIncrement;
                 }
             }
             else if (attr is DbForeignKeyAttribute)

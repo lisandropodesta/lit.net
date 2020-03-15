@@ -18,11 +18,6 @@ namespace Lit.Db.Attributes
         /// </summary>
         public override bool IsNullable => false;
 
-        /// <summary>
-        /// AutoIncrement flag.
-        /// </summary>
-        public bool AutoIncrement { get; private set; }
-
         #region Constructors
 
         public DbPrimaryKeyAttribute()
