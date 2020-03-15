@@ -11,6 +11,8 @@ namespace Lit.Db.Test.Common
         {
             Audit.Message("\n  ** DROP TABLEs test **");
             db.DropTable(typeof(Folder), true);
+            db.DropTable(typeof(Tag), true);
+            db.DropTable(typeof(TagCategory), true);
             db.DropTable(typeof(UserSession), true);
             db.DropTable(typeof(User), true);
             db.DropTable(typeof(StatusConnection), true);
@@ -20,6 +22,8 @@ namespace Lit.Db.Test.Common
             db.CreateTable(typeof(UserSession));
             db.CreateTable(typeof(StatusConnection));
             db.CreateTable(typeof(Folder));
+            db.CreateTable(typeof(TagCategory));
+            db.CreateTable(typeof(Tag));
 
             Audit.Message("\n  ** CREATE STORED PROCEDURES test **");
             CreateAllStoredProcedures(db, typeof(User));
