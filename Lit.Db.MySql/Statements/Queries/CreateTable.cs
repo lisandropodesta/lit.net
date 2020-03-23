@@ -129,8 +129,9 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var fk in table.ForeignKeys)
                 {
+                    var name = fk.DbName ?? $"fk_{TableName}_{GetKeyColumns(table, fk, "_")}";
                     str.Append(",\n");
-                    str.Append($"{ConstraintKey} fk_{TableName}_{GetKeyColumns(table, fk, "_")} {ForeignKeyKey} ( {GetKeyColumns(table, fk, ", ", "`")} ) {ReferecencesKey} {fk.ForeignTable} ( {ColumnsList(fk.ForeignColumns)} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
+                    str.Append($"{ConstraintKey} {name} {ForeignKeyKey} ( {GetKeyColumns(table, fk, ", ", "`")} ) {ReferecencesKey} {fk.ForeignTable} ( {ColumnsList(fk.ForeignColumns)} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
                 }
             }
 
@@ -138,8 +139,9 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var uk in table.UniqueKeys)
                 {
+                    var name = uk.DbName ?? $"uk_{TableName}_{GetKeyColumns(table, uk, "_")}_idx";
                     str.Append(",\n");
-                    str.Append($"{ConstraintKey} {UniqueKeyKey} uk_{TableName}_{GetKeyColumns(table, uk, "_")}_idx ( {GetKeyColumns(table, uk, ", ", "`")} )");
+                    str.Append($"{ConstraintKey} {UniqueKeyKey} {name} ( {GetKeyColumns(table, uk, ", ", "`")} )");
                 }
             }
 
@@ -147,8 +149,9 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var idx in table.Indexes)
                 {
+                    var name = idx.DbName ?? $"{TableName}_{GetKeyColumns(table, idx, "_")}_idx";
                     str.Append(",\n");
-                    str.Append($"{IndexKey} {TableName}_{GetKeyColumns(table, idx, "_")}_idx ( {GetKeyColumns(table, idx, ", ", "`")} )");
+                    str.Append($"{IndexKey} {name} ( {GetKeyColumns(table, idx, ", ", "`")} )");
                 }
             }
 
