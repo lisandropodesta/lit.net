@@ -5,7 +5,7 @@ namespace Lit.Db.Framework
     /// <summary>
     /// Db architecture access.
     /// </summary>
-    public interface IDbArchitecture : IDbHost
+    public interface IDbArchitecture : IDbDataAccess
     {
         /// <summary>
         /// Create a table.
