@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Lit.Db.Framework.Entities;
 
 namespace Lit.Db
 {
@@ -12,25 +11,31 @@ namespace Lit.Db
         /// Gets a record by id.
         /// </summary>
         T Get<T>(int id)
-            where T : DbTableTemplate, new();
+            where T : new();
 
         /// <summary>
         /// Gets a record by id.
         /// </summary>
         T Get<T>(long id)
-            where T : DbTableTemplate, new();
+            where T : new();
 
         /// <summary>
         /// Finds a record by code.
         /// </summary>
         T Find<T>(string code)
-            where T : DbTableTemplate, new();
+            where T : new();
 
         /// <summary>
         /// Deletes a record by id.
         /// </summary>
         void Delete<T>(int id)
-            where T : DbTableTemplate, new();
+            where T : new();
+
+        /// <summary>
+        /// Deletes a record by id.
+        /// </summary>
+        void Delete<T>(long id)
+            where T : new();
 
         /// <summary>
         /// Gets a record by primary key.
@@ -66,5 +71,35 @@ namespace Lit.Db
         /// List all records.
         /// </summary>
         List<T> List<T>();
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        void SetId32<T>(T record, int id);
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        void SetId64<T>(T record, long id);
+
+        /// <summary>
+        /// Sets the record code.
+        /// </summary>
+        void SetCode<T>(T record, string code);
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        int GetId32<T>(T record);
+
+        /// <summary>
+        /// Get the record id.
+        /// </summary>
+        long GetId64<T>(T record);
+
+        /// <summary>
+        /// Gets the record code.
+        /// </summary>
+        string GetCode<T>(T record);
     }
 }

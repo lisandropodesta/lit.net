@@ -24,10 +24,10 @@ namespace Lit.Db.Framework.Entities
         /// Gets a record by id.
         /// </summary>
         public T Get<T>(int id)
-            where T : DbTableTemplate, new()
+            where T : new()
         {
             var record = new T();
-            record.SetId(id);
+            SetId32(record, id);
             Get(record);
             return record;
         }
@@ -36,10 +36,10 @@ namespace Lit.Db.Framework.Entities
         /// Gets a record by id.
         /// </summary>
         public T Get<T>(long id)
-            where T : DbTableTemplate, new()
+            where T : new()
         {
             var record = new T();
-            record.SetId(id);
+            SetId64(record, id);
             Get(record);
             return record;
         }
@@ -48,10 +48,10 @@ namespace Lit.Db.Framework.Entities
         /// Finds a record by code.
         /// </summary>
         public T Find<T>(string code)
-            where T : DbTableTemplate, new()
+            where T : new()
         {
             var record = new T();
-            record.SetCode(code);
+            SetCode(record, code);
             Find(record);
             return record;
         }
@@ -60,10 +60,21 @@ namespace Lit.Db.Framework.Entities
         /// Deletes a record by id.
         /// </summary>
         public void Delete<T>(int id)
-            where T : DbTableTemplate, new()
+            where T : new()
         {
             var record = new T();
-            record.SetId(id);
+            SetId32(record, id);
+            Delete(record);
+        }
+
+        /// <summary>
+        /// Deletes a record by id.
+        /// </summary>
+        public void Delete<T>(long id)
+            where T : new()
+        {
+            var record = new T();
+            SetId64(record, id);
             Delete(record);
         }
 
@@ -124,6 +135,67 @@ namespace Lit.Db.Framework.Entities
             var spName = GetTableSpName(typeof(T), StoredProcedureFunction.ListAll);
             ExecuteTemplate(template, spName, CommandType.StoredProcedure);
             return template.Result;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public void SetId32<T>(T record, int id)
+        {
+            Cast<T, IDbId32>(record).Id = id;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public void SetId64<T>(T record, long id)
+        {
+            Cast<T, IDbId64>(record).Id = id;
+        }
+
+        /// <summary>
+        /// Sets the record code.
+        /// </summary>
+        public void SetCode<T>(T record, string code)
+        {
+            Cast<T, IDbStringCode>(record).Code = code;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public int GetId32<T>(T record)
+        {
+            return Cast<T, IDbId32>(record).Id;
+        }
+
+        /// <summary>
+        /// Get the record id.
+        /// </summary>
+        public long GetId64<T>(T record)
+        {
+            return Cast<T, IDbId64>(record).Id;
+        }
+
+        /// <summary>
+        /// Gets the record code.
+        /// </summary>
+        public string GetCode<T>(T record)
+        {
+            return Cast<T, IDbStringCode>(record).Code;
+        }
+
+        /// <summary>
+        /// Get as interface from a class.
+        /// </summary>
+        private TI Cast<TR, TI>(TR record)
+        {
+            if (record is TI intf)
+            {
+                return intf;
+            }
+
+            throw new ArgumentException($"Table template [{typeof(TR).FullName}] do not implements [{typeof(TI).Name}]");
         }
 
         /// <summary>
