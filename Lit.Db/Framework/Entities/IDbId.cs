@@ -3,7 +3,8 @@
     /// <summary>
     /// Integer id.
     /// </summary>
-    public interface IDbId
+    public interface IDbId<T>
     {
+        T Id { get; set; }
     }
 }

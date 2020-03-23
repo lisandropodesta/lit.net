@@ -10,19 +10,7 @@ namespace Lit.Db
         /// <summary>
         /// Gets a record by id.
         /// </summary>
-        T Get<T>(short id)
-            where T : new();
-
-        /// <summary>
-        /// Gets a record by id.
-        /// </summary>
-        T Get<T>(int id)
-            where T : new();
-
-        /// <summary>
-        /// Gets a record by id.
-        /// </summary>
-        T Get<T>(long id)
+        T Get<T, TID>(TID id)
             where T : new();
 
         /// <summary>
@@ -34,30 +22,18 @@ namespace Lit.Db
         /// <summary>
         /// Deletes a record by id.
         /// </summary>
-        void Delete<T>(short id)
-            where T : new();
-
-        /// <summary>
-        /// Deletes a record by id.
-        /// </summary>
-        void Delete<T>(int id)
-            where T : new();
-
-        /// <summary>
-        /// Deletes a record by id.
-        /// </summary>
-        void Delete<T>(long id)
+        void Delete<T, TID>(TID id)
             where T : new();
 
         /// <summary>
         /// Gets a record by primary key.
         /// </summary>
-        void Get<T>(T record);
+        bool Get<T>(T record);
 
         /// <summary>
         /// Finds a record by unique key.
         /// </summary>
-        void Find<T>(T record);
+        bool Find<T>(T record);
 
         /// <summary>
         /// Inserts a record.
@@ -87,17 +63,7 @@ namespace Lit.Db
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        int GetId16<T>(T record);
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        int GetId32<T>(T record);
-
-        /// <summary>
-        /// Get the record id.
-        /// </summary>
-        long GetId64<T>(T record);
+        TID GetId<T, TID>(T record);
 
         /// <summary>
         /// Gets the record code.
@@ -107,17 +73,7 @@ namespace Lit.Db
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        void SetId16<T>(T record, short id);
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        void SetId32<T>(T record, int id);
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        void SetId64<T>(T record, long id);
+        void SetId<T, TID>(T record, TID id);
 
         /// <summary>
         /// Sets the record code.

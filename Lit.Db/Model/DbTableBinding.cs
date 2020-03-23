@@ -112,12 +112,15 @@ namespace Lit.Db.Model
         /// <summary>
         /// Load results returned from stored procedure.
         /// </summary>
-        public void LoadResults(DbDataReader reader, object instance)
+        public bool LoadResults(DbDataReader reader, object instance)
         {
             if (reader.Read())
             {
                 GetOutputFields(reader, instance);
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>

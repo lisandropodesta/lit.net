@@ -58,7 +58,7 @@ namespace Lit.Db.Model
         /// <summary>
         /// Load results returned from stored procedure.
         /// </summary>
-        void LoadResults(DbDataReader reader, object instance);
+        bool LoadResults(DbDataReader reader, object instance);
 
         /// <summary>
         /// Get the first column that matches with selection.

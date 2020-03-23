@@ -23,37 +23,12 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Gets a record by id.
         /// </summary>
-        public T Get<T>(short id)
+        public T Get<T, TID>(TID id)
             where T : new()
         {
             var record = new T();
-            SetId16(record, id);
-            Get(record);
-            return record;
-        }
-
-        /// <summary>
-        /// Gets a record by id.
-        /// </summary>
-        public T Get<T>(int id)
-            where T : new()
-        {
-            var record = new T();
-            SetId32(record, id);
-            Get(record);
-            return record;
-        }
-
-        /// <summary>
-        /// Gets a record by id.
-        /// </summary>
-        public T Get<T>(long id)
-            where T : new()
-        {
-            var record = new T();
-            SetId64(record, id);
-            Get(record);
-            return record;
+            SetId(record, id);
+            return Get(record) ? record : default;
         }
 
         /// <summary>
@@ -64,57 +39,34 @@ namespace Lit.Db.Framework.Entities
         {
             var record = new T();
             SetCode(record, code);
-            Find(record);
-            return record;
+            return Find(record) ? record : default;
         }
 
         /// <summary>
         /// Deletes a record by id.
         /// </summary>
-        public void Delete<T>(short id)
+        public void Delete<T, TID>(TID id)
             where T : new()
         {
             var record = new T();
-            SetId16(record, id);
-            Delete(record);
-        }
-
-        /// <summary>
-        /// Deletes a record by id.
-        /// </summary>
-        public void Delete<T>(int id)
-            where T : new()
-        {
-            var record = new T();
-            SetId32(record, id);
-            Delete(record);
-        }
-
-        /// <summary>
-        /// Deletes a record by id.
-        /// </summary>
-        public void Delete<T>(long id)
-            where T : new()
-        {
-            var record = new T();
-            SetId64(record, id);
+            SetId(record, id);
             Delete(record);
         }
 
         /// <summary>
         /// Gets a record by primary key.
         /// </summary>
-        public void Get<T>(T record)
+        public bool Get<T>(T record)
         {
-            ExecuteTableSp(record, StoredProcedureFunction.Get);
+            return ExecuteTableSp(record, StoredProcedureFunction.Get);
         }
 
         /// <summary>
         /// Finds a record by unique key.
         /// </summary>
-        public void Find<T>(T record)
+        public bool Find<T>(T record)
         {
-            ExecuteTableSp(record, StoredProcedureFunction.Find);
+            return ExecuteTableSp(record, StoredProcedureFunction.Find);
         }
 
         /// <summary>
@@ -163,25 +115,9 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        public short GetId16<T>(T record)
+        public TID GetId<T, TID>(T record)
         {
-            return Cast<T, IDbId16>(record).Id;
-        }
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        public int GetId32<T>(T record)
-        {
-            return Cast<T, IDbId32>(record).Id;
-        }
-
-        /// <summary>
-        /// Get the record id.
-        /// </summary>
-        public long GetId64<T>(T record)
-        {
-            return Cast<T, IDbId64>(record).Id;
+            return Cast<T, IDbId<TID>>(record).Id;
         }
 
         /// <summary>
@@ -195,25 +131,9 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        public void SetId16<T>(T record, short id)
+        public void SetId<T, TID>(T record, TID id)
         {
-            Cast<T, IDbId16>(record).Id = id;
-        }
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        public void SetId32<T>(T record, int id)
-        {
-            Cast<T, IDbId32>(record).Id = id;
-        }
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        public void SetId64<T>(T record, long id)
-        {
-            Cast<T, IDbId64>(record).Id = id;
+            Cast<T, IDbId<TID>>(record).Id = id;
         }
 
         /// <summary>
@@ -240,7 +160,7 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Executes a table stored procedure over a single record.
         /// </summary>
-        protected void ExecuteTableSp(object record, StoredProcedureFunction spFunc)
+        protected bool ExecuteTableSp(object record, StoredProcedureFunction spFunc)
         {
             var type = record.GetType();
             var binding = Setup.GetTableBinding(type);
@@ -254,7 +174,7 @@ namespace Lit.Db.Framework.Entities
 
                     using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                     {
-                        binding.LoadResults(reader, record);
+                        return binding.LoadResults(reader, record);
                     }
                 }
             }
