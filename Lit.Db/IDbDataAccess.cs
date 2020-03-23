@@ -10,6 +10,12 @@ namespace Lit.Db
         /// <summary>
         /// Gets a record by id.
         /// </summary>
+        T Get<T>(short id)
+            where T : new();
+
+        /// <summary>
+        /// Gets a record by id.
+        /// </summary>
         T Get<T>(int id)
             where T : new();
 
@@ -23,6 +29,12 @@ namespace Lit.Db
         /// Finds a record by code.
         /// </summary>
         T Find<T>(string code)
+            where T : new();
+
+        /// <summary>
+        /// Deletes a record by id.
+        /// </summary>
+        void Delete<T>(short id)
             where T : new();
 
         /// <summary>
@@ -75,17 +87,7 @@ namespace Lit.Db
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        void SetId32<T>(T record, int id);
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        void SetId64<T>(T record, long id);
-
-        /// <summary>
-        /// Sets the record code.
-        /// </summary>
-        void SetCode<T>(T record, string code);
+        int GetId16<T>(T record);
 
         /// <summary>
         /// Sets the record id.
@@ -101,5 +103,25 @@ namespace Lit.Db
         /// Gets the record code.
         /// </summary>
         string GetCode<T>(T record);
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        void SetId16<T>(T record, short id);
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        void SetId32<T>(T record, int id);
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        void SetId64<T>(T record, long id);
+
+        /// <summary>
+        /// Sets the record code.
+        /// </summary>
+        void SetCode<T>(T record, string code);
     }
 }

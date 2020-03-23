@@ -23,6 +23,18 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Gets a record by id.
         /// </summary>
+        public T Get<T>(short id)
+            where T : new()
+        {
+            var record = new T();
+            SetId16(record, id);
+            Get(record);
+            return record;
+        }
+
+        /// <summary>
+        /// Gets a record by id.
+        /// </summary>
         public T Get<T>(int id)
             where T : new()
         {
@@ -54,6 +66,17 @@ namespace Lit.Db.Framework.Entities
             SetCode(record, code);
             Find(record);
             return record;
+        }
+
+        /// <summary>
+        /// Deletes a record by id.
+        /// </summary>
+        public void Delete<T>(short id)
+            where T : new()
+        {
+            var record = new T();
+            SetId16(record, id);
+            Delete(record);
         }
 
         /// <summary>
@@ -140,25 +163,9 @@ namespace Lit.Db.Framework.Entities
         /// <summary>
         /// Sets the record id.
         /// </summary>
-        public void SetId32<T>(T record, int id)
+        public short GetId16<T>(T record)
         {
-            Cast<T, IDbId32>(record).Id = id;
-        }
-
-        /// <summary>
-        /// Sets the record id.
-        /// </summary>
-        public void SetId64<T>(T record, long id)
-        {
-            Cast<T, IDbId64>(record).Id = id;
-        }
-
-        /// <summary>
-        /// Sets the record code.
-        /// </summary>
-        public void SetCode<T>(T record, string code)
-        {
-            Cast<T, IDbStringCode>(record).Code = code;
+            return Cast<T, IDbId16>(record).Id;
         }
 
         /// <summary>
@@ -183,6 +190,38 @@ namespace Lit.Db.Framework.Entities
         public string GetCode<T>(T record)
         {
             return Cast<T, IDbStringCode>(record).Code;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public void SetId16<T>(T record, short id)
+        {
+            Cast<T, IDbId16>(record).Id = id;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public void SetId32<T>(T record, int id)
+        {
+            Cast<T, IDbId32>(record).Id = id;
+        }
+
+        /// <summary>
+        /// Sets the record id.
+        /// </summary>
+        public void SetId64<T>(T record, long id)
+        {
+            Cast<T, IDbId64>(record).Id = id;
+        }
+
+        /// <summary>
+        /// Sets the record code.
+        /// </summary>
+        public void SetCode<T>(T record, string code)
+        {
+            Cast<T, IDbStringCode>(record).Code = code;
         }
 
         /// <summary>
