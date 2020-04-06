@@ -1,11 +1,12 @@
 ﻿using Lit.Db.Attributes;
 using Lit.Db.Custom.MySql.Attributes;
+using Lit.Db.Framework.Entities;
 
 namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
     [MySqlTable("latin1")]
-    public class User
+    public class User : IDbStringCode
     {
         [DbPrimaryKey]
         public int IdUser { get; set; }
@@ -21,6 +22,8 @@ namespace Lit.Db.Test.Schema.Tables
 
         [DbColumn(IsNullable = true)]
         public string Address { get; set; }
+
+        string IDbStringCode.Code { get => NickName; set => NickName = value; }
 
         public User() { }
 

@@ -40,8 +40,10 @@ namespace Lit.Db.Test.Common
             db.Get(user);
             Assert(user.FullName == "John Nash");
 
-            user.NickName = "mck";
-            db.Find(user);
+            user = db.Find<User>("not exists");
+            Assert(user == null);
+
+            user = db.Find<User>("mck");
             Assert(user.FullName == "Mick Doe");
 
             var userList = db.List<User>();
