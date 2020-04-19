@@ -4,6 +4,13 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Authors>Lisandro Podesta</Authors>
+    <Copyright>Lisandro Podesta</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
+    <Version>1.0.1.10</Version>
   </PropertyGroup>
 
   <ItemGroup>

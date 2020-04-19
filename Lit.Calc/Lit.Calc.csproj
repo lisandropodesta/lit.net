@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Lit.Calc</RootNamespace>
+    <Authors>Lisandro Podesta</Authors>
+    <Copyright>Lisandro Podesta</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Version>1.0.1.10</Version>
   </PropertyGroup>
 
   <ItemGroup>

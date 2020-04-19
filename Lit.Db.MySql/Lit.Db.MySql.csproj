@@ -5,7 +5,12 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Lisandro Podesta</Authors>
     <Company>Lisandro Podesta</Company>
-    <Version>1.0.1.6</Version>
+    <Version>1.0.1.10</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Lisandro Podesta</Copyright>
+    <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
+    <RepositoryType>gir</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
