@@ -1,6 +1,5 @@
 ﻿using System.Data.SqlClient;
 using Lit.Db.Framework.Entities;
-using Lit.Db.Model;
 
 namespace Lit.Db.Sql
 {

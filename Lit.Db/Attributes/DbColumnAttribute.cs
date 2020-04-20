@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Attributes
+namespace Lit.Db
 {
     /// <summary>
     /// Table column definition.

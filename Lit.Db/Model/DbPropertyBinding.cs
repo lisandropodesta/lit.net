@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Lit.DataType;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Binding to a database property (parameter/field).

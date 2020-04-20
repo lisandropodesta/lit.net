@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Text;
-using Lit.Db.Attributes;
 using Lit.Db.Framework;
-using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements.Queries
 {

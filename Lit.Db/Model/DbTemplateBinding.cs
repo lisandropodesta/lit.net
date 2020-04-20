@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Template information.

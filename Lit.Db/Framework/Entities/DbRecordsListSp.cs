@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Lit.Db.Attributes;
 
 namespace Lit.Db.Framework.Entities
 {

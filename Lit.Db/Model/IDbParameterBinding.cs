@@ -1,7 +1,6 @@
 ﻿using System.Data.Common;
-using Lit.Db.Attributes;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Db parameter binding interface.

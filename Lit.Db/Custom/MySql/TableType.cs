@@ -1,6 +1,4 @@
-﻿using Lit.Db.Attributes;
-
-namespace Lit.Db.Custom.MySql
+﻿namespace Lit.Db.Custom.MySql
 {
     /// <summary>
     /// Table type code definitions.

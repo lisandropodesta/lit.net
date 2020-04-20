@@ -1,4 +1,4 @@
-﻿namespace Lit.Db.Model
+﻿namespace Lit.Db
 {
     /// <summary>
     /// Columns selection.

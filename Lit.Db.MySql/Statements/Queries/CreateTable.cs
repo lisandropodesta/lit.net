@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Lit.DataType;
-using Lit.Db.Attributes;
 using Lit.Db.Custom.MySql;
-using Lit.Db.Custom.MySql.Attributes;
-using Lit.Db.Model;
 
 namespace Lit.Db.MySql.Statements
 {

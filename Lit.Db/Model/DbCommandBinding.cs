@@ -5,9 +5,8 @@ using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using Lit.DataType;
-using Lit.Db.Attributes;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Stored procedure/query template information.

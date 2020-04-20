@@ -1,5 +1,5 @@
 ﻿using System;
-using Lit.Db.Model;
+using Lit.Db;
 
 namespace Lit.Db
 {

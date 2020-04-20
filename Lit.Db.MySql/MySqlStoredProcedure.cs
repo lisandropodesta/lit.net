@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using Lit.Db.Model;
 
 namespace Lit.Db.MySql
 {

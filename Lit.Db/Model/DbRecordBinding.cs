@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Data.Common;
 using System.Reflection;
-using Lit.Db.Attributes;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Db record property binding.

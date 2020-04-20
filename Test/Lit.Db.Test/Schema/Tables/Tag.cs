@@ -1,6 +1,4 @@
-﻿using Lit.Db.Attributes;
-
-namespace Lit.Db.Test.Schema.Tables
+﻿namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
     [DbTablePrimaryKey(nameof(Id), nameof(IdTagCategory))]

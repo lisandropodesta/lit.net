@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Lit.DataType;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Db property binding.

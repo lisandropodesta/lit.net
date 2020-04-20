@@ -1,8 +1,7 @@
 ﻿using System;
 using Lit.DataType;
-using Lit.Db.Attributes;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     public abstract class DbTranslation : IDbTranslation
     {

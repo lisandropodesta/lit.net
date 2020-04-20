@@ -1,6 +1,4 @@
-﻿using Lit.Db.Attributes;
-
-namespace Lit.Db.Test.Schema
+﻿namespace Lit.Db.Test.Schema
 {
     /// <summary>
     /// General status.

@@ -1,5 +1,4 @@
 ﻿using System.Data.SqlClient;
-using Lit.Db.Model;
 
 namespace Lit.Db.Sql
 {

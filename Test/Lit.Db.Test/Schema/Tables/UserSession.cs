@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lit.Db.Attributes;
-using Lit.Db.Custom.MySql.Attributes;
+using Lit.Db.Custom.MySql;
 
 namespace Lit.Db.Test.Schema.Tables
 {

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.Common;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Stored procedure/query template information.

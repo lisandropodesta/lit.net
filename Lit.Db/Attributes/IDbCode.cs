@@ -1,4 +1,4 @@
-﻿namespace Lit.Db.Attributes
+﻿namespace Lit.Db
 {
     /// <summary>
     /// Database code.

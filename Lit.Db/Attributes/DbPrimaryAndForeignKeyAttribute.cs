@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Attributes
+namespace Lit.Db
 {
     /// <summary>
     /// Simultaneous primary and foreign key attributes definition.

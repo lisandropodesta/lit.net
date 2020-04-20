@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Text;
 using Lit.DataType;
-using Lit.Db.Attributes;
-using Lit.Db.Model;
 using Newtonsoft.Json;
 
 namespace Lit.Db.MySql

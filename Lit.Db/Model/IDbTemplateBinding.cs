@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Template information.

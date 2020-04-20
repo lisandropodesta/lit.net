@@ -1,6 +1,5 @@
 ﻿using System;
 using Lit.Db.Framework;
-using Lit.Db.Model;
 using Lit.Db.MySql.Statements;
 using Lit.Db.MySql.Statements.Queries;
 

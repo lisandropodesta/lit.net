@@ -1,9 +1,8 @@
-﻿using Lit.Db.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Table template information.

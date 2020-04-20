@@ -1,5 +1,4 @@
-﻿using Lit.Db.Model;
-using Lit.Names;
+﻿using Lit.Names;
 
 namespace Lit.Db.MySql
 {

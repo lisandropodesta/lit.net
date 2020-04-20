@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lit.Db.Custom.MySql.Attributes
+namespace Lit.Db.Custom.MySql
 {
     /// <summary>
     /// Engine specification.

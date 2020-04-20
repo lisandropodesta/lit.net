@@ -1,5 +1,4 @@
-﻿using Lit.Db.Attributes;
-using Lit.Db.Custom.MySql;
+﻿using Lit.Db.Custom.MySql;
 
 namespace Lit.Db.MySql.Schema.Information.Tables
 {

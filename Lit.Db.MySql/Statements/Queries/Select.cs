@@ -1,6 +1,4 @@
-﻿using Lit.Db.Attributes;
-
-namespace Lit.Db.MySql.Statements
+﻿namespace Lit.Db.MySql.Statements
 {
     /// <summary>
     /// SELECT statement.

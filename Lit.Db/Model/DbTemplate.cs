@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Database query/stored procedure template.

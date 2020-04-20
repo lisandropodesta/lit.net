@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// DB configuration setup.

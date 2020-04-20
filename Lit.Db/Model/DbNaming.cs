@@ -3,7 +3,7 @@ using System.Reflection;
 using Lit.Db.Framework;
 using Lit.Names;
 
-namespace Lit.Db.Model
+namespace Lit.Db
 {
     /// <summary>
     /// Common naming conventions.

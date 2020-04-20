@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Lit.Db.Attributes;
 using Lit.Db.MySql.Schema.Information.Tables;
 using Lit.Db.MySql.Statements;
 

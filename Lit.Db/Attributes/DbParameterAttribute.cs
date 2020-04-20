@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace Lit.Db.Attributes
+namespace Lit.Db
 {
     /// <summary>
     /// Stored procedure parameter definition.

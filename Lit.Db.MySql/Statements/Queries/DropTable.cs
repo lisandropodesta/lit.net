@@ -1,5 +1,4 @@
 ﻿using System;
-using Lit.Db.Attributes;
 
 namespace Lit.Db.MySql.Statements
 {
