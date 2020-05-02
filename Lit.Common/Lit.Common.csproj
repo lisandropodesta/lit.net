@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Lisandro Podesta</Authors>
     <Company>Lisandro Podesta</Company>
-    <Version>1.0.1.10</Version>
+    <Version>1.0.1.11</Version>
     <Copyright>Lisandro Podesta</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
