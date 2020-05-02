@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Collections.Generic;
 
 namespace Lit.Db
 {
@@ -15,14 +13,19 @@ namespace Lit.Db
         string TableName { get; }
 
         /// <summary>
-        /// Resolve foreign keys.
-        /// </summary>
-        void ResolveForeignKeys();
-
-        /// <summary>
         /// Columns.
         /// </summary>
         IReadOnlyList<IDbColumnBinding> Columns { get; }
+
+        /// <summary>
+        /// Single column primary key.
+        /// </summary>
+        IDbColumnBinding SingleColumnPrimaryKey { get; }
+
+        /// <summary>
+        /// Single column unique key.
+        /// </summary>
+        IDbColumnBinding SingleColumnUniqueKey { get; }
 
         /// <summary>
         /// Primary key.
@@ -43,30 +46,5 @@ namespace Lit.Db
         /// Indexes.
         /// </summary>
         IReadOnlyList<IDbTableIndexAttribute> Indexes { get; }
-
-        /// <summary>
-        /// Finds a column binding.
-        /// </summary>
-        IDbColumnBinding FindColumn(string propertyName);
-
-        /// <summary>
-        /// Get output fields.
-        /// </summary>
-        void GetOutputFields(DbDataReader reader, object instance);
-
-        /// <summary>
-        /// Load results returned from stored procedure.
-        /// </summary>
-        bool LoadResults(DbDataReader reader, object instance);
-
-        /// <summary>
-        /// Get the first column that matches with selection.
-        /// </summary>
-        IDbColumnBinding FindFirstColumn(DbColumnsSelection selection);
-
-        /// <summary>
-        /// Maps an action to every column.
-        /// </summary>
-        void MapColumns(DbColumnsSelection selection, Action<IDbColumnBinding> action);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using Lit.DataType;
@@ -23,9 +22,7 @@ namespace Lit.Db
         /// <summary>
         /// Execution mode.
         /// </summary>
-        public DbExecutionMode Mode => mode;
-
-        private readonly DbExecutionMode mode;
+        public DbExecutionMode Mode { get; private set; }
 
         /// <summary>
         /// Stored procedure name / query text.
@@ -51,35 +48,35 @@ namespace Lit.Db
         /// </summary>
         public IReadOnlyList<IDbParameterBinding> Parameters => parameterBindings;
 
-        private readonly List<IDbParameterBinding> parameterBindings;
+        private List<IDbParameterBinding> parameterBindings;
 
         /// <summary>
         /// Fields.
         /// </summary>
         public IReadOnlyList<IDbFieldBinding> Fields => fieldBindings;
 
-        private readonly List<IDbFieldBinding> fieldBindings;
+        private List<IDbFieldBinding> fieldBindings;
 
         /// <summary>
         /// Records.
         /// </summary>
         public IReadOnlyList<IDbRecordBinding> Records => recordBindings;
 
-        private readonly List<IDbRecordBinding> recordBindings;
+        private List<IDbRecordBinding> recordBindings;
 
         /// <summary>
         /// Recordsets.
         /// </summary>
         public IReadOnlyList<IDbRecordsetBinding> Recordsets => recordsetBindings;
 
-        private readonly List<IDbRecordsetBinding> recordsetBindings;
+        private List<IDbRecordsetBinding> recordsetBindings;
 
         #region Constructor
 
         internal DbCommandBinding(Type templateType, IDbSetup setup)
             : base(templateType, setup)
         {
-            mode = DbExecutionMode.NonQuery;
+            Mode = DbExecutionMode.NonQuery;
 
             var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType, true);
             var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType, true);
@@ -101,105 +98,52 @@ namespace Lit.Db
                 commandType = CommandType.StoredProcedure;
             }
 
-            foreach (var propInfo in templateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
-                {
-                    mode = DbExecutionMode.Query;
-                    AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr, setup);
-                }
-                else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
-                {
-                    mode = DbExecutionMode.Query;
-                    AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr, setup);
-                }
-                else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
-                    || TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr) && (fAttr = new DbFieldAttribute(cAttr.DbName)) != null)
-                {
-                    mode = DbExecutionMode.Query;
-                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr, setup);
-                }
-                else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
-                {
-                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr, setup);
-                }
-            }
+            AddProperties();
         }
 
         #endregion
 
         /// <summary>
-        /// Assigns all input parameters on the command.
+        /// Add properties defined in the template.
         /// </summary>
-        public void SetInputParameters(DbCommand cmd, object instance)
+        private void AddProperties()
         {
-            parameterBindings?.ForEach(b => b.SetInputParameters(cmd, instance));
-        }
-
-        /// <summary>
-        /// Assigns all input parameters on the command.
-        /// </summary>
-        public string SetInputParameters(string query, object instance)
-        {
-            parameterBindings?.ForEach(b => b.SetInputParameters(ref query, instance));
-            return query;
-        }
-
-        /// <summary>
-        /// Assigns all output parameters on the template instance.
-        /// </summary>
-        public void GetOutputParameters(DbCommand cmd, object instance)
-        {
-            parameterBindings?.ForEach(b => b.GetOutputParameters(cmd, instance));
-        }
-
-        /// <summary>
-        /// Get output fields.
-        /// </summary>
-        public void GetOutputFields(DbDataReader reader, object instance)
-        {
-            fieldBindings?.ForEach(b => b.GetOutputField(reader, instance));
-        }
-
-        /// <summary>
-        /// Load results returned from stored procedure.
-        /// </summary>
-        public void LoadResults(DbDataReader reader, object instance)
-        {
-            var recordsetCount = RecordsetCount;
-            if (recordsetCount == 0)
+            foreach (var propInfo in TemplateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                if (reader.Read())
+                if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
-                    GetOutputFields(reader, instance);
+                    Mode = DbExecutionMode.Query;
+                    AssertRecordsetIndex(rsAttr.Index);
+                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr);
+                }
+                else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
+                {
+                    Mode = DbExecutionMode.Query;
+                    AssertRecordsetIndex(rsAttr.Index);
+                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr);
+                }
+                else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
+                    || TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr) && (fAttr = new DbFieldAttribute(cAttr)) != null)
+                {
+                    Mode = DbExecutionMode.Query;
+                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr);
+                }
+                else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
+                {
+                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr);
                 }
             }
-            else
-            {
-                for (var index = 0; index < recordsetCount; index++)
-                {
-                    if (index > 0 && !reader.NextResult())
-                    {
-                        throw new ArgumentException($"Unable to load recordset index {index}");
-                    }
+        }
 
-                    var rsBinding = recordsetBindings?.FirstOrDefault(b => b.Attributes.Index == index);
-                    if (rsBinding != null)
-                    {
-                        rsBinding.LoadResults(reader, instance);
-                    }
-                    else
-                    {
-                        var rBinding = recordBindings?.FirstOrDefault(b => b.Attributes.Index == index);
-                        if (rBinding != null)
-                        {
-                            rBinding.LoadResults(reader, instance);
-                        }
-                    }
-                }
-            }
+        /// <summary>
+        /// Calculate binding.
+        /// </summary>
+        internal void ResolveBinding()
+        {
+            recordsetBindings?.ForEach(rs => rs.CalcBindingMode());
+            recordBindings?.ForEach(r => r.CalcBindingMode());
+            fieldBindings?.ForEach(f => f.CalcBindingMode());
+            parameterBindings?.ForEach(p => p.CalcBindingMode());
         }
 
         /// <summary>

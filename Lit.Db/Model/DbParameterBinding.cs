@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.Reflection;
 
 namespace Lit.Db
@@ -10,80 +9,29 @@ namespace Lit.Db
     internal class DbParameterBinding<TC, TP> : DbPropertyBinding<TC, TP, DbParameterAttribute>, IDbParameterBinding
         where TC : class
     {
+        /// <summary>
+        /// Values translation (to/from db).
+        /// </summary>
+        protected override bool ValuesTranslation => true;
+
+        /// <summary>
+        /// Name of the standard stored procedure parameter.
+        /// </summary>
+        public string SpParamName { get; private set; }
+
         #region Constructor
 
-        public DbParameterBinding(IDbSetup setup, PropertyInfo propInfo, DbParameterAttribute attr)
-            : base(setup, propInfo, attr)
+        public DbParameterBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbParameterAttribute attr)
+            : base(binding, propInfo, attr)
         {
-            spParamName = setup.Naming.GetParameterName(propInfo.Name, Attributes.ParameterName);
+            SpParamName = binding.Setup.Naming.GetParameterName(propInfo.Name, null, Attributes.ParameterName);
 
-            if (string.IsNullOrEmpty(spParamName))
+            if (string.IsNullOrEmpty(SpParamName))
             {
                 throw new ArgumentException($"Null parameter name in DbParameterBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
         }
 
         #endregion
-
-        /// <summary>
-        /// Name of the standard stored procedure parameter.
-        /// </summary>
-        public string SpParamName => spParamName;
-
-        private readonly string spParamName;
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        public void SetInputParameters(ref string text, object instance)
-        {
-            if (Attributes.IsInput)
-            {
-                var value = GetValue(instance);
-                DbHelper.SetSqlParameter(ref text, spParamName, value.ToString(), Attributes.IsOptional);
-            }
-        }
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        public void SetInputParameters(DbCommand cmd, object instance)
-        {
-            if (Attributes.IsInput)
-            {
-                try
-                {
-                    DbHelper.SetSqlParameter(cmd, spParamName, GetValue(instance), Attributes.IsOptional);
-                }
-                catch
-                {
-                    if (!Attributes.IsOptional)
-                    {
-                        throw;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get output parameters.
-        /// </summary>
-        public void GetOutputParameters(DbCommand cmd, object instance)
-        {
-            if (Attributes.IsOutput)
-            {
-                try
-                {
-                    SetValue(instance, DbHelper.GetSqlParameter(cmd, spParamName));
-                }
-                catch
-                {
-                    if (!Attributes.IsOptional)
-                    {
-                        throw;
-                    }
-                }
-            }
-        }
     }
 }

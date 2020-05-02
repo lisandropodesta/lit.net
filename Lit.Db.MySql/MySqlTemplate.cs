@@ -94,5 +94,26 @@ namespace Lit.Db.MySql
         {
             return text + new string(' ', (indentationLevel + indentationPlus) * 2);
         }
+
+        protected string GetFieldType(IDbColumnBinding column)
+        {
+            return MySqlDataType.Translate(column.DataType, column.ColumnType, column.ColumnSize);
+        }
+
+        protected string GetNullable(IDbColumnBinding column)
+        {
+            return column.IsNullable ? NullKey : NotNullKey;
+        }
+
+        protected string GetDefault(IDbColumnBinding column)
+        {
+            // TODO: implement this code!
+            return string.Empty;
+        }
+
+        protected string GetAutoIncrement(IDbColumnBinding column)
+        {
+            return column.IsAutoIncrement ? AutoIncrementKey : string.Empty;
+        }
     }
 }

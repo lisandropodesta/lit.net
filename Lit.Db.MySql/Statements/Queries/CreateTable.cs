@@ -91,7 +91,7 @@ namespace Lit.Db.MySql.Statements
                     str.Append(",\n");
                 }
 
-                str.Append($"  `{col.FieldName}`");
+                str.Append($"  `{col.ColumnName}`");
 
                 str.ConditionalAppend(" ", GetFieldType(col));
                 str.ConditionalAppend(" ", GetNullable(col));
@@ -99,14 +99,6 @@ namespace Lit.Db.MySql.Statements
                 str.ConditionalAppend(" ", GetAutoIncrement(col));
 
                 first = false;
-            }
-
-            // Constraint definition
-            foreach (var col in columns)
-            {
-                str.ConditionalAppend(",\n ", GetColumnIndex(col));
-                str.ConditionalAppend(",\n ", GetColumnConstraint(col));
-                str.ConditionalAppend(",\n ", GetColumnForeignKeyConstraint(col));
             }
 
             return str.ToString();
@@ -118,17 +110,33 @@ namespace Lit.Db.MySql.Statements
 
             if (table.PrimaryKey != null)
             {
+                var columnsList = table.GetKeyColumns(table.PrimaryKey, ", ", "`");
+
+                // [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (key_part,...) [index_option] ...
                 str.Append(",\n");
-                str.Append($"{ConstraintKey} {PrimaryKeyKey} ( {GetKeyColumns(table, table.PrimaryKey, ", ", "`")} )");
+                str.Append($"{ConstraintKey} {PrimaryKeyKey} ( {columnsList} )");
             }
 
             if (table.ForeignKeys.Count > 0)
             {
+                table.CheckConstraints();
+
                 foreach (var fk in table.ForeignKeys)
                 {
-                    var name = fk.DbName ?? $"fk_{TableName}_{GetKeyColumns(table, fk, "_")}";
+                    var columnsName = table.GetKeyColumns(fk, "_");
+                    var columnsList = table.GetKeyColumns(fk, ", ", "`");
+                    var primaryList = table.GetPrimaryColumns(out string primaryTableName, fk, ", ", "`");
+
+                    // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
+                    // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
+                    var name = fk.DbName ?? $"fk_{TableName}_{columnsName}";
                     str.Append(",\n");
-                    str.Append($"{ConstraintKey} {name} {ForeignKeyKey} ( {GetKeyColumns(table, fk, ", ", "`")} ) {ReferecencesKey} {fk.ForeignTable} ( {ColumnsList(fk.ForeignColumns)} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
+                    str.Append($"{ConstraintKey} {name} {ForeignKeyKey} ( {columnsList} ) ");
+                    str.Append($"{ReferecencesKey} {primaryTableName} ( {primaryList} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
+
+                    // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
+                    str.Append(",\n");
+                    str.Append($"{KeyKey} fk_{TableName}_{columnsName}_idx ( {columnsList} )");
                 }
             }
 
@@ -136,9 +144,13 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var uk in table.UniqueKeys)
                 {
-                    var name = uk.DbName ?? $"uk_{TableName}_{GetKeyColumns(table, uk, "_")}_idx";
+                    var columnsName = table.GetKeyColumns(uk, "_");
+                    var columnsList = table.GetKeyColumns(uk, ", ", "`");
+
+                    // [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (key_part,...) [index_option] ...
+                    var name = uk.DbName ?? $"uk_{TableName}_{columnsName}_idx";
                     str.Append(",\n");
-                    str.Append($"{ConstraintKey} {UniqueKeyKey} {name} ( {GetKeyColumns(table, uk, ", ", "`")} )");
+                    str.Append($"{ConstraintKey} {UniqueKeyKey} {name} ( {columnsList} )");
                 }
             }
 
@@ -146,125 +158,17 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var idx in table.Indexes)
                 {
-                    var name = idx.DbName ?? $"{TableName}_{GetKeyColumns(table, idx, "_")}_idx";
+                    var columnsName = table.GetKeyColumns(idx, "_");
+                    var columnsList = table.GetKeyColumns(idx, ", ", "`");
+
+                    // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
+                    var name = idx.DbName ?? $"{TableName}_{columnsName}_idx";
                     str.Append(",\n");
-                    str.Append($"{IndexKey} {name} ( {GetKeyColumns(table, idx, ", ", "`")} )");
+                    str.Append($"{IndexKey} {name} ( {columnsList} )");
                 }
             }
 
             return str.ToString();
-        }
-
-        private string GetKeyColumns(IDbTableBinding table, IDbTableKeyAttribute key, string separator, string surround = null)
-        {
-            var columns = string.Empty;
-
-            foreach (var name in key.FieldNames)
-            {
-                var col = table.FindColumn(name);
-                if (col == null)
-                {
-                    throw new ArgumentException($"Invalid key column {name} in table [{table.TableName}]");
-                }
-
-                var fieldName = col.FieldName;
-                columns += (!string.IsNullOrEmpty(columns) ? separator : string.Empty) + surround + fieldName + surround;
-            }
-
-            return columns;
-        }
-
-        private string ColumnsList(string[] columns)
-        {
-            var text = string.Empty;
-
-            foreach (var name in columns)
-            {
-                text += (!string.IsNullOrEmpty(text) ? ", " : string.Empty) + "`" + name + "`";
-            }
-
-            return text;
-        }
-
-        private string GetFieldType(IDbColumnBinding column)
-        {
-            return MySqlDataType.Translate(column.DataType, column.FieldType, column.FieldSize);
-        }
-
-        private string GetNullable(IDbColumnBinding column)
-        {
-            return column.IsNullable ? NullKey : NotNullKey;
-        }
-
-        private string GetDefault(IDbColumnBinding column)
-        {
-            // TODO: implement this code!
-            return string.Empty;
-        }
-
-        private string GetAutoIncrement(IDbColumnBinding column)
-        {
-            if (column.IsAutoIncrement)
-            {
-                return AutoIncrementKey;
-            }
-
-            return string.Empty;
-        }
-
-        private string GetColumnIndex(IDbColumnBinding column)
-        {
-            switch (column.KeyConstraint)
-            {
-                // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
-                case DbKeyConstraint.PrimaryForeignKey:
-                case DbKeyConstraint.ForeignKey:
-                    return $"{KeyKey} fk_{TableName}_{column.FieldName}_idx ( {column.FieldName} )";
-
-                case DbKeyConstraint.None:
-                case DbKeyConstraint.PrimaryKey:
-                case DbKeyConstraint.UniqueKey:
-                default:
-                    return string.Empty;
-            }
-        }
-
-        private string GetColumnConstraint(IDbColumnBinding column)
-        {
-            switch (column.KeyConstraint)
-            {
-                // [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (key_part,...) [index_option] ...
-                case DbKeyConstraint.PrimaryKey:
-                case DbKeyConstraint.PrimaryForeignKey:
-                    return $"{ConstraintKey} {PrimaryKeyKey} ( {column.FieldName} )";
-
-                // [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (key_part,...) [index_option] ...
-                case DbKeyConstraint.UniqueKey:
-                    return $"{ConstraintKey} {UniqueKeyKey} uk_{TableName}_{column.FieldName} ( {column.FieldName} )";
-
-                case DbKeyConstraint.ForeignKey:
-                case DbKeyConstraint.None:
-                default:
-                    return string.Empty;
-            }
-        }
-
-        private string GetColumnForeignKeyConstraint(IDbColumnBinding column)
-        {
-            switch (column.KeyConstraint)
-            {
-                // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
-                // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
-                case DbKeyConstraint.PrimaryForeignKey:
-                case DbKeyConstraint.ForeignKey:
-                    return $"{ConstraintKey} fk_{TableName}_{column.FieldName} {ForeignKeyKey} ( {column.FieldName} ) {ReferecencesKey} {column.ForeignTable} ( {column.ForeignColumn} ) ON DELETE NO ACTION ON UPDATE NO ACTION";
-
-                case DbKeyConstraint.None:
-                case DbKeyConstraint.PrimaryKey:
-                case DbKeyConstraint.UniqueKey:
-                default:
-                    return string.Empty;
-            }
         }
 
         #endregion

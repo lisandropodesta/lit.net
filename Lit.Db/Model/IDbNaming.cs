@@ -12,7 +12,7 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        string GetParameterName(string reflectionName, string parameterName);
+        string GetParameterName(string reflectionName, string columnName, string parameterName);
 
         /// <summary>
         /// Gets a field name.

@@ -13,59 +13,149 @@ namespace Lit.Db
         where TA : Attribute
     {
         /// <summary>
+        /// Values translation (to/from db).
+        /// </summary>
+        protected abstract bool ValuesTranslation { get; }
+
+        /// <summary>
+        /// Shortcut for property name.
+        /// </summary>
+        public string PropertyName => PropertyInfo.Name;
+
+        /// <summary>
         /// Database data type.
         /// </summary>
-        public DbDataType DataType => dataType;
-
-        private readonly DbDataType dataType;
+        public DbDataType DataType { get; private set; }
 
         /// <summary>
         /// Attributes.
         /// </summary>
-        public TA Attributes => attr;
+        public TA Attributes { get; private set; }
 
-        private readonly TA attr;
+        /// <summary>
+        /// Foreign key property flag.
+        /// </summary>
+        public bool IsForeignKeyProp { get; private set; }
+
+        // Type of the class that will hold this property
+        private Type foreignKeyPropType;
+
+        /// <summary>
+        /// Primary table template (when this property is a foreign key).
+        /// </summary>
+        public Type PrimaryTableTemplate { get; protected set; }
 
         protected readonly IDbSetup Setup;
 
+        /// <summary>
+        /// Forced IsNullable value.
+        /// </summary>
+        protected virtual bool? IsNullableForced => null;
+
         #region Constructor
 
-        protected DbPropertyBinding(IDbSetup setup, PropertyInfo propInfo, TA attr, bool? isNullableForced = null)
-            : base(propInfo, true, true, isNullableForced)
+        protected DbPropertyBinding(IDbTemplateBinding binding, PropertyInfo propInfo, TA attr)
+            : base(propInfo, true, true)
         {
-            this.Setup = setup;
-            this.attr = attr;
+            this.Setup = binding.Setup;
+            this.Attributes = attr;
 
-            switch (Mode)
-            {
-                case BindingMode.None:
-                default:
-                    dataType = DbDataType.Unknown;
-                    break;
-
-                case BindingMode.Scalar:
-                    dataType = GetDataType(BindingType);
-                    break;
-
-                case BindingMode.Class:
-                case BindingMode.List:
-                case BindingMode.Dictionary:
-                    dataType = DbDataType.Json;
-                    break;
-            }
-
-            if (dataType == DbDataType.Unknown)
-            {
-                throw new ArgumentException($"Property {this} of type [{propInfo.PropertyType.Name}] has an unknown binding mode");
-            }
+            PrimaryTableTemplate = DbHelper.GetForeignKeyPropType(PropertyInfo.PropertyType);
+            IsForeignKeyProp = PrimaryTableTemplate != null;
         }
 
         #endregion
 
         /// <summary>
+        /// Get the binding mode.
+        /// </summary>
+        protected override BindingMode GetBindingMode(ref Type bindingType, out bool isNullable)
+        {
+            foreignKeyPropType = DbHelper.TranslateForeignKeyType(Setup, ref bindingType, IsNullableForced);
+
+            var mode = TypeHelper.GetBindingMode(ref bindingType, out isNullable);
+
+            if (IsNullableForced.HasValue)
+            {
+                isNullable = IsNullableForced.Value;
+            }
+
+            switch (mode)
+            {
+                case BindingMode.None:
+                default:
+                    DataType = DbDataType.Unknown;
+                    break;
+
+                case BindingMode.Scalar:
+                    DataType = GetDataType(bindingType);
+                    break;
+
+                case BindingMode.Class:
+                case BindingMode.List:
+                case BindingMode.Dictionary:
+                    DataType = DbDataType.Json;
+                    break;
+            }
+
+            if (DataType == DbDataType.Unknown)
+            {
+                throw new ArgumentException($"Property {this} of type [{PropertyName}] has an unknown binding mode");
+            }
+
+            return mode;
+        }
+
+        /// <summary>
+        /// Gets the binding value from an instance.
+        /// </summary>
+        public override object GetValue(object instance)
+        {
+            if (IsForeignKeyProp)
+            {
+                var value = (GetRawValue(instance) as IDbForeignKeyRef)?.KeyAsObject;
+                return DecodePropertyValue(value, false);
+            }
+
+            return base.GetValue(instance);
+        }
+
+        /// <summary>
+        /// Sets the binding value to an instance.
+        /// </summary>
+        public override void SetValue(object instance, object value)
+        {
+            if (IsForeignKeyProp)
+            {
+                var fk = GetRawValue(instance) as IDbForeignKeyRef;
+                if (fk == null)
+                {
+                    var prop = Activator.CreateInstance(foreignKeyPropType);
+                    SetRawValue(instance, prop);
+                    fk = prop as IDbForeignKeyRef;
+                    fk.Db = (instance as IDbDataAccessRef)?.Db;
+                }
+
+                fk.KeyAsObject = EncodePropertyValue(value, false);
+            }
+            else
+            {
+                base.SetValue(instance, value);
+            }
+        }
+
+        /// <summary>
         /// Value decoding from property type.
         /// </summary>
         protected override object DecodePropertyValue(TP value)
+        {
+            return DecodePropertyValue(value, ValuesTranslation);
+        }
+
+        /// <summary>
+        /// Value decoding from property type.
+        /// </summary>
+        protected object DecodePropertyValue(object value, bool translate)
         {
             try
             {
@@ -74,7 +164,7 @@ namespace Lit.Db
                     return DBNull.Value;
                 }
 
-                return Setup.Translation.ToDb(dataType, BindingType, value);
+                return translate ? Setup.Translation.ToDb(DataType, BindingType, value) : value;
             }
             catch
             {
@@ -87,6 +177,14 @@ namespace Lit.Db
         /// </summary>
         protected override TP EncodePropertyValue(object value)
         {
+            return (TP)EncodePropertyValue(value, ValuesTranslation);
+        }
+
+        /// <summary>
+        /// Value encoding to property type.
+        /// </summary>
+        protected object EncodePropertyValue(object value, bool translate)
+        {
             try
             {
                 if (value == null || value is DBNull)
@@ -94,7 +192,7 @@ namespace Lit.Db
                     return default;
                 }
 
-                return (TP)Setup.Translation.FromDb(dataType, BindingType, value);
+                return translate ? Setup.Translation.FromDb(DataType, BindingType, value) : value;
             }
             catch
             {

@@ -23,14 +23,17 @@ namespace Lit.Db
         /// <summary>
         /// IsNullable flag defined flag.
         /// </summary>
-        public virtual bool IsNullableDefined => isNullable != null;
+        public virtual bool IsNullableDefined => IsNullableForced != null;
 
         /// <summary>
         /// IsNullable flag.
         /// </summary>
-        public virtual bool IsNullable { get => isNullable ?? false; set => isNullable = value; }
+        public virtual bool IsNullable { get => IsNullableForced ?? false; set => IsNullableForced = value; }
 
-        private bool? isNullable;
+        /// <summary>
+        /// IsNullable forced.
+        /// </summary>
+        public bool? IsNullableForced { get; private set; }
 
         /// <summary>
         /// AutoIncrement flag.

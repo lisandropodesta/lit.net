@@ -22,6 +22,11 @@ namespace Lit.Db
 
         protected readonly bool isOptional;
 
+        /// <summary>
+        /// IsNullable forced. Used when defining a field from a column.
+        /// </summary>
+        public bool? IsNullableForced { get; private set; }
+
         #region Constructors
 
         public DbFieldAttribute() { }
@@ -32,6 +37,12 @@ namespace Lit.Db
         {
             this.name = name;
             this.isOptional = isOptional;
+        }
+
+        public DbFieldAttribute(DbColumnAttribute colAttr)
+        {
+            name = colAttr.DbName;
+            IsNullableForced = colAttr.IsNullableForced;
         }
 
         #endregion

@@ -11,23 +11,17 @@ namespace Lit.DataType
         /// <summary>
         /// Binding mode.
         /// </summary>
-        public BindingMode Mode => mode;
-
-        private readonly BindingMode mode;
+        public BindingMode Mode { get; private set; }
 
         /// <summary>
         /// Binding type.
         /// </summary>
-        public Type BindingType => bindingType;
-
-        private readonly Type bindingType;
+        public Type BindingType { get; private set; }
 
         /// <summary>
         /// Is nullable flag.
         /// </summary>
-        public bool IsNullable => isNullable;
-
-        private readonly bool isNullable;
+        public bool IsNullable { get; private set; }
 
         private readonly Action<TC, TP> setter;
 
@@ -35,17 +29,9 @@ namespace Lit.DataType
 
         #region Constructor
 
-        public PropertyBinding(PropertyInfo propInfo, bool getterRequired = false, bool setterRequired = false, bool? isNullableForced = null)
+        public PropertyBinding(PropertyInfo propInfo, bool getterRequired = false, bool setterRequired = false)
             : base(propInfo)
         {
-            bindingType = propInfo.PropertyType;
-            mode = TypeHelper.GetBindingMode(ref bindingType, out isNullable);
-
-            if (isNullableForced.HasValue)
-            {
-                isNullable = isNullableForced.Value;
-            }
-
             var gm = propInfo.GetGetMethod(true);
             if (gm != null)
             {
@@ -72,31 +58,64 @@ namespace Lit.DataType
         /// <summary>
         /// Gets the binding value from an instance.
         /// </summary>
-        public object GetValue(object instance)
+        public object GetRawValue(object instance)
         {
             if (getter == null)
             {
                 throw new ArgumentException($"Property{this} has no getter method.");
             }
 
-            var value = getter(instance as TC);
-
-            return DecodePropertyValue(value);
+            return getter(instance as TC);
         }
 
         /// <summary>
         /// Sets the binding value to an instance.
         /// </summary>
-        public void SetValue(object instance, object value)
+        public void SetRawValue(object instance, object value)
         {
             if (setter == null)
             {
                 throw new ArgumentException($"Property{this} has no setter method.");
             }
 
-            var propValue = EncodePropertyValue(value);
-
+            var propValue = value != null ? (TP)value : default;
             setter(instance as TC, propValue);
+        }
+
+        /// <summary>
+        /// Gets the binding value from an instance.
+        /// </summary>
+        public virtual object GetValue(object instance)
+        {
+            return DecodePropertyValue((TP)GetRawValue(instance));
+        }
+
+        /// <summary>
+        /// Sets the binding value to an instance.
+        /// </summary>
+        public virtual void SetValue(object instance, object value)
+        {
+            value = EncodePropertyValue(value);
+            SetRawValue(instance, value);
+        }
+
+        /// <summary>
+        /// Calculates binding mode.
+        /// </summary>
+        public void CalcBindingMode()
+        {
+            var bindingType = PropertyInfo.PropertyType;
+            Mode = GetBindingMode(ref bindingType, out bool isNullable);
+            BindingType = bindingType;
+            IsNullable = isNullable;
+        }
+
+        /// <summary>
+        /// Get the binding mode.
+        /// </summary>
+        protected virtual BindingMode GetBindingMode(ref Type bindingType, out bool isNullable)
+        {
+            return TypeHelper.GetBindingMode(ref bindingType, out isNullable);
         }
 
         /// <summary>

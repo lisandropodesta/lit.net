@@ -37,7 +37,7 @@ namespace Lit.Db.MySql.Statements.Queries
         {
             var binding = setup.GetTableBinding(tableTemplate);
 
-            var pk = binding.FindFirstColumn(DbColumnsSelection.PrimaryKey);
+            var pk = binding.SingleColumnPrimaryKey;
 
             if (pk == null)
             {
@@ -46,7 +46,7 @@ namespace Lit.Db.MySql.Statements.Queries
 
             TableName = binding.TableName;
             Name = setup.Naming.GetStoredProcedureName(TableName, function);
-            FilterField = pk.FieldName;
+            FilterField = pk.ColumnName;
             FilterParam = pk.SpParamName;
 
             Setup(tableTemplate, setup.Naming, function, binding, pk);
@@ -72,7 +72,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         public void AddParameter(IDbColumnBinding column, ParameterDirection direction)
         {
-            AddParameter(column.SpParamName, direction, column.DataType, column.FieldType);
+            AddParameter(column.SpParamName, direction, column.DataType, column.ColumnType);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         public void AddColumnName(StringBuilder text, string separator, IDbColumnBinding column)
         {
-            text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, column.FieldName);
+            text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, column.ColumnName);
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Lit.Db.MySql.Statements.Queries
         /// </summary>
         public void AddFieldAssignment(StringBuilder text, string separator, IDbColumnBinding column)
         {
-            text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, $"{column.FieldName} = {column.SpParamName}");
+            text.ConditionalAppend(text.Length == 0 ? string.Empty : separator, $"{column.ColumnName} = {column.SpParamName}");
         }
     }
 }

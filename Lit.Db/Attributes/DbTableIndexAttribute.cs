@@ -6,28 +6,18 @@ namespace Lit.Db
     /// Table primary key definition.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class DbTableIndexAttribute : Attribute, IDbTableIndexAttribute
+    public class DbTableIndexAttribute : DbTableKeyAttributeBase, IDbTableIndexAttribute
     {
-        /// <summary>
-        /// Primary key name.
-        /// </summary>
-        public string DbName { get; set; }
-
         /// <summary>
         /// Is unique flag.
         /// </summary>
         public bool IsUnique { get; set; }
 
-        /// <summary>
-        /// List of field names.
-        /// </summary>
-        public string[] FieldNames { get; private set; }
-
         #region Constructors
 
-        public DbTableIndexAttribute(params string[] fieldNames)
+        public DbTableIndexAttribute(params string[] propertyNames)
+            : base(propertyNames)
         {
-            FieldNames = fieldNames;
         }
 
         #endregion

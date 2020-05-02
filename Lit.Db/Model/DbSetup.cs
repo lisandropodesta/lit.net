@@ -43,9 +43,11 @@ namespace Lit.Db
             {
                 if (!tableBindings.TryGetValue(type, out var binding))
                 {
-                    binding = new DbTableBinding(type, this);
+                    var newBinding = new DbTableBinding(type, this);
+                    binding = newBinding;
                     tableBindings.Add(type, binding);
-                    binding.ResolveForeignKeys();
+
+                    newBinding.ResolveBinding();
                 }
 
                 return binding;
@@ -61,8 +63,11 @@ namespace Lit.Db
             {
                 if (!commandBindings.TryGetValue(type, out var binding))
                 {
-                    binding = new DbCommandBinding(type, this);
+                    var newBinding = new DbCommandBinding(type, this);
+                    binding = newBinding;
                     commandBindings.Add(type, binding);
+
+                    newBinding.ResolveBinding();
                 }
 
                 return binding;

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data.Common;
 
 namespace Lit.Db
@@ -72,23 +70,96 @@ namespace Lit.Db
         }
 
         /// <summary>
-        /// Builds a generic list and loads a recordset in it.
+        /// Creates an instance of a db object and optionally assigns the db reference.
         /// </summary>
-        public static object LoadSqlRecordset(DbDataReader reader, Type type, int maxCount, IDbSetup setup)
+        public static object CreateInstance(IDbDataAccess db, Type type, params object[] args)
         {
-            var binding = setup.GetCommandBinding(type);
-            var listType = typeof(List<>).MakeGenericType(type);
-            var result = Activator.CreateInstance(listType);
-            var list = result as IList;
+            var result = Activator.CreateInstance(type, args);
+            SetDbRef(result, db);
+            return result;
+        }
 
-            for (var ri = 0; ri < maxCount && reader.Read(); ri++)
+        /// <summary>
+        /// Assigns data access reference.
+        /// </summary>
+        public static T SetDbRef<T>(T obj, IDbDataAccess db)
+        {
+            if (obj is IDbDataAccessRef dbRef && db != null)
             {
-                var record = Activator.CreateInstance(type);
-                binding.GetOutputFields(reader, record);
-                list.Add(record);
+                dbRef.Db = db;
             }
 
-            return result;
+            return obj;
+        }
+
+        /// <summary>
+        /// Creates an instance of a foreign key to a table.
+        /// </summary>
+        public static IDbForeignKeyRef<T> CreateKey<T>(IDbDataAccess db, object key, bool? isNullableForced = null)
+        {
+            return CreateKey(db, typeof(T), key, isNullableForced) as IDbForeignKeyRef<T>;
+        }
+
+        /// <summary>
+        /// Creates an instance of a foreign key to a table.
+        /// </summary>
+        public static IDbForeignKeyRef CreateKey(IDbDataAccess db, Type tableType, object key, bool? isNullableForced = null)
+        {
+            var type = GetPrimaryKeyType(db.Setup, tableType, isNullableForced, out Type _);
+            var instance = Activator.CreateInstance(type) as IDbForeignKeyRef;
+            instance.Db = db;
+            instance.KeyAsObject = key;
+            return instance;
+        }
+
+        /// <summary>
+        /// Translates a foreign key column type.
+        /// </summary>
+        public static Type TranslateForeignKeyType(IDbSetup setup, ref Type columnType, bool? isNullableForced)
+        {
+            var primaryTable = GetForeignKeyPropType(columnType);
+            return primaryTable != null ? GetPrimaryKeyType(setup, primaryTable, isNullableForced, out columnType) : null;
+        }
+
+        /// <summary>
+        /// Check if the property is a foreign key.
+        /// </summary>
+        public static Type GetForeignKeyPropType(Type propType)
+        {
+            return propType.IsGenericType
+                && propType.GetGenericArguments().Length == 1
+                && propType.GetGenericTypeDefinition() == typeof(IDbForeignKeyRef<>) ? propType.GetGenericArguments()[0] : null;
+        }
+
+        /// <summary>
+        /// Get the primary key type.
+        /// </summary>
+        public static Type GetPrimaryKeyType(IDbSetup setup, Type tableType, bool? isNullableForced, out Type columnType)
+        {
+            var col = GetPrimaryKeyColumn(setup, tableType);
+            columnType = col.ColumnType;
+            if (col.IsNullable || isNullableForced == true)
+            {
+                columnType = typeof(Nullable<>).MakeGenericType(columnType);
+            }
+
+            return typeof(DbForeignKey<,>).MakeGenericType(tableType, columnType);
+        }
+
+        /// <summary>
+        /// Get the primary key column type.
+        /// </summary>
+        public static IDbColumnBinding GetPrimaryKeyColumn(IDbSetup setup, Type tableType)
+        {
+            var binding = setup.GetTableBinding(tableType);
+            var col = binding?.SingleColumnPrimaryKey;
+
+            if (col == null)
+            {
+                throw new ArgumentException($"Unknown type/foreign key for [{tableType.Name}]");
+            }
+
+            return col;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 
 namespace Lit.Db
 {
@@ -53,30 +52,5 @@ namespace Lit.Db
         /// Recordsets.
         /// </summary>
         IReadOnlyList<IDbRecordsetBinding> Recordsets { get; }
-
-        /// <summary>
-        /// Assigns all input parameters on the command.
-        /// </summary>
-        void SetInputParameters(DbCommand cmd, object instance);
-
-        /// <summary>
-        /// Assigns all input parameters on the command.
-        /// </summary>
-        string SetInputParameters(string query, object instance);
-
-        /// <summary>
-        /// Assigns all output parameters on the template instance.
-        /// </summary>
-        void GetOutputParameters(DbCommand cmd, object instance);
-
-        /// <summary>
-        /// Get output fields.
-        /// </summary>
-        void GetOutputFields(DbDataReader reader, object instance);
-
-        /// <summary>
-        /// Load results returned from stored procedure.
-        /// </summary>
-        void LoadResults(DbDataReader reader, object instance);
     }
 }

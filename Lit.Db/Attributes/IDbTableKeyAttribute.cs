@@ -5,11 +5,11 @@
         /// <summary>
         /// DB name.
         /// </summary>
-        string DbName { get; set; }
+        string DbName { get; }
 
         /// <summary>
         /// List of field names.
         /// </summary>
-        string[] FieldNames { get; }
+        string[] PropertyNames { get; }
     }
 }

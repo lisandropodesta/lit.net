@@ -12,7 +12,6 @@ namespace Lit.Db.Framework.Entities
         where TH : DbConnection
         where TS : DbCommand
     {
-
         #region Constructors
 
         protected DbDataAccess(IDbSetup setup, string connectionString) : base(setup, connectionString) { }
@@ -112,11 +111,23 @@ namespace Lit.Db.Framework.Entities
         }
 
         /// <summary>
-        /// Sets the record id.
+        /// Gets the record id.
         /// </summary>
         public TID GetId<T, TID>(T record)
         {
-            return Cast<T, IDbId<TID>>(record).Id;
+            if (record is IDbId<TID> intf)
+            {
+                return intf.Id;
+            }
+
+            var binding = Setup.GetTableBinding(typeof(T));
+            if (binding.SingleColumnPrimaryKey != null)
+            {
+                var value = binding.SingleColumnPrimaryKey.GetValue(record);
+                return (TID)value;
+            }
+
+            throw new TemplateDoNotImplementInterface(typeof(T), typeof(IDbId<TID>));
         }
 
         /// <summary>
@@ -132,7 +143,20 @@ namespace Lit.Db.Framework.Entities
         /// </summary>
         public void SetId<T, TID>(T record, TID id)
         {
-            Cast<T, IDbId<TID>>(record).Id = id;
+            if (record is IDbId<TID> intf)
+            {
+                intf.Id = id;
+                return;
+            }
+
+            var binding = Setup.GetTableBinding(typeof(T));
+            if (binding.SingleColumnPrimaryKey != null)
+            {
+                binding.SingleColumnPrimaryKey.SetValue(record, id);
+                return;
+            }
+
+            throw new TemplateDoNotImplementInterface(typeof(T), typeof(IDbId<TID>));
         }
 
         /// <summary>
@@ -163,17 +187,17 @@ namespace Lit.Db.Framework.Entities
         {
             var type = record.GetType();
             var binding = Setup.GetTableBinding(type);
-            var spName = GetTableSpName(binding, spFunc);
+            var spName = binding.GetTableSpName(spFunc);
 
             using (var connection = GetOpenedConnection())
             {
                 using (var cmd = GetCommand(spName, connection, CommandType.StoredProcedure))
                 {
-                    SetTableSpInputParameters(binding, cmd, record, spFunc);
+                    binding.SetTableSpInputParameters(cmd, record, spFunc);
 
                     using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                     {
-                        return binding.LoadResults(reader, record);
+                        return binding.LoadResults(this, reader, record);
                     }
                 }
             }
@@ -185,53 +209,25 @@ namespace Lit.Db.Framework.Entities
         protected string GetTableSpName(Type tableTemplate, StoredProcedureFunction spFunc)
         {
             var binding = Setup.GetTableBinding(tableTemplate);
-            return GetTableSpName(binding, spFunc);
+            return binding.GetTableSpName(spFunc);
         }
 
-        /// <summary>
-        /// Table stored procedure resolving.
-        /// </summary>
-        protected string GetTableSpName(IDbTableBinding binding, StoredProcedureFunction spFunc)
+        protected override void LoadResults<T>(IDbCommandBinding binding, DbDataReader reader, T template)
         {
-            return Setup.Naming.GetStoredProcedureName(binding.TableName, spFunc);
+            binding.LoadResults(this, reader, template);
         }
 
-        /// <summary>
-        /// Set table stored procedure parameters.
-        /// </summary>
-        protected void SetTableSpInputParameters<T>(IDbTableBinding binding, DbCommand cmd, T instance, StoredProcedureFunction spFunc)
-        {
-            var columns = GetTableSpParameters(spFunc);
-            binding.MapColumns(columns, c => c.SetInputParameters(cmd, instance));
-        }
+        #region Exceptions
 
-        /// <summary>
-        /// Get parameters selection for a table stored procedure.
-        /// </summary>
-        protected DbColumnsSelection GetTableSpParameters(StoredProcedureFunction spFunc)
+        public class TemplateDoNotImplementInterface : ArgumentException
         {
-            switch (spFunc)
+            public TemplateDoNotImplementInterface(Type templateType, Type interfaceType)
+                : base($"Table template [{templateType.FullName}] do not implements [{interfaceType.Name}]")
+
             {
-                case StoredProcedureFunction.Get:
-                case StoredProcedureFunction.Delete:
-                    return DbColumnsSelection.PrimaryKey;
-
-                case StoredProcedureFunction.Find:
-                    return DbColumnsSelection.UniqueKey;
-
-                case StoredProcedureFunction.ListAll:
-                    return DbColumnsSelection.None;
-
-                case StoredProcedureFunction.Insert:
-                    return DbColumnsSelection.NonPrimaryKey;
-
-                case StoredProcedureFunction.Update:
-                case StoredProcedureFunction.Store:
-                    return DbColumnsSelection.All;
-
-                default:
-                    throw new NotImplementedException();
             }
         }
+
+        #endregion
     }
 }

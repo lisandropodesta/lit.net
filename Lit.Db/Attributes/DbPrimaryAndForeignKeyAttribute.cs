@@ -9,27 +9,27 @@ namespace Lit.Db
     public class DbPrimaryAndForeignKeyAttribute : DbPrimaryKeyAttribute, IDbForeignKeyAttribute
     {
         /// <summary>
-        /// Foreign table template.
+        /// Primary table template.
         /// </summary>
-        public Type ForeignTableTemplate { get; private set; }
+        public Type PrimaryTableTemplate { get; private set; }
 
         /// <summary>
-        /// Foreign column property name.
+        /// Primary column property name.
         /// </summary>
-        public string ForeignColumnProperty { get; private set; }
+        public string PrimaryColumnProperty { get; private set; }
 
         #region Constructors
 
         public DbPrimaryAndForeignKeyAttribute(Type tableTemplate, string propertyName = null) : base(false)
         {
-            ForeignTableTemplate = tableTemplate;
-            ForeignColumnProperty = propertyName;
+            PrimaryTableTemplate = tableTemplate;
+            PrimaryColumnProperty = propertyName;
         }
 
         public DbPrimaryAndForeignKeyAttribute(string name, Type tableTemplate, string propertyName = null) : base(name, false)
         {
-            ForeignTableTemplate = tableTemplate;
-            ForeignColumnProperty = propertyName;
+            PrimaryTableTemplate = tableTemplate;
+            PrimaryColumnProperty = propertyName;
         }
 
         #endregion

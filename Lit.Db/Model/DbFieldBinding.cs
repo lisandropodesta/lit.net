@@ -1,25 +1,8 @@
 ﻿using System;
-using System.Data.Common;
 using System.Reflection;
 
 namespace Lit.Db
 {
-    /// <summary>
-    /// Db field binding interface.
-    /// </summary>
-    public interface IDbFieldBinding : IDbPropertyBinding<DbFieldAttribute>
-    {
-        /// <summary>
-        /// Field name.
-        /// </summary>
-        string FieldName { get; }
-
-        /// <summary>
-        /// Get output field.
-        /// </summary>
-        void GetOutputField(DbDataReader reader, object instance);
-    }
-
     /// <summary>
     /// Db field property binding.
     /// </summary>
@@ -27,48 +10,38 @@ namespace Lit.Db
         where TC : class
     {
         /// <summary>
+        /// Values translation (to/from db).
+        /// </summary>
+        protected override bool ValuesTranslation => true;
+
+        /// <summary>
         /// Field name.
         /// </summary>
-        public string FieldName => fieldName;
-
-        private readonly string fieldName;
+        public string FieldName { get; private set; }
 
         /// <summary>
         /// Field type.
         /// </summary>
         public Type FieldType => BindingType;
 
+        /// <summary>
+        /// Forced IsNullable value.
+        /// </summary>
+        protected override bool? IsNullableForced => Attributes.IsNullableForced;
+
         #region Constructor
 
-        public DbFieldBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
-            : base(setup, propInfo, attr, null)
+        public DbFieldBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbFieldAttribute attr)
+            : base(binding, propInfo, attr)
         {
-            fieldName = setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
+            FieldName = binding.Setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
 
-            if (string.IsNullOrEmpty(fieldName))
+            if (string.IsNullOrEmpty(FieldName))
             {
                 throw new ArgumentException($"Null field name in DbFieldBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
         }
 
         #endregion
-
-        /// <summary>
-        /// Get output field.
-        /// </summary>
-        public void GetOutputField(DbDataReader reader, object instance)
-        {
-            try
-            {
-                SetValue(instance, reader[fieldName]);
-            }
-            catch
-            {
-                if (!Attributes.IsOptional)
-                {
-                    throw;
-                }
-            }
-        }
     }
 }

@@ -9,10 +9,14 @@ namespace Lit.Db.MySql
     {
         public MySqlDefaultNaming() : base(AffixPlacing.Sufix, Case.Snake, "id") { }
 
-        public override string GetParameterName(string reflectionName, string parameterName)
+        public override string GetParameterName(string reflectionName, string columnName, string parameterName)
         {
-            reflectionName = !string.IsNullOrEmpty(reflectionName) ? "p_" + reflectionName : null;
-            return base.GetParameterName(reflectionName, parameterName);
+            if (string.IsNullOrEmpty(parameterName))
+            {
+                parameterName = "p_" + (columnName ?? reflectionName);
+            }
+
+            return base.GetParameterName(null, null, parameterName);
         }
     }
 }

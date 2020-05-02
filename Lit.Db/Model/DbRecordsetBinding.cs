@@ -1,5 +1,4 @@
-﻿using System.Data.Common;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Lit.Db
 {
@@ -9,38 +8,18 @@ namespace Lit.Db
     internal class DbRecordsetBinding<TC, TP> : DbPropertyBinding<TC, TP, DbRecordsetAttribute>, IDbRecordsetBinding
         where TC : class
     {
+        /// <summary>
+        /// Values translation (to/from db).
+        /// </summary>
+        protected override bool ValuesTranslation => false;
+
         #region Constructor
 
-        public DbRecordsetBinding(IDbSetup setup, PropertyInfo propInfo, DbRecordsetAttribute attr)
-            : base(setup, propInfo, attr)
+        public DbRecordsetBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbRecordsetAttribute attr)
+            : base(binding, propInfo, attr)
         {
         }
 
         #endregion
-
-        /// <summary>
-        /// Load the current recordset.
-        /// </summary>
-        public void LoadResults(DbDataReader reader, object instance)
-        {
-            var list = DbHelper.LoadSqlRecordset(reader, BindingType, int.MaxValue, Setup);
-            SetValue(instance, list);
-        }
-
-        /// <summary>
-        /// Value decoding from property type.
-        /// </summary>
-        protected override object DecodePropertyValue(TP value)
-        {
-            return value;
-        }
-
-        /// <summary>
-        /// Value encoding to property type.
-        /// </summary>
-        protected override TP EncodePropertyValue(object value)
-        {
-            return value != null ? (TP)value : default;
-        }
     }
 }

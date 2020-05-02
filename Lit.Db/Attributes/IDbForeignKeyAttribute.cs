@@ -5,13 +5,13 @@ namespace Lit.Db
     public interface IDbForeignKeyAttribute
     {
         /// <summary>
-        /// Foreign table template.
+        /// Primary table template.
         /// </summary>
-        Type ForeignTableTemplate { get; }
+        Type PrimaryTableTemplate { get; }
 
         /// <summary>
-        /// Foreign column property name.
+        /// Primary column property name.
         /// </summary>
-        string ForeignColumnProperty { get; }
+        string PrimaryColumnProperty { get; }
     }
 }

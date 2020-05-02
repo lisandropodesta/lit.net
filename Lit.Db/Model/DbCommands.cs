@@ -1,8 +1,8 @@
-﻿using Lit.Auditing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using Lit.Auditing;
 
 namespace Lit.Db
 {
@@ -138,7 +138,7 @@ namespace Lit.Db
                             case DbExecutionMode.Query:
                                 using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
                                 {
-                                    binding.LoadResults(reader, template);
+                                    LoadResults(binding, reader, template);
                                 }
                                 break;
                         }
@@ -204,5 +204,7 @@ namespace Lit.Db
         protected abstract TS CreateCommand(string name, TH connection);
 
         protected abstract DbStoredProcedure<TS> CreateStoredProcedure(string name, TS command);
+
+        protected abstract void LoadResults<T>(IDbCommandBinding binding, DbDataReader reader, T template);
     }
 }

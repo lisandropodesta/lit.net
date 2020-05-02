@@ -126,9 +126,9 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        public virtual string GetParameterName(string reflectionName, string parameterName)
+        public virtual string GetParameterName(string reflectionName, string columnName, string parameterName)
         {
-            return TranslateName(TextSource, Scope, reflectionName, parameterName, ParametersCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, reflectionName, parameterName ?? columnName, ParametersCase, IdPlacing, IdText);
         }
 
         /// <summary>

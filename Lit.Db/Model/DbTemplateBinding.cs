@@ -7,16 +7,19 @@ namespace Lit.Db
     /// <summary>
     /// Template information.
     /// </summary>
-    internal abstract class DbTemplateBinding
+    internal abstract class DbTemplateBinding : IDbTemplateBinding
     {
+        /// <summary>
+        /// Database setup.
+        /// </summary>
+        public IDbSetup Setup { get; private set; }
+
         /// <summary>
         /// Template data type.
         /// </summary>
         public Type TemplateType => templateType;
 
         private readonly Type templateType;
-
-        protected readonly IDbSetup Setup;
 
         #region Constructor
 
@@ -31,7 +34,7 @@ namespace Lit.Db
         /// <summary>
         /// Adds a binding to a list.
         /// </summary>
-        protected TI AddBinding<TI, TAttr>(ref List<TI> list, Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbSetup setup)
+        protected TI AddBinding<TI, TAttr>(ref List<TI> list, Type genClassType, PropertyInfo propertyInfo, TAttr attribute)
             where TI : class
         {
             if (list == null)
@@ -39,7 +42,7 @@ namespace Lit.Db
                 list = new List<TI>();
             }
 
-            var binding = CreateBinding<TI, TAttr>(genClassType, propertyInfo, attribute, setup);
+            var binding = CreateBinding<TI, TAttr>(genClassType, propertyInfo, attribute);
             list.Add(binding);
             return binding;
         }
@@ -47,11 +50,11 @@ namespace Lit.Db
         /// <summary>
         /// Creates a binding.
         /// </summary>
-        private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute, IDbSetup setup)
+        private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute)
             where TI : class
         {
             var type = genClassType.MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType);
-            var binding = Activator.CreateInstance(type, new object[] { setup, propertyInfo, attribute });
+            var binding = Activator.CreateInstance(type, new object[] { this, propertyInfo, attribute });
             return binding as TI;
         }
     }

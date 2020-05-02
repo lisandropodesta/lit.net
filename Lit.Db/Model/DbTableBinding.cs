@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using Lit.DataType;
@@ -15,23 +14,28 @@ namespace Lit.Db
         /// <summary>
         /// Table name.
         /// </summary>
-        public string TableName => tableName;
-
-        private readonly string tableName;
-
+        public string TableName { get; private set; }
         /// <summary>
         /// Columns.
         /// </summary>
         public IReadOnlyList<IDbColumnBinding> Columns => columnBindings;
 
-        private readonly List<IDbColumnBinding> columnBindings;
+        private List<IDbColumnBinding> columnBindings;
+
+        /// <summary>
+        /// Single column primary key.
+        /// </summary>
+        public IDbColumnBinding SingleColumnPrimaryKey { get; private set; }
+
+        /// <summary>
+        /// Single column unique key.
+        /// </summary>
+        public IDbColumnBinding SingleColumnUniqueKey { get; private set; }
 
         /// <summary>
         /// Primary key.
         /// </summary>
-        public IDbTablePrimaryKeyAttribute PrimaryKey => primaryKey;
-
-        private readonly IDbTablePrimaryKeyAttribute primaryKey;
+        public IDbTablePrimaryKeyAttribute PrimaryKey { get; private set; }
 
         /// <summary>
         /// Foreign keys.
@@ -63,156 +67,105 @@ namespace Lit.Db
 
             if (tattr != null)
             {
-                tableName = setup.Naming.GetTableName(templateType, tattr.TableName);
+                TableName = setup.Naming.GetTableName(templateType, tattr.TableName);
             }
 
-            primaryKey = TypeHelper.GetAttribute<IDbTablePrimaryKeyAttribute>(templateType, true);
+            PrimaryKey = TypeHelper.GetAttribute<IDbTablePrimaryKeyAttribute>(templateType, true);
             foreignKeys = TypeHelper.GetAttributes<IDbTableForeignKeyAttribute>(templateType, true).ToList();
             uniqueKeys = TypeHelper.GetAttributes<IDbTableUniqueKeyAttribute>(templateType, true).ToList();
             indexes = TypeHelper.GetAttributes<IDbTableIndexAttribute>(templateType, true).ToList();
 
-            foreach (var propInfo in templateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
-                {
-                    AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr, setup);
-                }
-            }
+            AddColumns();
         }
 
         #endregion
 
         /// <summary>
-        /// Resolve foreign keys.
+        /// Scan properties and add column definition.
         /// </summary>
-        public void ResolveForeignKeys()
+        private void AddColumns()
         {
-            columnBindings?.ForEach(binding => ResolveForeignKey(binding));
-            foreignKeys?.ForEach(fk => ResolveForeignKey(fk));
-        }
+            List<string> primaryKeyProps = null;
+            Dictionary<Type, List<IDbColumnBinding>> foreignKeyFields = null;
+            List<string> uniqueKeyProps = null;
 
-        /// <summary>
-        /// Finds a column binding.
-        /// </summary>
-        public IDbColumnBinding FindColumn(string propertyName)
-        {
-            var propInfo = TemplateType.GetProperty(propertyName);
-            return Columns?.FirstOrDefault(i => i.PropertyInfo == propInfo);
-        }
-
-        /// <summary>
-        /// Get output fields.
-        /// </summary>
-        public void GetOutputFields(DbDataReader reader, object instance)
-        {
-            columnBindings?.ForEach(c => c.GetOutputField(reader, instance));
-        }
-
-        /// <summary>
-        /// Load results returned from stored procedure.
-        /// </summary>
-        public bool LoadResults(DbDataReader reader, object instance)
-        {
-            if (reader.Read())
+            foreach (var propInfo in TemplateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
-                GetOutputFields(reader, instance);
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Get the first column that matches with selection.
-        /// </summary>
-        public IDbColumnBinding FindFirstColumn(DbColumnsSelection selection)
-        {
-            return Columns.FirstOrDefault(c => IsSelected(c, selection));
-        }
-
-        /// <summary>
-        /// Maps an action to every column.
-        /// </summary>
-        public void MapColumns(DbColumnsSelection selection, Action<IDbColumnBinding> action)
-        {
-            Columns.Where(c => IsSelected(c, selection)).ForEach(c => action(c));
-        }
-
-        /// <summary>
-        /// Check whether if a column matches a selection criteria or not.
-        /// </summary>
-        public static bool IsSelected(IDbColumnBinding column, DbColumnsSelection selection)
-        {
-            switch (selection)
-            {
-                case DbColumnsSelection.None:
-                    return false;
-
-                case DbColumnsSelection.PrimaryKey:
-                    return column.KeyConstraint == DbKeyConstraint.PrimaryKey || column.KeyConstraint == DbKeyConstraint.PrimaryForeignKey;
-
-                case DbColumnsSelection.UniqueKey:
-                    return column.KeyConstraint == DbKeyConstraint.UniqueKey;
-
-                case DbColumnsSelection.NonPrimaryKey:
-                    return column.KeyConstraint != DbKeyConstraint.PrimaryKey && column.KeyConstraint != DbKeyConstraint.PrimaryForeignKey;
-
-                case DbColumnsSelection.All:
-                default:
-                    return true;
-            }
-        }
-
-        /// <summary>
-        /// Resolve a single column foreign key.
-        /// </summary>
-        private void ResolveForeignKey(IDbColumnBinding col)
-        {
-            if (col.Attributes is IDbForeignKeyAttribute fk)
-            {
-                var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
-                var colBinding = !string.IsNullOrEmpty(fk.ForeignColumnProperty) ? binding.FindColumn(fk.ForeignColumnProperty)
-                    : binding.FindFirstColumn(DbColumnsSelection.PrimaryKey);
-
-                if (colBinding == null)
+                if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
                 {
-                    throw new ArgumentException($"Invalid foreign key definition [{col.PropertyInfo.DeclaringType.Namespace}.{col.PropertyInfo.DeclaringType.Name}.{col.PropertyInfo.Name}]");
+                    var col = AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr);
+                    var keyConstraint = col.KeyConstraint;
+
+                    if (keyConstraint == DbKeyConstraint.PrimaryKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
+                    {
+                        (primaryKeyProps = primaryKeyProps ?? new List<string>()).Add(col.PropertyName);
+                    }
+
+                    if (keyConstraint == DbKeyConstraint.UniqueKey)
+                    {
+                        (uniqueKeyProps = uniqueKeyProps ?? new List<string>()).Add(col.PropertyName);
+                    }
+
+                    if (keyConstraint == DbKeyConstraint.ForeignKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
+                    {
+                        foreignKeyFields = foreignKeyFields ?? new Dictionary<Type, List<IDbColumnBinding>>();
+                        if (!foreignKeyFields.TryGetValue(col.PrimaryTableTemplate, out List<IDbColumnBinding> list))
+                        {
+                            list = new List<IDbColumnBinding>();
+                            foreignKeyFields.Add(col.PrimaryTableTemplate, list);
+                        }
+                        list.Add(col);
+                    }
+                }
+            }
+
+            if (primaryKeyProps != null)
+            {
+                if (PrimaryKey != null)
+                {
+                    throw new ArgumentException($"Multiple primary key definition in table [{TableName}]");
                 }
 
-                var foreignTable = binding.TableName;
-                var foreignColumn = Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName);
-                col.AssignForeignKey(foreignTable, foreignColumn);
+                PrimaryKey = new DbTablePrimaryKeyAttribute(primaryKeyProps.ToArray());
+            }
+
+            if (PrimaryKey?.PropertyNames.Length == 1)
+            {
+                SingleColumnPrimaryKey = this.FindColumn(primaryKeyProps[0]);
+            }
+
+            if (uniqueKeyProps != null)
+            {
+                uniqueKeys.Add(new DbTableUniqueKeyAttribute(uniqueKeyProps.ToArray()));
+            }
+
+            if (uniqueKeys?.Count == 1 && uniqueKeys[0].PropertyNames.Length == 1)
+            {
+                SingleColumnUniqueKey = this.FindColumn(uniqueKeys[0].PropertyNames[0]);
+            }
+
+            if (foreignKeyFields != null)
+            {
+                foreach (var item in foreignKeyFields)
+                {
+                    var propertyNames = new List<string>();
+                    foreach (var rel in item.Value)
+                    {
+                        propertyNames.Add(rel.PropertyName);
+                    }
+
+                    var attr = new DbTableForeignKeyAttribute(item.Key, propertyNames.ToArray());
+                    foreignKeys.Add(attr);
+                }
             }
         }
 
         /// <summary>
-        /// Resolve a multi column foreign key.
+        /// Calculate binding.
         /// </summary>
-        private void ResolveForeignKey(IDbTableForeignKeyAttribute fk)
+        internal void ResolveBinding()
         {
-            var binding = Setup.GetTableBinding(fk.ForeignTableTemplate);
-
-            if (binding.PrimaryKey == null)
-            {
-                throw new ArgumentException($"Invalid foreign key definition in table [{TableName}], remote table has no primary key");
-            }
-
-            if (binding.PrimaryKey.FieldNames.Length != fk.FieldNames.Length)
-            {
-                throw new ArgumentException($"Invalid foreign key definition in table [{TableName}], local fields count [{fk.FieldNames.Length}] do not match with foreign fields count [{binding.PrimaryKey.FieldNames.Length}]");
-            }
-
-            var foreignTable = binding.TableName;
-            var foreignColumns = new List<string>();
-
-            foreach (var colName in binding.PrimaryKey.FieldNames)
-            {
-                var colBinding = binding.FindColumn(colName);
-                foreignColumns.Add(Setup.Naming.GetColumnName(foreignTable, colBinding.PropertyInfo, colBinding.FieldName));
-            }
-
-            fk.ForeignTable = foreignTable;
-            fk.ForeignColumns = foreignColumns.ToArray();
+            columnBindings.ForEach(col => col.CalcBindingMode());
         }
     }
 }

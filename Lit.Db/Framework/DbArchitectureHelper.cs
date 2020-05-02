@@ -53,5 +53,34 @@ namespace Lit.Db.Framework
                     throw new NotImplementedException($"Stored procedure func {spFunc}");
             }
         }
+
+        /// <summary>
+        /// Get parameters selection for a table stored procedure.
+        /// </summary>
+        public static DbColumnsSelection GetTableSpParameters(StoredProcedureFunction spFunc)
+        {
+            switch (spFunc)
+            {
+                case StoredProcedureFunction.Get:
+                case StoredProcedureFunction.Delete:
+                    return DbColumnsSelection.PrimaryKey;
+
+                case StoredProcedureFunction.Find:
+                    return DbColumnsSelection.UniqueKey;
+
+                case StoredProcedureFunction.ListAll:
+                    return DbColumnsSelection.None;
+
+                case StoredProcedureFunction.Insert:
+                    return DbColumnsSelection.NonPrimaryKey;
+
+                case StoredProcedureFunction.Update:
+                case StoredProcedureFunction.Store:
+                    return DbColumnsSelection.All;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

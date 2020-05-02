@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace Lit.Db
+﻿namespace Lit.Db
 {
     /// <summary>
     /// Db parameter binding interface.
@@ -11,20 +9,5 @@ namespace Lit.Db
         /// Name of the standard stored procedure parameter.
         /// </summary>
         string SpParamName { get; }
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        void SetInputParameters(ref string text, object instance);
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        void SetInputParameters(DbCommand cmd, object instance);
-
-        /// <summary>
-        /// Get output parameters.
-        /// </summary>
-        void GetOutputParameters(DbCommand cmd, object instance);
     }
 }

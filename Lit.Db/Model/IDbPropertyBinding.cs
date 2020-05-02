@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using System;
 using Lit.DataType;
 
 namespace Lit.Db
@@ -9,9 +9,9 @@ namespace Lit.Db
     public interface IDbPropertyBinding<TA> : IPropertyBinding
     {
         /// <summary>
-        /// Property information.
+        /// Property name.
         /// </summary>
-        PropertyInfo PropertyInfo { get; }
+        string PropertyName { get; }
 
         /// <summary>
         /// Database data type.
@@ -22,5 +22,15 @@ namespace Lit.Db
         /// Attributes.
         /// </summary>
         TA Attributes { get; }
+
+        /// <summary>
+        /// Foreign key property flag.
+        /// </summary>
+        bool IsForeignKeyProp { get; }
+
+        /// <summary>
+        /// Primary table template (when this property is a foreign key).
+        /// </summary>
+        Type PrimaryTableTemplate { get; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 
 namespace Lit.Db
 {
@@ -9,24 +8,19 @@ namespace Lit.Db
     public interface IDbColumnBinding : IDbPropertyBinding<DbColumnAttribute>
     {
         /// <summary>
-        /// Field name.
+        /// Column name.
         /// </summary>
-        string FieldName { get; }
+        string ColumnName { get; }
 
         /// <summary>
-        /// Field type.
+        /// Column type.
         /// </summary>
-        Type FieldType { get; }
+        Type ColumnType { get; }
 
         /// <summary>
-        /// Field size.
+        /// Column size.
         /// </summary>
-        ulong? FieldSize { get; }
-
-        /// <summary>
-        /// Nullable flag.
-        /// </summary>
-        bool IsNullable { get; }
+        ulong? ColumnSize { get; }
 
         /// <summary>
         /// Key constraint.
@@ -39,33 +33,8 @@ namespace Lit.Db
         bool IsAutoIncrement { get; }
 
         /// <summary>
-        /// Foreign table.
-        /// </summary>
-        string ForeignTable { get; }
-
-        /// <summary>
-        /// Foreign column.
-        /// </summary>
-        string ForeignColumn { get; }
-
-        /// <summary>
         /// Name of the standard stored procedure parameter.
         /// </summary>
         string SpParamName { get; }
-
-        /// <summary>
-        /// Assign foreign key.
-        /// </summary>
-        void AssignForeignKey(string foreignTable, string foreignColumn);
-
-        /// <summary>
-        /// Get output field.
-        /// </summary>
-        void GetOutputField(DbDataReader reader, object instance);
-
-        /// <summary>
-        /// Assigns input parameters.
-        /// </summary>
-        void SetInputParameters(DbCommand cmd, object instance);
     }
 }

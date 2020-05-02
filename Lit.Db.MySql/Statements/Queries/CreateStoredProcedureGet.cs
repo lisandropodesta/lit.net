@@ -36,13 +36,13 @@ namespace Lit.Db.MySql.Statements.Queries
 
             if (function == StoredProcedureFunction.Find)
             {
-                filterCol = binding.FindFirstColumn(DbColumnsSelection.UniqueKey);
+                filterCol = binding.SingleColumnUniqueKey;
                 if (filterCol == null)
                 {
                     throw new ArgumentException($"Invalid unique key in table template [{tableTemplate.FullName}]");
                 }
 
-                FilterField = filterCol.FieldName;
+                FilterField = filterCol.ColumnName;
                 FilterParam = filterCol.SpParamName;
             }
 
