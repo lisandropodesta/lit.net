@@ -4,7 +4,7 @@ namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
     [MySqlTable(Engine.Memory, "latin1")]
-    public class StatusConnection
+    public class StatusConnection : DbRecordBase
     {
         [DbPrimaryKey]
         public int IdConnection { get; protected set; }

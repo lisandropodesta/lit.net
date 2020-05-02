@@ -5,10 +5,13 @@ namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
     [MySqlTable("latin1")]
-    public class User : IDbStringCode
+    public class User : DbRecordBase, IDbStringCode
     {
         [DbPrimaryKey]
         public int IdUser { get; set; }
+
+        [DbColumn(IsNullable = true)]
+        public IDbForeignKeyRef<User> IdRefereeUser { get; set; }
 
         [DbColumn]
         public Status Status { get; set; }

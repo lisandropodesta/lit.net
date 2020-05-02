@@ -1,8 +1,8 @@
-﻿using Lit.Auditing;
+﻿using System;
+using System.Collections.Generic;
+using Lit.Auditing;
 using Lit.Db.Test.Schema;
 using Lit.Db.Test.Schema.Tables;
-using System;
-using System.Collections.Generic;
 
 namespace Lit.Db.Test.Common
 {
@@ -25,13 +25,17 @@ namespace Lit.Db.Test.Common
             user.NickName = "j0hn";
             user.Status = Status.Hold;
             db.Update(user);
+            var idFirstUser = user.IdUser;
 
             user = new User
             {
                 FullName = "Mick Doe",
                 NickName = "mck",
+                IdRefereeUser = DbHelper.CreateKey<User>(db, idFirstUser, true),
                 Status = Status.Active
             };
+
+            Assert(user.IdRefereeUser.Record.IdUser == idFirstUser);
 
             db.Store(user);
             Assert(user.IdUser > 0);
@@ -49,7 +53,7 @@ namespace Lit.Db.Test.Common
             var userList = db.List<User>();
             foreach (var u in userList)
             {
-                Audit.Message($"  IdUser={u.IdUser}, Status={u.Status}, NickName={u.NickName}, FullName={u.FullName}");
+                Audit.Message($"  IdUser={u.IdUser}, Status={u.Status}, NickName={u.NickName}, FullName={u.FullName}, IdRefereeUser={u.IdRefereeUser}");
             }
 
 

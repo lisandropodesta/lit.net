@@ -4,7 +4,7 @@
     [DbTablePrimaryKey(nameof(Id), nameof(IdTagCategory))]
     [DbTableForeignKey(typeof(Tag), nameof(IdParentTag), nameof(IdTagCategory))]
     [DbTableUniqueKey(nameof(IdParentTag), nameof(Name))]
-    public class Tag
+    public class Tag : DbRecordBase
     {
         [DbColumn(AutoIncrement = true)]
         public long Id { get; set; }

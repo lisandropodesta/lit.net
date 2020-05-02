@@ -33,6 +33,8 @@ namespace Lit.Db.Test.Common
 
         private static void CreateAllStoredProcedures(IDbArchitecture db, Type tableTemplate)
         {
+            Audit.Message($"\n    ** Table [{tableTemplate.Name}] **");
+
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Get);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Find);
             CreateStoredProcedure(db, tableTemplate, StoredProcedureFunction.Insert);
@@ -44,17 +46,17 @@ namespace Lit.Db.Test.Common
 
         private static void CreateStoredProcedure(IDbArchitecture db, Type tableTemplate, StoredProcedureFunction function)
         {
-            Audit.Message($"\n   ** Creating table function [{function}] **");
+            Audit.Message($"\n    ** Creating table function [{function}] **");
 
             db.DropStoredProcedure(tableTemplate, function, true);
 
-            try
+            if (function == StoredProcedureFunction.Find && db.Setup.GetTableBinding(tableTemplate).SingleColumnUniqueKey == null)
+            {
+                Audit.Message($"\n    SKIPPED");
+            }
+            else
             {
                 db.CreateStoredProcedure(tableTemplate, function);
-            }
-            catch (Exception x)
-            {
-                Audit.Error($"Error: {x.Message}.");
             }
         }
     }

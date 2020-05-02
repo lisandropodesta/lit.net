@@ -6,7 +6,7 @@ namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
     [MySqlTable("latin1")]
-    public class UserSession
+    public class UserSession : DbRecordBase
     {
         [DbPrimaryKey]
         public long IdUserSession { get; set; }

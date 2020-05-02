@@ -1,7 +1,7 @@
 ﻿namespace Lit.Db.Test.Schema.Tables
 {
     [DbTable]
-    public class TagCategory
+    public class TagCategory : DbRecordBase
     {
         [DbPrimaryKey]
         public short Id { get; set; }

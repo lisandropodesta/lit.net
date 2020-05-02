@@ -8,7 +8,7 @@ namespace Lit.Db.Test.Schema.Tables
     [DbTableForeignKey(typeof(Folder), nameof(IdParentFolder), nameof(ParentRelease))]
     [DbTableUniqueKey(nameof(IdUser), nameof(IdParentFolder), nameof(Name))]
     [DbTableIndex(nameof(Name))]
-    public class Folder
+    public class Folder : DbRecordBase
     {
         [DbColumn]
         public int IdFolder { get; set; }
