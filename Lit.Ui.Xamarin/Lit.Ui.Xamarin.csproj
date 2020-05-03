@@ -9,6 +9,8 @@
     <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Version>1.0.1.10</Version>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

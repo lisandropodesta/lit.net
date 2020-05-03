@@ -15,6 +15,8 @@
     <RepositoryType>git</RepositoryType>
     <Copyright>Lisandro Podesta</Copyright>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <PropertyGroup>

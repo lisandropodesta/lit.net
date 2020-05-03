@@ -11,6 +11,8 @@
     <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
     <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
