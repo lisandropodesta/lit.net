@@ -21,51 +21,51 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Publish Lit.Common nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Common\Lit.Common.csproj
 
     - name: Publish Lit.Names nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Names\Lit.Names.csproj
 
     - name: Publish Lit.Os.Win nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Os.Win\Lit.Os.Win.csproj
 
     - name: Publish Lit.Auditing nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Auditing\Lit.Auditing.csproj
 
     - name: Publish Lit.Auditing.NLog nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Auditing.NLog\Lit.Auditing.NLog.csproj
 
     - name: Publish Lit.Db nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Db\Lit.Db.csproj
 
     - name: Publish Lit.Db.MySql nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Db.MySql\Lit.Db.MySql.csproj
 
     - name: Publish Lit.Db.Sql nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Db.Sql\Lit.Db.Sql.csproj
 
     - name: Publish Lit.Ui nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Ui\Lit.Ui.csproj
 
     - name: Publish Lit.Ui.Wpf nuget packages
-      uses: lisandropodesta/publish-nuget@v2
+      uses: lisandropodesta/publish-nuget
       with:
         PROJECT_FILE_PATH: Lit.Ui.Wpf\Lit.Ui.Wpf.csproj
