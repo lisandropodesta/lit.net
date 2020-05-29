@@ -54,6 +54,8 @@ namespace Lit.Db
         public DbColumnBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbColumnAttribute attr)
             : base(binding, propInfo, attr)
         {
+            GetKeyConstraints();
+
             var setup = binding.Setup;
             ColumnName = setup.Naming.GetColumnName((binding as IDbTableBinding)?.TableName, propInfo, Attributes.DbName);
             ColumnSize = attr.Size;
@@ -64,7 +66,16 @@ namespace Lit.Db
             }
 
             SpParamName = setup.Naming.GetParameterName(propInfo.Name, ColumnName, null);
+        }
 
+        #endregion
+
+        /// <summary>
+        /// Get key constraints.
+        /// </summary>
+        private void GetKeyConstraints()
+        {
+            var attr = Attributes;
             if (attr is DbPrimaryKeyAttribute)
             {
                 if (IsNullable)
@@ -104,7 +115,5 @@ namespace Lit.Db
                 KeyConstraint = DbKeyConstraint.None;
             }
         }
-
-        #endregion
    }
 }

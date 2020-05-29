@@ -31,11 +31,11 @@ namespace Lit.Db.Test.Common
             {
                 FullName = "Mick Doe",
                 NickName = "mck",
-                IdRefereeUser = DbHelper.CreateKey<User>(db, idFirstUser, true),
+                RefereeUser = DbHelper.CreateKey<User>(db, idFirstUser, true),
                 Status = Status.Active
             };
 
-            Assert(user.IdRefereeUser.Record.IdUser == idFirstUser);
+            Assert(user.RefereeUser.Record.IdUser == idFirstUser);
 
             db.Store(user);
             Assert(user.IdUser > 0);
@@ -53,7 +53,7 @@ namespace Lit.Db.Test.Common
             var userList = db.List<User>();
             foreach (var u in userList)
             {
-                Audit.Message($"  IdUser={u.IdUser}, Status={u.Status}, NickName={u.NickName}, FullName={u.FullName}, IdRefereeUser={u.IdRefereeUser}");
+                Audit.Message($"  IdUser={u.IdUser}, Status={u.Status}, NickName={u.NickName}, FullName={u.FullName}, IdRefereeUser={u.RefereeUser}");
             }
 
 

@@ -10,8 +10,8 @@ namespace Lit.Db.Test.Schema.Tables
         [DbPrimaryKey]
         public int IdUser { get; set; }
 
-        [DbColumn(IsNullable = true)]
-        public IDbForeignKeyRef<User> IdRefereeUser { get; set; }
+        [DbColumn("Id" + nameof(RefereeUser), IsNullable = true)]
+        public IDbForeignKeyRef<User> RefereeUser { get; set; }
 
         [DbColumn]
         public Status Status { get; set; }

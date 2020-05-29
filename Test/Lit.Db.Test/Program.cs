@@ -10,7 +10,7 @@ namespace Lit.Db.Test
     {
         private static readonly string testingConnectionStr = "server=localhost; port=3306; database=litdb-testing; uid=lisandro; pwd=lisandro_testing";
 
-        private static readonly IDbNaming naming = new MySqlDefaultNaming();
+        private static readonly IDbNaming naming = new MySqlDefaultNaming() { Scope = DbNaming.Translation.All };
 
         private static readonly IDbTranslation translation = new MySqlDefaultTranslation();
 
