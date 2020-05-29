@@ -23,11 +23,6 @@ namespace Lit.Db
         ulong? ColumnSize { get; }
 
         /// <summary>
-        /// Key constraint.
-        /// </summary>
-        DbKeyConstraint KeyConstraint { get; }
-
-        /// <summary>
         /// Auto increment flag.
         /// </summary>
         bool IsAutoIncrement { get; }

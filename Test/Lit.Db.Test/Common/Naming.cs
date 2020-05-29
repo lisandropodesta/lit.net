@@ -10,7 +10,7 @@ namespace Lit.Db.Test.Common
         {
             foreach (var i in itemList)
             {
-                var text = Name.Format(i.Text, i.Case, i.Id, "id");
+                var text = Name.Format(i.Text, i.Case, i.Id, false, "id");
                 Audit.Message($"  Translated [{i.Text}] into [{text}], with case={i.Case} and ids={i.Id}");
                 if (text != i.ExpectedResult)
                 {

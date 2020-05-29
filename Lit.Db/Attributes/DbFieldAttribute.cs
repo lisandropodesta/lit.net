@@ -42,6 +42,7 @@ namespace Lit.Db
         public DbFieldAttribute(DbColumnAttribute colAttr)
         {
             name = colAttr.DbName;
+            isOptional = true;
             IsNullableForced = colAttr.IsNullableForced;
         }
 

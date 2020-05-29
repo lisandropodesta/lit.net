@@ -41,6 +41,11 @@ namespace Lit.Db
         private Type foreignKeyPropType;
 
         /// <summary>
+        /// Key constraint.
+        /// </summary>
+        public DbKeyConstraint KeyConstraint { get; private set; }
+
+        /// <summary>
         /// Primary table template (when this property is a foreign key).
         /// </summary>
         public Type PrimaryTableTemplate { get; protected set; }
@@ -62,9 +67,55 @@ namespace Lit.Db
 
             PrimaryTableTemplate = DbHelper.GetForeignKeyPropType(PropertyInfo.PropertyType);
             IsForeignKeyProp = PrimaryTableTemplate != null;
+            GetKeyConstraints(attr);
         }
 
         #endregion
+
+        /// <summary>
+        /// Get key constraints.
+        /// </summary>
+        private void GetKeyConstraints(TA attr)
+        {
+            if (attr is DbPrimaryKeyAttribute)
+            {
+                if (IsNullable)
+                {
+                    throw new ArgumentException($"Primary key can not be nullable on property [{PropertyInfo.DeclaringType.Namespace}.{PropertyInfo.DeclaringType.Name}.{PropertyInfo.Name}]");
+                }
+
+                if (attr is DbPrimaryAndForeignKeyAttribute pfk)
+                {
+                    KeyConstraint = DbKeyConstraint.PrimaryForeignKey;
+                    PrimaryTableTemplate = pfk.PrimaryTableTemplate;
+                }
+                else if (IsForeignKeyProp)
+                {
+                    KeyConstraint = DbKeyConstraint.ForeignKey;
+                }
+                else
+                {
+                    KeyConstraint = DbKeyConstraint.PrimaryKey;
+                }
+            }
+            else if (attr is DbForeignKeyAttribute fk)
+            {
+                KeyConstraint = DbKeyConstraint.ForeignKey;
+                PrimaryTableTemplate = fk.PrimaryTableTemplate;
+            }
+            else if (IsForeignKeyProp)
+            {
+                KeyConstraint = DbKeyConstraint.ForeignKey;
+            }
+            else if (attr is DbUniqueKeyAttribute)
+            {
+                KeyConstraint = DbKeyConstraint.UniqueKey;
+            }
+            else
+            {
+                KeyConstraint = DbKeyConstraint.None;
+            }
+        }
 
         /// <summary>
         /// Get the binding mode.

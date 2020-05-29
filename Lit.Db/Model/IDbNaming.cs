@@ -12,12 +12,17 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        string GetParameterName(string reflectionName, string columnName, string parameterName);
+        string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, DbKeyConstraint constraint = DbKeyConstraint.None);
 
         /// <summary>
         /// Gets a field name.
         /// </summary>
-        string GetFieldName(string reflectionName, string fieldName);
+        string GetFieldName(PropertyInfo propInfo, string fieldName, DbKeyConstraint constraint = DbKeyConstraint.None);
+
+        /// <summary>
+        /// Gets a table column name.
+        /// </summary>
+        string GetColumnName(string tableName, PropertyInfo propInfo, string columnName, DbKeyConstraint constraint = DbKeyConstraint.None);
 
         /// <summary>
         /// Gets a stored procedure name.
@@ -33,10 +38,5 @@ namespace Lit.Db
         /// Gets a table name.
         /// </summary>
         string GetTableName(Type tableType, string tableName);
-
-        /// <summary>
-        /// Gets a table column name.
-        /// </summary>
-        string GetColumnName(string tableName, PropertyInfo propInfo, string fieldName);
     }
 }

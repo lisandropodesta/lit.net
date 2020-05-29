@@ -11,7 +11,7 @@ namespace Lit.Names
         /// <summary>
         /// Formats a name.
         /// </summary>
-        public static string Format(string name, Case namingCase, AffixPlacing affixPlacing, params string[] affixes)
+        public static string Format(string name, Case namingCase, AffixPlacing affixPlacing, bool forceId, params string[] affixes)
         {
             var words = SplitInWords(name, namingCase);
             var count = words.Length;
@@ -36,18 +36,34 @@ namespace Lit.Names
                         break;
 
                     case AffixPlacing.Prefix:
-                        if (i < 0 && j >= 0)
+                        if (i < 0)
                         {
-                            startIndex = count - 1;
-                            words[startIndex] = affixes[j];
+                            if (j >= 0)
+                            {
+                                startIndex = count - 1;
+                                words[startIndex] = affixes[j];
+                            }
+                            else if (forceId)
+                            {
+                                Array.Resize(ref words, ++count);
+                                words[startIndex = count - 1] = affixes[0];
+                            }
                         }
                         break;
 
                     case AffixPlacing.Sufix:
-                        if (i >= 0 && j < 0)
+                        if (j < 0)
                         {
-                            startIndex = 1;
-                            words[0] = affixes[i];
+                            if (i >= 0)
+                            {
+                                startIndex = 1;
+                                words[0] = affixes[i];
+                            }
+                            else if (forceId)
+                            {
+                                Array.Resize(ref words, ++count);
+                                words[count - 1] = affixes[0];
+                            }
                         }
                         break;
 
@@ -59,6 +75,10 @@ namespace Lit.Names
                         if (j >= 0)
                         {
                             return affixes[j];
+                        }
+                        if (forceId)
+                        {
+                            return affixes[0];
                         }
                         break;
                 }

@@ -29,6 +29,11 @@ namespace Lit.Db
         bool IsForeignKeyProp { get; }
 
         /// <summary>
+        /// Key constraint.
+        /// </summary>
+        DbKeyConstraint KeyConstraint { get; }
+
+        /// <summary>
         /// Primary table template (when this property is a foreign key).
         /// </summary>
         Type PrimaryTableTemplate { get; }

@@ -24,7 +24,7 @@ namespace Lit.Db
         public DbParameterBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbParameterAttribute attr)
             : base(binding, propInfo, attr)
         {
-            SpParamName = binding.Setup.Naming.GetParameterName(propInfo.Name, null, Attributes.ParameterName);
+            SpParamName = binding.Setup.Naming.GetParameterName(propInfo, null, Attributes.ParameterName);
 
             if (string.IsNullOrEmpty(SpParamName))
             {

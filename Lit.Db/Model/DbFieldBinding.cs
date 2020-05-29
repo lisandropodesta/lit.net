@@ -34,7 +34,7 @@ namespace Lit.Db
         public DbFieldBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbFieldAttribute attr)
             : base(binding, propInfo, attr)
         {
-            FieldName = binding.Setup.Naming.GetFieldName(propInfo.Name, Attributes.DbName);
+            FieldName = binding.Setup.Naming.GetFieldName(propInfo, Attributes.DbName, KeyConstraint);
 
             if (string.IsNullOrEmpty(FieldName))
             {

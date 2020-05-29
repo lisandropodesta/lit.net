@@ -7,6 +7,9 @@ namespace Lit.Db.Sql
     /// </summary>
     public class SqlDefaultNaming : DbNaming
     {
-        public SqlDefaultNaming() : base(AffixPlacing.Prefix, Case.Pascal, "Id") { }
+        public SqlDefaultNaming() : base(AffixPlacing.Prefix, Case.Pascal, "Id")
+        {
+            ForceIdOnKeyColumn = true;
+        }
     }
 }

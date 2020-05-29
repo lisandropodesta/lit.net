@@ -82,6 +82,11 @@ namespace Lit.Db
         public AffixPlacing IdPlacing;
 
         /// <summary>
+        /// Forces id on primary/foreign key columns.
+        /// </summary>
+        public bool ForceIdOnKeyColumn;
+
+        /// <summary>
         /// Stored procedure affix.
         /// </summary>
         public AffixPlacing StoredProcedureAffix;
@@ -126,17 +131,47 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        public virtual string GetParameterName(string reflectionName, string columnName, string parameterName)
+        public virtual string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, DbKeyConstraint constraint = DbKeyConstraint.None)
         {
-            return TranslateName(TextSource, Scope, reflectionName, parameterName ?? columnName, ParametersCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, propInfo?.Name, parameterName ?? columnName, ParametersCase, constraint, IdPlacing, IdText);
         }
 
         /// <summary>
         /// Gets a field name.
         /// </summary>
-        public virtual string GetFieldName(string reflectionName, string fieldName)
+        public virtual string GetFieldName(PropertyInfo propInfo, string fieldName, DbKeyConstraint constraint = DbKeyConstraint.None)
         {
-            return TranslateName(TextSource, Scope, reflectionName, fieldName, FieldsCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, propInfo?.Name, fieldName, FieldsCase, constraint, IdPlacing, IdText);
+        }
+
+        /// <summary>
+        /// Gets a table column name.
+        /// </summary>
+        public virtual string GetColumnName(string tableName, PropertyInfo propInfo, string columnName, DbKeyConstraint constraint = DbKeyConstraint.None)
+        {
+            return TranslateName(TextSource, Scope, propInfo.Name, columnName, FieldsCase, constraint, IdPlacing, IdText);
+        }
+
+        /// <summary>
+        /// Translates a name.
+        /// </summary>
+        protected virtual string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, DbKeyConstraint constraint, AffixPlacing idPlacing, params string[] affixes)
+        {
+            bool forceId;
+            switch (constraint)
+            {
+                case DbKeyConstraint.PrimaryKey:
+                case DbKeyConstraint.PrimaryForeignKey:
+                case DbKeyConstraint.ForeignKey:
+                    forceId = ForceIdOnKeyColumn;
+                    break;
+
+                default:
+                    forceId = false;
+                    break;
+            }
+
+            return TranslateName(source, scope, reflectionName, configurationName, namingCase, forceId, idPlacing, affixes);
         }
 
         /// <summary>
@@ -144,7 +179,7 @@ namespace Lit.Db
         /// </summary>
         public virtual string GetStoredProcedureName(Type template, string spName)
         {
-            return TranslateName(TextSource, Scope, template.Name, spName, StoredProceduresCase, AffixPlacing.DoNotChange, null);
+            return TranslateName(TextSource, Scope, template.Name, spName, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
@@ -170,7 +205,7 @@ namespace Lit.Db
                     break;
             }
 
-            return TranslateName(TextSource, Scope, null, name, StoredProceduresCase, AffixPlacing.DoNotChange, null);
+            return TranslateName(TextSource, Scope, null, name, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
@@ -186,21 +221,13 @@ namespace Lit.Db
         /// </summary>
         public virtual string GetTableName(Type template, string tableName)
         {
-            return TranslateName(TextSource, Scope, template.Name, tableName, TablesCase, AffixPlacing.DoNotChange, null);
-        }
-
-        /// <summary>
-        /// Gets a table column name.
-        /// </summary>
-        public virtual string GetColumnName(string tableName, PropertyInfo propInfo, string fieldName)
-        {
-            return TranslateName(TextSource, Scope, propInfo.Name, fieldName, FieldsCase, IdPlacing, IdText);
+            return TranslateName(TextSource, Scope, template.Name, tableName, TablesCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
         /// Translates a name.
         /// </summary>
-        public static string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, AffixPlacing idPlacing, params string[] affixes)
+        public static string TranslateName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, bool forceId, AffixPlacing idPlacing, params string[] affixes)
         {
             string name;
 
@@ -233,7 +260,7 @@ namespace Lit.Db
                 || scope == Translation.Configuration && source == Source.Configuration
                 || scope == Translation.Reflection && source == Source.Reflection)
             {
-                name = Name.Format(name, namingCase, idPlacing, affixes);
+                name = Name.Format(name, namingCase, idPlacing, forceId, affixes);
             }
 
             return name;

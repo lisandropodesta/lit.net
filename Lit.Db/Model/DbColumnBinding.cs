@@ -30,11 +30,6 @@ namespace Lit.Db
         public ulong? ColumnSize { get; private set; }
 
         /// <summary>
-        /// Key constraint.
-        /// </summary>
-        public DbKeyConstraint KeyConstraint { get; private set; }
-
-        /// <summary>
         /// Auto increment flag.
         /// </summary>
         public bool IsAutoIncrement => Attributes.AutoIncrement;
@@ -54,10 +49,8 @@ namespace Lit.Db
         public DbColumnBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbColumnAttribute attr)
             : base(binding, propInfo, attr)
         {
-            GetKeyConstraints();
-
             var setup = binding.Setup;
-            ColumnName = setup.Naming.GetColumnName((binding as IDbTableBinding)?.TableName, propInfo, Attributes.DbName);
+            ColumnName = setup.Naming.GetColumnName((binding as IDbTableBinding)?.TableName, propInfo, Attributes.DbName, KeyConstraint);
             ColumnSize = attr.Size;
 
             if (string.IsNullOrEmpty(ColumnName))
@@ -65,55 +58,9 @@ namespace Lit.Db
                 throw new ArgumentException($"Null field name in DbColumnBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
 
-            SpParamName = setup.Naming.GetParameterName(propInfo.Name, ColumnName, null);
+            SpParamName = setup.Naming.GetParameterName(propInfo, ColumnName, null, KeyConstraint);
         }
 
         #endregion
-
-        /// <summary>
-        /// Get key constraints.
-        /// </summary>
-        private void GetKeyConstraints()
-        {
-            var attr = Attributes;
-            if (attr is DbPrimaryKeyAttribute)
-            {
-                if (IsNullable)
-                {
-                    throw new ArgumentException($"Primary key can not be nullable on property [{PropertyInfo.DeclaringType.Namespace}.{PropertyInfo.DeclaringType.Name}.{PropertyInfo.Name}]");
-                }
-
-                if (attr is DbPrimaryAndForeignKeyAttribute pfk)
-                {
-                    KeyConstraint = DbKeyConstraint.PrimaryForeignKey;
-                    PrimaryTableTemplate = pfk.PrimaryTableTemplate;
-                }
-                else if (IsForeignKeyProp)
-                {
-                    KeyConstraint = DbKeyConstraint.ForeignKey;
-                }
-                else
-                {
-                    KeyConstraint = DbKeyConstraint.PrimaryKey;
-                }
-            }
-            else if (attr is DbForeignKeyAttribute fk)
-            {
-                KeyConstraint = DbKeyConstraint.ForeignKey;
-                PrimaryTableTemplate = fk.PrimaryTableTemplate;
-            }
-            else if (IsForeignKeyProp)
-            {
-                KeyConstraint = DbKeyConstraint.ForeignKey;
-            }
-            else if (attr is DbUniqueKeyAttribute)
-            {
-                KeyConstraint = DbKeyConstraint.UniqueKey;
-            }
-            else
-            {
-                KeyConstraint = DbKeyConstraint.None;
-            }
-        }
-   }
+    }
 }
