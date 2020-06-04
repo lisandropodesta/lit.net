@@ -17,19 +17,21 @@ namespace Lit.Names
             var count = words.Length;
 
             var startIndex = 0;
-            if (count > 1 && affixPlacing != AffixPlacing.DoNotChange && affixes?.Length > 0)
+            if (count > 0 && affixPlacing != AffixPlacing.DoNotChange && affixes?.Length > 0)
             {
                 var i = IndexOf(affixes, words[0]);
-                var j = IndexOf(affixes, words[count - 1]);
+                var j = count > 1 ? IndexOf(affixes, words[count - 1]) : -1;
 
                 switch (affixPlacing)
                 {
                     case AffixPlacing.DoNotPlace:
-                        if (i >= 0)
+                        var remainingCount = count;
+                        if (i >= 0 && remainingCount > 1)
                         {
                             words[0] = string.Empty;
+                            remainingCount--;
                         }
-                        if (j >= 0)
+                        if (j >= 0 && remainingCount > 1)
                         {
                             words[count - 1] = string.Empty;
                         }
