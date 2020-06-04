@@ -34,6 +34,8 @@ namespace Lit.Db
                         }
                     }
 
+                    value = value.Replace("\t", "  ");
+
                     query = leftPart + value + rightPart;
                     found = true;
                 }
