@@ -148,14 +148,11 @@ namespace Lit.Db
             {
                 foreach (var item in foreignKeyFields)
                 {
-                    var propertyNames = new List<string>();
                     foreach (var rel in item.Value)
                     {
-                        propertyNames.Add(rel.PropertyName);
+                        var attr = new DbTableForeignKeyAttribute(item.Key, rel.PropertyName);
+                        foreignKeys.Add(attr);
                     }
-
-                    var attr = new DbTableForeignKeyAttribute(item.Key, propertyNames.ToArray());
-                    foreignKeys.Add(attr);
                 }
             }
         }
