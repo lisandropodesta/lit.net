@@ -13,6 +13,11 @@ namespace Lit.Db
         where TA : Attribute
     {
         /// <summary>
+        /// Database setup.
+        /// </summary>
+        public IDbSetup Setup { get; private set; }
+
+        /// <summary>
         /// Values translation (to/from db).
         /// </summary>
         protected abstract bool ValuesTranslation { get; }
@@ -50,8 +55,6 @@ namespace Lit.Db
         /// </summary>
         public Type PrimaryTableTemplate { get; protected set; }
 
-        protected readonly IDbSetup Setup;
-
         /// <summary>
         /// Forced IsNullable value.
         /// </summary>
@@ -59,8 +62,8 @@ namespace Lit.Db
 
         #region Constructor
 
-        protected DbPropertyBinding(IDbTemplateBinding binding, PropertyInfo propInfo, TA attr)
-            : base(propInfo, true, true)
+        protected DbPropertyBinding(IDbTemplateBinding binding, PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
+            : base(propInfo, getterRequired, setterRequired)
         {
             this.Setup = binding.Setup;
             this.Attributes = attr;

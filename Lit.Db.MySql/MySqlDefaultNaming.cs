@@ -13,14 +13,29 @@ namespace Lit.Db.MySql
             ForceIdOnKeyColumn = true;
         }
 
-        public override string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, DbKeyConstraint constraint = DbKeyConstraint.None)
+        public override string GetSqlTableName(string name)
+        {
+            return "`" + name + "`";
+        }
+
+        public override string GetSqlSpName(string name)
+        {
+            return "`" + name + "`";
+        }
+
+        public override string GetSqlColumnName(string name)
+        {
+            return "`" + name + "`";
+        }
+
+        public override string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, bool doNotTranslate = false, DbKeyConstraint constraint = DbKeyConstraint.None)
         {
             if (string.IsNullOrEmpty(parameterName))
             {
-                parameterName = "p_" + (columnName ?? propInfo.Name);
+                parameterName = (doNotTranslate ? string.Empty : "p_") + (columnName ?? propInfo.Name);
             }
 
-            return base.GetParameterName(null, null, parameterName);
+            return base.GetParameterName(null, null, parameterName, doNotTranslate, constraint);
         }
     }
 }

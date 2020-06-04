@@ -32,7 +32,7 @@ namespace Lit.Db
         #region Constructor
 
         public DbFieldBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbFieldAttribute attr)
-            : base(binding, propInfo, attr)
+            : base(binding, propInfo, attr, false, true)
         {
             FieldName = binding.Setup.Naming.GetFieldName(propInfo, Attributes.DbName, KeyConstraint);
 

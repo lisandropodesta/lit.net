@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using Lit.Db.Framework;
 
 namespace Lit.Db
@@ -12,6 +13,14 @@ namespace Lit.Db
         #region IDbTableBinding general
 
         /// <summary>
+        /// Gets a table name.
+        /// </summary>
+        public static string GetSqlTableName(this IDbTableBinding table)
+        {
+            return table.Setup.Naming.GetSqlTableName(table.TableName);
+        }
+
+        /// <summary>
         /// Get table stored procedure name.
         /// </summary>
         public static string GetTableSpName(this IDbTableBinding binding, StoredProcedureFunction spFunc)
@@ -19,6 +28,14 @@ namespace Lit.Db
             return binding.Setup.Naming.GetStoredProcedureName(binding.TableName, spFunc);
         }
 
+        /// <summary>
+        /// Get table stored procedure name as needed to be included in a SQL sentence.
+        /// </summary>
+        public static string GetSqlTableSpName(this IDbTableBinding binding, StoredProcedureFunction spFunc)
+        {
+            var spName = binding.GetTableSpName(spFunc);
+            return binding.Setup.Naming.GetSqlSpName(spName);
+        }
         /// <summary>
         /// Check constraints consistency.
         /// </summary>
@@ -46,6 +63,20 @@ namespace Lit.Db
         }
 
         /// <summary>
+        /// Get a column binding.
+        /// </summary>
+        public static IDbColumnBinding GetColumn(this IDbTableBinding binding, string propertyName)
+        {
+            var col = binding.FindColumn(propertyName);
+            if (col == null)
+            {
+                throw new ArgumentException($"Invalid column {propertyName} in table [{binding.TableName}]");
+            }
+
+            return col;
+        }
+
+        /// <summary>
         /// Finds a column binding.
         /// </summary>
         public static IDbColumnBinding FindColumn(this IDbTableBinding binding, string propertyName)
@@ -56,49 +87,40 @@ namespace Lit.Db
         /// <summary>
         /// Get the list of columns defined in a key.
         /// </summary>
-        public static string GetKeyColumns(this IDbTableBinding binding, IDbTableKeyAttribute key, string separator, string surround = null)
+        public static string AggregateText(this IDbTableBinding binding, IDbTableKeyAttribute key, string separator, Func<IDbColumnBinding, string> action)
         {
-            return binding.GetColumnNames(key.PropertyNames, separator, surround);
-        }
-
-        /// <summary>
-        /// Get foreign key information.
-        /// </summary>
-        public static string GetPrimaryColumns(this IDbTableBinding binding, out string tableName, IDbTableForeignKeyAttribute fk, string separator, string surround = null)
-        {
-            binding = binding.Setup.GetTableBinding(fk.PrimaryTableTemplate);
-            tableName = binding.TableName;
-            return binding.GetColumnNames(binding.PrimaryKey.PropertyNames, separator, surround);
+            return binding.AggregateText(key.PropertyNames, separator, action);
         }
 
         /// <summary>
         /// Get an array of column names.
         /// </summary>
-        public static string GetColumnNames(this IDbTableBinding binding, string[] propertyNames, string separator, string surround = null)
+        public static string AggregateText(this IDbTableBinding binding, string[] propertyNames, string separator, Func<IDbColumnBinding, string> action)
         {
-            var text = string.Empty;
-            binding.MapColumnNames(propertyNames, col =>
-            {
-                text += (!string.IsNullOrEmpty(text) ? separator : string.Empty) + surround + col.ColumnName + surround;
-            });
-            return text;
+            return propertyNames.Select(n => binding.GetColumn(n)).AggregateText(separator, action);
         }
 
         /// <summary>
-        /// Map column names with an action.
+        /// Get an aggregated text from a columns selection.
         /// </summary>
-        public static void MapColumnNames(this IDbTableBinding binding, string[] propertyNames, Action<IDbColumnBinding> colAction)
+        public static string AggregateText(this IDbTableBinding binding, DbColumnsSelection selection, string separator, Func<IDbColumnBinding, string> action)
         {
-            foreach (var propName in propertyNames)
+            if (selection != DbColumnsSelection.None)
             {
-                var col = binding.FindColumn(propName);
-                if (col == null)
-                {
-                    throw new ArgumentException($"Invalid key column {propName} in table [{binding.TableName}]");
-                }
-
-                colAction(col);
+                return binding.Columns.Where(c => IsSelected(binding, c, selection)).AggregateText(separator, action);
             }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Get an aggregated text from a columns.
+        /// </summary>
+        public static string AggregateText(this IEnumerable<IDbColumnBinding> columns, string separator, Func<IDbColumnBinding, string> action)
+        {
+            var sb = new StringBuilder();
+            columns.ForEach(c => sb.ConditionalAppend(separator, action(c)));
+            return sb.ToString();
         }
 
         /// <summary>
@@ -106,32 +128,51 @@ namespace Lit.Db
         /// </summary>
         public static void MapColumns(this IDbTableBinding binding, DbColumnsSelection selection, Action<IDbColumnBinding> action)
         {
-            binding.Columns.Where(c => IsSelected(c, selection)).ForEach(c => action(c));
+            binding.Columns.Where(c => IsSelected(binding, c, selection)).ForEach(c => action(c));
         }
 
         /// <summary>
         /// Check whether if a column matches a selection criteria or not.
         /// </summary>
-        private static bool IsSelected(IDbColumnBinding column, DbColumnsSelection selection)
+        private static bool IsSelected(IDbTableBinding binding, IDbColumnBinding column, DbColumnsSelection selection)
         {
             switch (selection)
             {
                 case DbColumnsSelection.None:
                     return false;
 
-                case DbColumnsSelection.PrimaryKey:
-                    return column.KeyConstraint == DbKeyConstraint.PrimaryKey || column.KeyConstraint == DbKeyConstraint.PrimaryForeignKey;
+                case DbColumnsSelection.AutoInc:
+                    return column.IsAutoIncrement;
 
-                case DbColumnsSelection.UniqueKey:
-                    return column.KeyConstraint == DbKeyConstraint.UniqueKey;
+                case DbColumnsSelection.NonAutoInc:
+                    return !column.IsAutoIncrement;
+
+                case DbColumnsSelection.PrimaryKey:
+                    return IsInPrimaryKey(binding, column);
 
                 case DbColumnsSelection.NonPrimaryKey:
-                    return column.KeyConstraint != DbKeyConstraint.PrimaryKey && column.KeyConstraint != DbKeyConstraint.PrimaryForeignKey;
+                    return !IsInPrimaryKey(binding, column);
+
+                case DbColumnsSelection.UniqueKey:
+                    return IsInUniqueKey(binding, column);
 
                 case DbColumnsSelection.All:
                 default:
                     return true;
             }
+        }
+
+        private static bool IsInPrimaryKey(IDbTableBinding binding, IDbColumnBinding column)
+        {
+            return column.KeyConstraint == DbKeyConstraint.PrimaryKey
+                || column.KeyConstraint == DbKeyConstraint.PrimaryForeignKey
+                || binding.PrimaryKey.PropertyNames.Contains(column.PropertyName);
+        }
+
+        private static bool IsInUniqueKey(IDbTableBinding binding, IDbColumnBinding column)
+        {
+            return column.KeyConstraint == DbKeyConstraint.UniqueKey
+                || binding.UniqueKeys.Count == 1 && binding.UniqueKeys.Any(uk => uk.PropertyNames.Contains(column.PropertyName));
         }
 
         #endregion
@@ -247,6 +288,22 @@ namespace Lit.Db
         #endregion
 
         #region IDbColumnBinding
+
+        /// <summary>
+        /// Get a column name.
+        /// </summary>
+        public static string GetSqlColumnName(this IDbColumnBinding column)
+        {
+            return column.Setup.Naming.GetSqlColumnName(column.ColumnName);
+        }
+
+        /// <summary>
+        /// Get a parameter name.
+        /// </summary>
+        public static string GetSqlParamName(this IDbColumnBinding column)
+        {
+            return column.Setup.Naming.GetSqlParamName(column.SpParamName);
+        }
 
         /// <summary>
         /// Assigns input parameters.

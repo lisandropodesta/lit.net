@@ -16,18 +16,28 @@
         All,
 
         /// <summary>
+        /// Auto incremented.
+        /// </summary>
+        AutoInc,
+
+        /// <summary>
+        /// Non auto incremented.
+        /// </summary>
+        NonAutoInc,
+
+        /// <summary>
         /// Primary key.
         /// </summary>
         PrimaryKey,
 
         /// <summary>
-        /// Unique key.
-        /// </summary>
-        UniqueKey,
-
-        /// <summary>
         /// Non primary keys.
         /// </summary>
-        NonPrimaryKey
+        NonPrimaryKey,
+
+        /// <summary>
+        /// Unique key.
+        /// </summary>
+        UniqueKey
     }
 }

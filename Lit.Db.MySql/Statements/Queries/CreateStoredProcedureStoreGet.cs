@@ -7,50 +7,40 @@ namespace Lit.Db.MySql.Statements.Queries
     /// Set record stored procedure creation template.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateStoredProcedureStoreGet : CreateStoredProcedureStore
+    public class CreateStoredProcedureStoreGet : CreateStoredProcedureTemplate
     {
-        public new const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+        public const string Template =
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(AllParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  IF COALESCE( {{@filter_param}}, 0 ) = 0 THEN\n" +
-            "    INSERT INTO {{@table_name}}\n" +
+            "  IF COALESCE( {{@" + nameof(AutoIncParam) + "}}, 0 ) = 0 THEN\n" +
+            "    INSERT INTO {{@" + nameof(SqlTableName) + "}}\n" +
             "    (\n" +
-            "      {{@columns}}\n" +
+            "      {{@" + nameof(NonAutoIncColumns) + "}}\n" +
             "    )\n" +
             "    VALUES\n" +
             "    (\n" +
-            "      {{@values}}\n" +
+            "      {{@" + nameof(NonAutoIncParams) + "}}\n" +
             "    );\n" +
             "\n" +
-            "    SET {{@filter_param}} = LAST_INSERT_ID();\n" +
+            "    SET {{@" + nameof(AutoIncParam) + "}} = LAST_INSERT_ID();\n" +
             "  ELSE\n" +
-            "    UPDATE {{@table_name}} SET\n" +
-            "      {{@columns_set}}\n" +
-            "    WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "    UPDATE {{@" + nameof(SqlTableName) + "}} SET\n" +
+            "      {{@" + nameof(NonPrimaryColumsSet) + "}}\n" +
+            "    WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
             "  END IF;\n" +
             "\n" +
             "  SELECT\n" +
-            "    {{@result_columns}}\n" +
-            "  FROM {{@table_name}}\n" +
-            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "    {{@" + nameof(AllColumns) + "}}\n" +
+            "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
             "END\n";
-
-        [DbParameter("result_columns")]
-        protected string ResultColumns { get; set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureStoreGet(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Store)
+        public CreateStoredProcedureStoreGet(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.Store)
         {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
-        {
-            ResultColumns = GetColumnsNames(binding, DbColumnsSelection.All);
-
-            base.Setup(tableTemplate, dbNaming, function, binding, pk);
         }
     }
 }

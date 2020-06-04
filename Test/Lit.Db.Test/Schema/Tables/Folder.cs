@@ -10,7 +10,7 @@ namespace Lit.Db.Test.Schema.Tables
     [DbTableIndex(nameof(Name))]
     public class Folder : DbRecordBase
     {
-        [DbColumn]
+        [DbColumn(AutoIncrement = true)]
         public int IdFolder { get; set; }
 
         [DbColumn]

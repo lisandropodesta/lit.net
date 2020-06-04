@@ -26,6 +26,9 @@ namespace Lit.Db.Test.Common
             db.CreateTable(typeof(Tag));
 
             Audit.Message("\n  ** CREATE STORED PROCEDURES test **");
+            CreateAllStoredProcedures(db, typeof(Folder));
+            CreateAllStoredProcedures(db, typeof(Tag));
+            CreateAllStoredProcedures(db, typeof(TagCategory));
             CreateAllStoredProcedures(db, typeof(User));
             CreateAllStoredProcedures(db, typeof(UserSession));
             CreateAllStoredProcedures(db, typeof(StatusConnection));

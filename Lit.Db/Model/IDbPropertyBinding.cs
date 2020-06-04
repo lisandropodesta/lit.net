@@ -9,6 +9,11 @@ namespace Lit.Db
     public interface IDbPropertyBinding<TA> : IPropertyBinding
     {
         /// <summary>
+        /// Database setup.
+        /// </summary>
+        IDbSetup Setup { get; }
+
+        /// <summary>
         /// Property name.
         /// </summary>
         string PropertyName { get; }

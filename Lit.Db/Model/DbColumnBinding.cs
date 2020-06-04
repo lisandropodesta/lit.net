@@ -47,7 +47,7 @@ namespace Lit.Db
         #region Constructor
 
         public DbColumnBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbColumnAttribute attr)
-            : base(binding, propInfo, attr)
+            : base(binding, propInfo, attr, true, true)
         {
             var setup = binding.Setup;
             ColumnName = setup.Naming.GetColumnName((binding as IDbTableBinding)?.TableName, propInfo, Attributes.DbName, KeyConstraint);
@@ -58,7 +58,7 @@ namespace Lit.Db
                 throw new ArgumentException($"Null field name in DbColumnBinding at class [{propInfo.DeclaringType.Namespace}.{propInfo.DeclaringType.Name}]");
             }
 
-            SpParamName = setup.Naming.GetParameterName(propInfo, ColumnName, null, KeyConstraint);
+            SpParamName = setup.Naming.GetParameterName(propInfo, ColumnName, null, false, KeyConstraint);
         }
 
         #endregion

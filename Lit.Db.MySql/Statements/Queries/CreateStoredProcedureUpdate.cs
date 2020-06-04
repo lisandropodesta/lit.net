@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using Lit.Db.Framework;
 
 namespace Lit.Db.MySql.Statements.Queries
@@ -11,37 +10,19 @@ namespace Lit.Db.MySql.Statements.Queries
     public class CreateStoredProcedureUpdate : CreateStoredProcedureTemplate
     {
         public const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(AllParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  UPDATE {{@table_name}} SET\n" +
-            "    {{@columns_set}}\n" +
-            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "  UPDATE {{@" + nameof(SqlTableName) + "}} SET\n" +
+            "    {{@" + nameof(NonPrimaryColumsSet) + "}}\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
             "END\n";
 
-        [DbParameter("columns_set")]
-        protected string ColumnsSet { get; set; }
-
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CreateStoredProcedureUpdate(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function)
-            : base(tableTemplate, setup, function)
+        public CreateStoredProcedureUpdate(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.Update)
         {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CreateStoredProcedureUpdate(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Update)
-        {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
-        {
-            AddParameters(binding, DbColumnsSelection.All, ParameterDirection.Input);
-
-            ColumnsSet = GetFieldsAssignment(binding, DbColumnsSelection.NonPrimaryKey);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Lit.Db.Framework;
+using System.Text;
 
 namespace Lit.Db
 {
@@ -7,6 +8,16 @@ namespace Lit.Db
     /// </summary>
     public class DbTemplate
     {
+        protected IDbSetup Setup;
+
+        #region Constructor
+
+        public DbTemplate(IDbSetup setup)
+        {
+            Setup = setup;
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -31,7 +42,11 @@ namespace Lit.Db
         {
             if (!string.IsNullOrEmpty(text))
             {
-                instance.Append(separator);
+                if (instance.Length > 0)
+                {
+                    instance.Append(separator);
+                }
+
                 instance.Append(text);
             }
         }

@@ -7,42 +7,32 @@ namespace Lit.Db.MySql.Statements.Queries
     /// Insert record stored procedure creation template.
     /// </summary>
     [DbQuery(Template)]
-    public class CreateStoredProcedureInsertGet : CreateStoredProcedureInsert
+    public class CreateStoredProcedureInsertGet : CreateStoredProcedureTemplate
     {
-        public new const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+        public const string Template =
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(NonAutoIncParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  INSERT INTO {{@table_name}}\n" +
+            "  INSERT INTO {{@" + nameof(SqlTableName) + "}}\n" +
             "  (\n" +
-            "    {{@columns}}\n" +
+            "    {{@" + nameof(NonAutoIncColumns) + "}}\n" +
             "  )\n" +
             "  VALUES\n" +
             "  (\n" +
-            "    {{@values}}\n" +
+            "    {{@" + nameof(NonAutoIncParams) + "}}\n" +
             "  );\n" +
             "\n" +
             "  SELECT\n" +
-            "    {{@result_columns}}\n" +
-            "  FROM {{@table_name}}\n" +
-            "  WHERE {{@filter_field}} = LAST_INSERT_ID();\n" +
+            "    {{@" + nameof(AllColumns) + "}}\n" +
+            "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
+            "  WHERE {{@" + nameof(AutoIncColumn) + "}} = LAST_INSERT_ID();\n" +
             "END\n";
-
-        [DbParameter("result_columns")]
-        protected string ResultColumns { get; set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureInsertGet(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Insert)
+        public CreateStoredProcedureInsertGet(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.Insert)
         {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
-        {
-            base.Setup(tableTemplate, dbNaming, function, binding, pk);
-
-            ResultColumns = GetColumnsNames(binding, DbColumnsSelection.All);
         }
     }
 }

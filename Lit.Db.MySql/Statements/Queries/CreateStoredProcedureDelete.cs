@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using Lit.Db.Framework;
 
 namespace Lit.Db.MySql.Statements.Queries
@@ -11,21 +10,18 @@ namespace Lit.Db.MySql.Statements.Queries
     public class CreateStoredProcedureDelete : CreateStoredProcedureTemplate
     {
         public const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(PrimaryKeyParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  DELETE FROM {{@table_name}}\n" +
-            "  WHERE {{@filter_field}} = {{@filter_param}};\n" +
+            "  DELETE FROM {{@" + nameof(SqlTableName) + "}}\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
             "END\n";
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureDelete(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Delete) { }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
+        public CreateStoredProcedureDelete(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.Delete)
         {
-            AddParameter(pk, ParameterDirection.Input);
         }
     }
 }

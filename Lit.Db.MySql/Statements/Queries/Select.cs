@@ -133,9 +133,9 @@
         /// <summary>
         /// Single table all columns SELECT statement execution.
         /// </summary>
-        public Select(string table, string whereCondition = null, string orderBy = null)
+        public Select(string table, string whereCondition = null, string orderBy = null) : base(null)
         {
-            Columns = AllColumns;
+            Columns = AllColumnsKey;
             Table = table;
             Where = whereCondition;
             OrderBy = orderBy;

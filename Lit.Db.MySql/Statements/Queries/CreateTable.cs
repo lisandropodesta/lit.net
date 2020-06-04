@@ -51,7 +51,7 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateTable(Type tableTemplate, IDbSetup setup)
+        public CreateTable(IDbSetup setup, Type tableTemplate) : base(setup)
         {
             var tableAttr = TypeHelper.GetAttribute<MySqlTableAttribute>(tableTemplate, true);
 
@@ -63,17 +63,6 @@ namespace Lit.Db.MySql.Statements
             TableName = bindings.TableName;
             ColumnDefinition = GetColumnDefinition(bindings.Columns);
             TableConstraints = GetTableConstraints(bindings);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CreateTable(string tableName, IEnumerable<IDbColumnBinding> columns, Engine engine, string defaultCharset)
-        {
-            Engine = engine.ToString();
-            DefaultCharset = defaultCharset;
-            TableName = tableName;
-            ColumnDefinition = GetColumnDefinition(columns);
         }
 
         #region Property setters
@@ -91,7 +80,7 @@ namespace Lit.Db.MySql.Statements
                     str.Append(",\n");
                 }
 
-                str.Append($"  `{col.ColumnName}`");
+                str.Append($"  {col.GetSqlColumnName()}");
 
                 str.ConditionalAppend(" ", GetFieldType(col));
                 str.ConditionalAppend(" ", GetNullable(col));
@@ -110,7 +99,7 @@ namespace Lit.Db.MySql.Statements
 
             if (table.PrimaryKey != null)
             {
-                var columnsList = table.GetKeyColumns(table.PrimaryKey, ", ", "`");
+                var columnsList = table.AggregateText(table.PrimaryKey, ", ", c => c.GetSqlColumnName());
 
                 // [CONSTRAINT [symbol]] PRIMARY KEY [index_type] (key_part,...) [index_option] ...
                 str.Append(",\n");
@@ -123,16 +112,17 @@ namespace Lit.Db.MySql.Statements
 
                 foreach (var fk in table.ForeignKeys)
                 {
-                    var columnsName = table.GetKeyColumns(fk, "_");
-                    var columnsList = table.GetKeyColumns(fk, ", ", "`");
-                    var primaryList = table.GetPrimaryColumns(out string primaryTableName, fk, ", ", "`");
+                    var columnsName = table.AggregateText(fk, "_", c => c.ColumnName);
+                    var columnsList = table.AggregateText(fk, ", ", c => c.GetSqlColumnName());
+                    var pkBinding = Setup.GetTableBinding(fk.PrimaryTableTemplate);
+                    var primaryList = pkBinding.AggregateText(DbColumnsSelection.PrimaryKey, ", ", c => c.GetSqlColumnName());
 
                     // [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name,...)
                     // REFERENCES tbl_name (key_part,...) [MATCH FULL | MATCH PARTIAL | MATCH SIMPLE] [ON DELETE reference_option] [ON UPDATE reference_option]
                     var name = fk.DbName ?? $"fk_{TableName}_{columnsName}";
                     str.Append(",\n");
                     str.Append($"{ConstraintKey} {name} {ForeignKeyKey} ( {columnsList} ) ");
-                    str.Append($"{ReferecencesKey} {primaryTableName} ( {primaryList} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
+                    str.Append($"{ReferecencesKey} {pkBinding.GetSqlTableName()} ( {primaryList} ) ON DELETE NO ACTION ON UPDATE NO ACTION");
 
                     // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
                     str.Append(",\n");
@@ -144,8 +134,8 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var uk in table.UniqueKeys)
                 {
-                    var columnsName = table.GetKeyColumns(uk, "_");
-                    var columnsList = table.GetKeyColumns(uk, ", ", "`");
+                    var columnsName = table.AggregateText(uk, "_", c => c.ColumnName);
+                    var columnsList = table.AggregateText(uk, ", ", c => c.GetSqlColumnName());
 
                     // [CONSTRAINT [symbol]] UNIQUE [INDEX|KEY] [index_name] [index_type] (key_part,...) [index_option] ...
                     var name = uk.DbName ?? $"uk_{TableName}_{columnsName}_idx";
@@ -158,8 +148,8 @@ namespace Lit.Db.MySql.Statements
             {
                 foreach (var idx in table.Indexes)
                 {
-                    var columnsName = table.GetKeyColumns(idx, "_");
-                    var columnsList = table.GetKeyColumns(idx, ", ", "`");
+                    var columnsName = table.AggregateText(idx, "_", c => c.ColumnName);
+                    var columnsList = table.AggregateText(idx, ", ", c => c.GetSqlColumnName());
 
                     // {INDEX|KEY} [index_name] [index_type] (key_part,...) [index_option] ...
                     var name = idx.DbName ?? $"{TableName}_{columnsName}_idx";

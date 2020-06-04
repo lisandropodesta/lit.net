@@ -131,9 +131,9 @@ namespace Lit.Db
         /// <summary>
         /// Gets a parameter name.
         /// </summary>
-        public virtual string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, DbKeyConstraint constraint = DbKeyConstraint.None)
+        public virtual string GetParameterName(PropertyInfo propInfo, string columnName, string parameterName, bool doNotTranslate = false, DbKeyConstraint constraint = DbKeyConstraint.None)
         {
-            return TranslateName(TextSource, Scope, propInfo?.Name, parameterName ?? columnName, ParametersCase, constraint, IdPlacing, IdText);
+            return TranslateName(TextSource, doNotTranslate ? Translation.None : Scope, propInfo?.Name, parameterName ?? columnName, ParametersCase, constraint, IdPlacing, IdText);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace Lit.Db
                 case DbKeyConstraint.PrimaryKey:
                 case DbKeyConstraint.PrimaryForeignKey:
                 case DbKeyConstraint.ForeignKey:
-                    forceId = ForceIdOnKeyColumn;
+                    forceId = scope != Translation.None && ForceIdOnKeyColumn;
                     break;
 
                 default:
@@ -222,6 +222,38 @@ namespace Lit.Db
         public virtual string GetTableName(Type template, string tableName)
         {
             return TranslateName(TextSource, Scope, template.Name, tableName, TablesCase, false, AffixPlacing.DoNotChange, null);
+        }
+
+        /// <summary>
+        /// Gets a table name as it needs to be put inside a SQL sentence.
+        /// </summary>
+        public virtual string GetSqlTableName(string name)
+        {
+            return name;
+        }
+
+        /// <summary>
+        /// Gets a stored procedure name as it needs to be put inside a SQL sentence.
+        /// </summary>
+        public virtual string GetSqlSpName(string name)
+        {
+            return name;
+        }
+
+        /// <summary>
+        /// Gets the column name as it needs to be put inside a SQL sentence.
+        /// </summary>
+        public virtual string GetSqlColumnName(string name)
+        {
+            return name;
+        }
+
+        /// <summary>
+        /// Gets the parameter name related to a column as it needs to be put inside a SQL sentence.
+        /// </summary>
+        public virtual string GetSqlParamName(string name)
+        {
+            return name;
         }
 
         /// <summary>

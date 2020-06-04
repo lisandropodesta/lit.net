@@ -31,6 +31,11 @@ namespace Lit.Db
         protected readonly bool isOptional;
 
         /// <summary>
+        /// Do not translate in query replacements.
+        /// </summary>
+        public bool DoNotTranslate { get; set; }
+
+        /// <summary>
         /// Is input flag.
         /// </summary>
         public bool IsInput => direction == ParameterDirection.Input || direction == ParameterDirection.InputOutput;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Data;
-
-namespace Lit.Db.MySql
+﻿namespace Lit.Db.MySql
 {
     /// <summary>
     /// MySql template.
@@ -10,7 +7,7 @@ namespace Lit.Db.MySql
     {
         #region String constants
 
-        public const string AllColumns = "*";
+        public const string AllColumnsKey = "*";
 
         public const string NullKey = "NULL";
 
@@ -36,63 +33,14 @@ namespace Lit.Db.MySql
 
         public const string IfExistsKey = "IF EXISTS";
 
-        public const string InKey = "IN";
-
-        public const string OutKey = "OUT";
-
-        public const string InOutKey = "INOUT";
-
         #endregion
 
-        private int indentationLevel = 1;
-
         /// <summary>
-        /// Get MySql direction.
+        /// Constructor.
         /// </summary>
-        protected string GetDirection(ParameterDirection direction)
+        /// <param name="setup"></param>
+        public MySqlTemplate(IDbSetup setup) : base(setup)
         {
-            switch (direction)
-            {
-                case ParameterDirection.Input:
-                    return InKey;
-
-                case ParameterDirection.InputOutput:
-                    return InOutKey;
-
-                case ParameterDirection.Output:
-                    return OutKey;
-
-                case ParameterDirection.ReturnValue:
-                default:
-                    throw new ArgumentException();
-            }
-        }
-
-        /// <summary>
-        /// Increments indentation level.
-        /// </summary>
-        protected void Indent()
-        {
-            indentationLevel++;
-        }
-
-        /// <summary>
-        /// Decrements indentation level.
-        /// </summary>
-        protected void Unindent()
-        {
-            if (indentationLevel > 0)
-            {
-                indentationLevel--;
-            }
-        }
-
-        /// <summary>
-        /// Get an indented separator.
-        /// </summary>
-        protected string GetSeparator(string text, int indentationPlus = 0)
-        {
-            return text + new string(' ', (indentationLevel + indentationPlus) * 2);
         }
 
         protected string GetFieldType(IDbColumnBinding column)

@@ -32,19 +32,10 @@ namespace Lit.Db.MySql.Statements
         /// <summary>
         /// Constructor.
         /// </summary>
-        public DropTable(Type tableTemplate, IDbSetup setup, bool onlyIfExists = false)
+        public DropTable(IDbSetup setup, Type tableTemplate, bool onlyIfExists = false) : base(setup)
         {
             var bindings = setup.GetTableBinding(tableTemplate);
             TableName = bindings.TableName;
-            OnlyIfExists = onlyIfExists;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DropTable(string tableName, bool onlyIfExists = false)
-        {
-            TableName = tableName;
             OnlyIfExists = onlyIfExists;
         }
 

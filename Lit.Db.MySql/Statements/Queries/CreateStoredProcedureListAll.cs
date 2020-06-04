@@ -10,27 +10,19 @@ namespace Lit.Db.MySql.Statements.Queries
     public class CreateStoredProcedureListAll : CreateStoredProcedureTemplate
     {
         public const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}()\n" +
             "BEGIN\n" +
             "  SELECT\n" +
-            "    {{@columns}}\n" +
-            "  FROM {{@table_name}};\n" +
+            "    {{@" + nameof(AllColumns) + "}}\n" +
+            "  FROM {{@" + nameof(SqlTableName) + "}};\n" +
             "END\n";
-
-        [DbParameter("columns")]
-        protected string Columns { get; set; }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureListAll(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.ListAll)
+        public CreateStoredProcedureListAll(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.ListAll)
         {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
-        {
-            Columns = GetColumnsNames(binding, DbColumnsSelection.All);
         }
     }
 }

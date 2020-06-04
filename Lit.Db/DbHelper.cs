@@ -22,7 +22,19 @@ namespace Lit.Db
                 index = query.IndexOf(replaceText, StringComparison.OrdinalIgnoreCase);
                 if (index >= 0)
                 {
-                    query = query.Substring(0, index) + value + query.Substring(index + replaceText.Length);
+                    var leftPart = query.Substring(0, index);
+                    var rightPart = query.Substring(index + replaceText.Length);
+
+                    if (value.Contains("\n\t"))
+                    {
+                        var nlIndex = Math.Max(leftPart.LastIndexOf("\n"), 0);
+                        if (nlIndex < leftPart.Length - 1)
+                        {
+                            value = value.Replace("\n\t", "\n" + new string(' ', leftPart.Length - 1 - nlIndex));
+                        }
+                    }
+
+                    query = leftPart + value + rightPart;
                     found = true;
                 }
             }

@@ -11,47 +11,32 @@ namespace Lit.Db.MySql.Statements.Queries
     public class CreateStoredProcedureInsert : CreateStoredProcedureTemplate
     {
         public const string Template =
-            "CREATE PROCEDURE {{@name}} {{@parameters}}\n" +
+            "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(NonAutoIncParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  INSERT INTO {{@table_name}}\n" +
+            "  INSERT INTO {{@" + nameof(SqlTableName) + "}}\n" +
             "  (\n" +
-            "    {{@columns}}\n" +
+            "    {{@" + nameof(NonAutoIncColumns) + "}}\n" +
             "  )\n" +
             "  VALUES\n" +
             "  (\n" +
-            "    {{@values}}\n" +
+            "    {{@" + nameof(NonAutoIncParams) + "}}\n" +
             "  );\n" +
             "END\n";
 
-        [DbParameter("columns")]
-        protected string Columns { get; set; }
-
-        [DbParameter("values")]
-        protected string Values { get; set; }
-
         /// <summary>
         /// Constructor.
         /// </summary>
-        protected CreateStoredProcedureInsert(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function)
-            : base(tableTemplate, setup, function)
+        protected CreateStoredProcedureInsert(IDbSetup setup, Type tableTemplate, StoredProcedureFunction function)
+            : base(setup, tableTemplate, function)
         {
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public CreateStoredProcedureInsert(Type tableTemplate, IDbSetup setup)
-            : base(tableTemplate, setup, StoredProcedureFunction.Insert)
+        public CreateStoredProcedureInsert(IDbSetup setup, Type tableTemplate)
+            : base(setup, tableTemplate, StoredProcedureFunction.Insert)
         {
-        }
-
-        protected override void Setup(Type tableTemplate, IDbNaming dbNaming, StoredProcedureFunction function, IDbTableBinding binding, IDbColumnBinding pk)
-        {
-            AddParameters(binding, DbColumnsSelection.NonPrimaryKey, ParameterDirection.Input);
-
-            Columns = GetColumnsNames(binding, DbColumnsSelection.NonPrimaryKey);
-
-            Values = GetParametersNames(binding, DbColumnsSelection.NonPrimaryKey);
         }
     }
 }

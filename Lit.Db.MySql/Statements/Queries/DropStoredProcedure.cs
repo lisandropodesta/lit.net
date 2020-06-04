@@ -31,19 +31,10 @@ namespace Lit.Db.MySql.Statements.Queries
         /// <summary>
         /// Constructor.
         /// </summary>
-        public DropStoredProcedure(Type tableTemplate, IDbSetup setup, StoredProcedureFunction function, bool onlyIfExists = false)
+        public DropStoredProcedure(IDbSetup setup, Type tableTemplate, StoredProcedureFunction function, bool onlyIfExists = false) : base(setup)
         {
             var binding = setup.GetTableBinding(tableTemplate);
             Name = setup.Naming.GetStoredProcedureName(binding.TableName, function);
-            OnlyIfExists = onlyIfExists;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public DropStoredProcedure(string name, bool onlyIfExists = false)
-        {
-            Name = name;
             OnlyIfExists = onlyIfExists;
         }
     }
