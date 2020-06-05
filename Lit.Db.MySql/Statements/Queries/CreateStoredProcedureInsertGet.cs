@@ -12,6 +12,7 @@ namespace Lit.Db.MySql.Statements.Queries
         public const string Template =
             "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(NonAutoIncParamsDef) + "}})\n" +
             "BEGIN\n" +
+            "{{@" + nameof(ConditionalDeclareAutoIncParam) + "}}" +
             "  INSERT INTO {{@" + nameof(SqlTableName) + "}}\n" +
             "  (\n" +
             "    {{@" + nameof(NonAutoIncColumns) + "}}\n" +
@@ -20,11 +21,12 @@ namespace Lit.Db.MySql.Statements.Queries
             "  (\n" +
             "    {{@" + nameof(NonAutoIncParams) + "}}\n" +
             "  );\n" +
+            "  {{@" + nameof(ConditionalAssignAutoIncParam) + "}}" +
             "\n" +
             "  SELECT\n" +
             "    {{@" + nameof(AllColumns) + "}}\n" +
             "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
-            "  WHERE {{@" + nameof(AutoIncColumn) + "}} = LAST_INSERT_ID();\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

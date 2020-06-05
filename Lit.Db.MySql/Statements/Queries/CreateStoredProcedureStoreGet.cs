@@ -12,7 +12,7 @@ namespace Lit.Db.MySql.Statements.Queries
         public const string Template =
             "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(AllParamsDef) + "}})\n" +
             "BEGIN\n" +
-            "  IF COALESCE( {{@" + nameof(AutoIncParam) + "}}, 0 ) = 0 THEN\n" +
+            "  IF {{@" + nameof(RecordDoNotExistsCondition) + "}} THEN\n" +
             "    INSERT INTO {{@" + nameof(SqlTableName) + "}}\n" +
             "    (\n" +
             "      {{@" + nameof(NonAutoIncColumns) + "}}\n" +
@@ -21,18 +21,17 @@ namespace Lit.Db.MySql.Statements.Queries
             "    (\n" +
             "      {{@" + nameof(NonAutoIncParams) + "}}\n" +
             "    );\n" +
-            "\n" +
-            "    SET {{@" + nameof(AutoIncParam) + "}} = LAST_INSERT_ID();\n" +
+            "    {{@"+ nameof(ConditionalAssignAutoIncParam) +"}}" +
             "  ELSE\n" +
             "    UPDATE {{@" + nameof(SqlTableName) + "}} SET\n" +
             "      {{@" + nameof(NonPrimaryColumsSet) + "}}\n" +
-            "    WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "    WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "  END IF;\n" +
             "\n" +
             "  SELECT\n" +
             "    {{@" + nameof(AllColumns) + "}}\n" +
             "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
-            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

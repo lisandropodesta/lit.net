@@ -82,7 +82,7 @@ namespace Lit.Db.MySql.Statements
 
                 str.Append($"  {col.GetSqlColumnName()}");
 
-                str.ConditionalAppend(" ", GetFieldType(col));
+                str.ConditionalAppend(" ", col.GetSqlColumnType());
                 str.ConditionalAppend(" ", GetNullable(col));
                 str.ConditionalAppend(" ", GetDefault(col));
                 str.ConditionalAppend(" ", GetAutoIncrement(col));

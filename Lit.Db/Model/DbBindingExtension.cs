@@ -63,6 +63,36 @@ namespace Lit.Db
         }
 
         /// <summary>
+        /// Check if a table has columns of a certain type.
+        /// </summary>
+        public static bool HasColumns(this IDbTableBinding binding, DbColumnsSelection selection)
+        {
+            return binding.Columns.Any(c => IsSelected(binding, c, selection));
+        }
+
+        /// <summary>
+        /// Get a column binding.
+        /// </summary>
+        public static IDbColumnBinding GetColumn(this IDbTableBinding binding, DbColumnsSelection selection)
+        {
+            var col = binding.FindColumn(selection);
+            if (col == null)
+            {
+                throw new ArgumentException($"Invalid column of kind {selection} in table [{binding.TableName}]");
+            }
+
+            return col;
+        }
+
+        /// <summary>
+        /// Finds a column binding.
+        /// </summary>
+        public static IDbColumnBinding FindColumn(this IDbTableBinding binding, DbColumnsSelection selection)
+        {
+            return binding.Columns?.FirstOrDefault(c => IsSelected(binding, c, selection));
+        }
+
+        /// <summary>
         /// Get a column binding.
         /// </summary>
         public static IDbColumnBinding GetColumn(this IDbTableBinding binding, string propertyName)
@@ -134,7 +164,7 @@ namespace Lit.Db
         /// <summary>
         /// Check whether if a column matches a selection criteria or not.
         /// </summary>
-        private static bool IsSelected(IDbTableBinding binding, IDbColumnBinding column, DbColumnsSelection selection)
+        public static bool IsSelected(IDbTableBinding binding, IDbColumnBinding column, DbColumnsSelection selection)
         {
             switch (selection)
             {
@@ -306,6 +336,14 @@ namespace Lit.Db
         }
 
         /// <summary>
+        /// Get a column type.
+        /// </summary>
+        public static string GetSqlColumnType(this IDbColumnBinding column)
+        {
+            return column.Setup.Naming.GetSqlType(column.DataType, column.ColumnType, column.ColumnSize);
+        }
+
+        /// <summary>
         /// Assigns input parameters.
         /// </summary>
         public static void SetInputParameters(this IDbColumnBinding binding, DbCommand cmd, object instance)
@@ -355,8 +393,8 @@ namespace Lit.Db
             var attr = binding.Attributes;
             if (attr.IsInput)
             {
-                var value = binding.GetValue(instance);
-                DbHelper.SetSqlParameter(ref text, binding.SpParamName, value.ToString(), attr.IsOptional);
+                string valueGetter() => binding.GetValue(instance).ToString();
+                DbHelper.SetSqlParameter(ref text, binding.SpParamName, valueGetter, attr.IsOptional);
             }
         }
 

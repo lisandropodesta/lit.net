@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using Lit.DataType;
 using Newtonsoft.Json;
+using Lit.DataType;
 
 namespace Lit.Db.MySql
 {

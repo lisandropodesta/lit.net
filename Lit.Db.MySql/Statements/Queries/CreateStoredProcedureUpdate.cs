@@ -14,7 +14,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "BEGIN\n" +
             "  UPDATE {{@" + nameof(SqlTableName) + "}} SET\n" +
             "    {{@" + nameof(NonPrimaryColumsSet) + "}}\n" +
-            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

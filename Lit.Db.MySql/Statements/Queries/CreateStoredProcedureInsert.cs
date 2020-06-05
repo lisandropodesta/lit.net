@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using Lit.Db.Framework;
 
 namespace Lit.Db.MySql.Statements.Queries

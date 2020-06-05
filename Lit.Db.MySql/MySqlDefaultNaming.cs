@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Lit.Names;
 
 namespace Lit.Db.MySql
@@ -36,6 +37,14 @@ namespace Lit.Db.MySql
             }
 
             return base.GetParameterName(null, null, parameterName, doNotTranslate, constraint);
+        }
+
+        /// <summary>
+        /// Gets a SQL type name.
+        /// </summary>
+        public override string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null)
+        {
+            return MySqlDataType.Translate(dataType, type, size, precision);
         }
     }
 }

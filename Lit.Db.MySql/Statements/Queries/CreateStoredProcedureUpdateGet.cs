@@ -14,12 +14,12 @@ namespace Lit.Db.MySql.Statements.Queries
             "BEGIN\n" +
             "  UPDATE {{@" + nameof(SqlTableName) + "}} SET\n" +
             "    {{@" + nameof(NonPrimaryColumsSet) + "}}\n" +
-            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "\n" +
             "  SELECT\n" +
             "    {{@" + nameof(AllColumns) + "}}\n" +
             "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
-            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

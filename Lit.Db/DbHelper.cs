@@ -11,7 +11,7 @@ namespace Lit.Db
         /// <summary>
         /// Assigns an input parameter by name.
         /// </summary>
-        public static void SetSqlParameter(ref string query, string paramName, string value, bool isOptional)
+        public static void SetSqlParameter(ref string query, string paramName, Func<string> valueGetter, bool isOptional)
         {
             var replaceText = @"{{@" + paramName + @"}}";
             var found = false;
@@ -25,7 +25,12 @@ namespace Lit.Db
                     var leftPart = query.Substring(0, index);
                     var rightPart = query.Substring(index + replaceText.Length);
 
-                    if (value.Contains("\n\t"))
+                    var value = valueGetter();
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        leftPart = leftPart.TrimEnd(' ', '\t');
+                    }
+                    else if (value.Contains("\n\t"))
                     {
                         var nlIndex = Math.Max(leftPart.LastIndexOf("\n"), 0);
                         if (nlIndex < leftPart.Length - 1)

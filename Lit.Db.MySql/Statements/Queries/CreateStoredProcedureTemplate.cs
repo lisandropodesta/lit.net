@@ -19,6 +19,12 @@ namespace Lit.Db.MySql.Statements.Queries
 
         #endregion
 
+        [DbParameter(isOptional: true, DoNotTranslate = true)]
+        protected string ConditionalDeclareAutoIncParam => Binding.HasColumns(DbColumnsSelection.AutoInc) ? $"  DECLARE {AutoIncParam} {AutoIncDataType};\n\n" : string.Empty;
+
+        [DbParameter(isOptional: true, DoNotTranslate = true)]
+        protected string ConditionalAssignAutoIncParam => Binding.HasColumns(DbColumnsSelection.AutoInc) ? $"SET {AutoIncParam} = LAST_INSERT_ID();\n" : string.Empty;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -32,7 +38,7 @@ namespace Lit.Db.MySql.Statements.Queries
         protected override string GetParamDefs(DbColumnsSelection selection)
         {
             var text = GetColumnsText(selection, ",\n  ",
-                c => $"{GetDirection(ParameterDirection.Input)} {c.GetSqlParamName()} {MySqlDataType.Translate(c.DataType, c.ColumnType)}");
+                c => $"{GetDirection(ParameterDirection.Input)} {c.GetSqlParamName()} {c.GetSqlColumnType()}");
 
             return !string.IsNullOrEmpty(text) ? "\n  " + text + "\n" : text;
         }

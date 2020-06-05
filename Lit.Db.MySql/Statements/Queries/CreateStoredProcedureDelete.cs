@@ -13,7 +13,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "CREATE PROCEDURE {{@" + nameof(SqlSpName) + "}}({{@" + nameof(PrimaryKeyParamsDef) + "}})\n" +
             "BEGIN\n" +
             "  DELETE FROM {{@" + nameof(SqlTableName) + "}}\n" +
-            "  WHERE {{@" + nameof(PrimaryKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(PrimaryKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

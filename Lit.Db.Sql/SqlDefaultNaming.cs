@@ -1,4 +1,5 @@
-﻿using Lit.Names;
+﻿using System;
+using Lit.Names;
 
 namespace Lit.Db.Sql
 {
@@ -10,6 +11,11 @@ namespace Lit.Db.Sql
         public SqlDefaultNaming() : base(AffixPlacing.Prefix, Case.Pascal, "Id")
         {
             ForceIdOnKeyColumn = true;
+        }
+
+        public override string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Lit.Db.MySql.Statements.Queries
             "  SELECT\n" +
             "    {{@" + nameof(AllColumns) + "}}\n" +
             "  FROM {{@" + nameof(SqlTableName) + "}}\n" +
-            "  WHERE {{@" + nameof(UniqueKeyFilterList) + "}};\n" +
+            "  WHERE {{@" + nameof(UniqueKeyMatchCondition) + "}};\n" +
             "END\n";
 
         /// <summary>

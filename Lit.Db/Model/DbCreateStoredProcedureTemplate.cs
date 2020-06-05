@@ -39,7 +39,7 @@ namespace Lit.Db
 
         #endregion
 
-        #region Parameters list
+        #region Parameters
 
         [DbParameter(isOptional: true, DoNotTranslate = true)]
         protected string AllParams => GetParamNames(DbColumnsSelection.All);
@@ -61,7 +61,7 @@ namespace Lit.Db
 
         #endregion
 
-        #region Columns list
+        #region Columns
 
         [DbParameter(isOptional: true, DoNotTranslate = true)]
         protected string AllColumns => GetColumnNames(DbColumnsSelection.All);
@@ -96,16 +96,26 @@ namespace Lit.Db
 
         #endregion
 
-        #region Filters list
+        #region Data types
 
         [DbParameter(isOptional: true, DoNotTranslate = true)]
-        protected string AutoIncFilter => GetFilters(DbColumnsSelection.AutoInc);
+        protected string AutoIncDataType => Binding.GetColumn(DbColumnsSelection.AutoInc).GetSqlColumnType();
+
+        #endregion
+
+        #region Conditions
 
         [DbParameter(isOptional: true, DoNotTranslate = true)]
-        protected string PrimaryKeyFilterList => GetFilters(DbColumnsSelection.PrimaryKey);
+        protected string AutoIncMatchCondition => GetMatchCondition(DbColumnsSelection.AutoInc);
 
         [DbParameter(isOptional: true, DoNotTranslate = true)]
-        protected string UniqueKeyFilterList => GetFilters(DbColumnsSelection.UniqueKey);
+        protected string PrimaryKeyMatchCondition => GetMatchCondition(DbColumnsSelection.PrimaryKey);
+
+        [DbParameter(isOptional: true, DoNotTranslate = true)]
+        protected string UniqueKeyMatchCondition => GetMatchCondition(DbColumnsSelection.UniqueKey);
+
+        [DbParameter(isOptional: true, DoNotTranslate = true)]
+        protected string RecordDoNotExistsCondition => GetRecordDoNotExistsCondition();
 
         #endregion
 
@@ -156,7 +166,7 @@ namespace Lit.Db
         /// <summary>
         /// Get filter list.
         /// </summary>
-        protected virtual string GetFilters(DbColumnsSelection selection)
+        protected virtual string GetMatchCondition(DbColumnsSelection selection)
         {
             var text = GetColumnsText(selection, "\n\tAND ", c => $"{c.GetSqlColumnName()} = {c.GetSqlParamName()}");
             return !string.IsNullOrEmpty(text) ? "    " + text : text;
@@ -168,6 +178,21 @@ namespace Lit.Db
         protected string GetColumnsText(DbColumnsSelection selection, string separator, Func<IDbColumnBinding, string> action)
         {
             return Binding.AggregateText(selection, separator, action);
+        }
+
+        /// <summary>
+        /// Check record existance.
+        /// </summary>
+        protected string GetRecordDoNotExistsCondition()
+        {
+            if (Binding.HasColumns(DbColumnsSelection.AutoInc))
+            {
+                return GetColumnsText(DbColumnsSelection.AutoInc, " AND ", c => $"COALESCE( {c.GetSqlParamName()}, 0 ) = 0");
+            }
+
+            var fields = GetColumnsText(DbColumnsSelection.PrimaryKey, ", ", c => c.GetSqlColumnName());
+            var condition = GetColumnsText(DbColumnsSelection.PrimaryKey, " AND ", c => $"{c.GetSqlColumnName()} = {c.GetSqlParamName()}");
+            return $"NOT EXISTS ( SELECT {fields} FROM {SqlTableName} WHERE {condition} )";
         }
     }
 }

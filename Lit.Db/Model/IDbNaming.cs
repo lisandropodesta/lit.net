@@ -58,5 +58,10 @@ namespace Lit.Db
         /// Gets the parameter name related to a column as it needs to be put inside a SQL sentence.
         /// </summary>
         string GetSqlParamName(string name);
+
+        /// <summary>
+        /// Gets a SQL type name.
+        /// </summary>
+        string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null);
     }
 }

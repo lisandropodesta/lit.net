@@ -43,11 +43,6 @@
         {
         }
 
-        protected string GetFieldType(IDbColumnBinding column)
-        {
-            return MySqlDataType.Translate(column.DataType, column.ColumnType, column.ColumnSize);
-        }
-
         protected string GetNullable(IDbColumnBinding column)
         {
             return column.IsNullable ? NullKey : NotNullKey;
