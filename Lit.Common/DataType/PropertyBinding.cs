@@ -4,10 +4,15 @@ using System.Reflection;
 namespace Lit.DataType
 {
     /// <summary>
-    /// Binding to a specific property of a specific class.
+    /// Binding to a class's property.
     /// </summary>
     public class PropertyBinding<TC, TP> : ReflectionProperty, IPropertyBinding where TC : class
     {
+        /// <summary>
+        /// Shortcut for property name.
+        /// </summary>
+        public string PropertyName => PropertyInfo.Name;
+
         /// <summary>
         /// Binding mode.
         /// </summary>

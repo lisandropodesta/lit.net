@@ -8,7 +8,7 @@ namespace Lit.Db
     /// <summary>
     /// Binding to a database property (parameter/field).
     /// </summary>
-    internal abstract class DbPropertyBinding<TC, TP, TA> : PropertyBinding<TC, TP>, IDbPropertyBinding<TA>
+    internal abstract class DbPropertyBinding<TC, TP, TA> : AttrPropertyBinding<TC, TP, TA>, IDbPropertyBinding<TA>
         where TC : class
         where TA : Attribute
     {
@@ -23,19 +23,9 @@ namespace Lit.Db
         protected abstract bool ValuesTranslation { get; }
 
         /// <summary>
-        /// Shortcut for property name.
-        /// </summary>
-        public string PropertyName => PropertyInfo.Name;
-
-        /// <summary>
         /// Database data type.
         /// </summary>
         public DbDataType DataType { get; private set; }
-
-        /// <summary>
-        /// Attributes.
-        /// </summary>
-        public TA Attributes { get; private set; }
 
         /// <summary>
         /// Foreign key property flag.
@@ -63,10 +53,9 @@ namespace Lit.Db
         #region Constructor
 
         protected DbPropertyBinding(IDbTemplateBinding binding, PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
-            : base(propInfo, getterRequired, setterRequired)
+            : base(propInfo, attr, getterRequired, setterRequired)
         {
             this.Setup = binding.Setup;
-            this.Attributes = attr;
 
             PrimaryTableTemplate = DbHelper.GetForeignKeyPropType(PropertyInfo.PropertyType);
             IsForeignKeyProp = PrimaryTableTemplate != null;

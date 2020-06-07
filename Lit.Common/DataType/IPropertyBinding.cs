@@ -3,10 +3,15 @@
 namespace Lit.DataType
 {
     /// <summary>
-    /// Property binding.
+    /// Binding to a class's property.
     /// </summary>
     public interface IPropertyBinding
     {
+        /// <summary>
+        /// Property name.
+        /// </summary>
+        string PropertyName { get; }
+
         /// <summary>
         /// Binding mode.
         /// </summary>
