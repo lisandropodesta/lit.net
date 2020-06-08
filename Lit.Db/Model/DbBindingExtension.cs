@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Text;
+using Lit.DataType;
 using Lit.Db.Framework;
 
 namespace Lit.Db
@@ -490,8 +491,7 @@ namespace Lit.Db
         private static object LoadSqlRecordset(IDbDataAccess db, DbDataReader reader, Type type, int maxCount)
         {
             var binding = db.Setup.GetCommandBinding(type);
-            var listType = typeof(List<>).MakeGenericType(type);
-            var result = Activator.CreateInstance(listType);
+            var result = TypeHelper.CreateInstance(typeof(List<>), new[] { type });
             var list = result as IList;
 
             for (var ri = 0; ri < maxCount && reader.Read(); ri++)
