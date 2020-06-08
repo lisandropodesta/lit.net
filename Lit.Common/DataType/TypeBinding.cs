@@ -7,6 +7,32 @@ namespace Lit.DataType
     /// <summary>
     /// Type binding.
     /// </summary>
+    /// <typeparam name="TA">Property attributes class</typeparam>
+    public class TypeBinding<TA> : TypeBinding<IAttrPropertyBinding<TA>, TA> where TA : class
+    {
+        #region Constructors
+
+        public TypeBinding(Type bindedType)
+            : base(bindedType, DefaultBindingFlags, DefaultCreateInstance)
+        {
+
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Default creation of binding instance.
+        /// </summary>
+        protected static IAttrPropertyBinding<TA> DefaultCreateInstance(PropertyInfo propInfo, TA attr)
+        {
+            var genericParams = new[] { propInfo.DeclaringType, propInfo.PropertyType, typeof(TA) };
+            return TypeHelper.CreateInstance(typeof(AttrPropertyBinding<,,>), genericParams, propInfo, attr, false, false) as IAttrPropertyBinding<TA>;
+        }
+    }
+
+    /// <summary>
+    /// Type binding.
+    /// </summary>
     /// <typeparam name="TI">Items interface type</typeparam>
     /// <typeparam name="TA">Property attributes class</typeparam>
     public class TypeBinding<TI, TA> : ITypeBinding<TI> where TI : class where TA : class
@@ -23,11 +49,6 @@ namespace Lit.DataType
         #region Constructors
 
         public TypeBinding()
-        {
-        }
-
-        public TypeBinding(Type bindedType)
-            : this(bindedType, DefaultBindingFlags, DefaultCreateInstance)
         {
         }
 
@@ -66,15 +87,6 @@ namespace Lit.DataType
         {
             list.Add(binding);
             return binding;
-        }
-
-        /// <summary>
-        /// Default creation of binding instance.
-        /// </summary>
-        protected static TI DefaultCreateInstance(PropertyInfo propInfo, TA attr)
-        {
-            var genericParams = new[] { propInfo.DeclaringType, propInfo.PropertyType, typeof(TA) };
-            return TypeHelper.CreateInstance(typeof(AttrPropertyBinding<,,>), genericParams, propInfo, attr, false, false) as TI;
         }
     }
 }
