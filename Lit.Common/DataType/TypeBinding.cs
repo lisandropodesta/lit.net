@@ -1,0 +1,80 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+namespace Lit.DataType
+{
+    /// <summary>
+    /// Type binding.
+    /// </summary>
+    /// <typeparam name="TI">Items interface type</typeparam>
+    /// <typeparam name="TA">Property attributes class</typeparam>
+    public class TypeBinding<TI, TA> : ITypeBinding<TI> where TI : class where TA : class
+    {
+        protected const BindingFlags DefaultBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        /// <summary>
+        /// Binding list.
+        /// </summary>
+        public IReadOnlyList<TI> BindingList => list;
+
+        private readonly List<TI> list = new List<TI>();
+
+        #region Constructors
+
+        public TypeBinding()
+        {
+        }
+
+        public TypeBinding(Type bindedType)
+            : this(bindedType, DefaultBindingFlags, DefaultCreateInstance)
+        {
+        }
+
+        public TypeBinding(Type bindedType, Func<PropertyInfo, TA, TI> createInstace)
+            : this(bindedType, DefaultBindingFlags, createInstace)
+        {
+        }
+
+        public TypeBinding(Type bindedType, BindingFlags bindingAttr, Func<PropertyInfo, TA, TI> createInstace)
+        {
+            foreach (var propInfo in bindedType.GetProperties(bindingAttr))
+            {
+                if (TypeHelper.GetAttribute<TA>(propInfo, out var cAttr))
+                {
+                    var binding = createInstace(propInfo, cAttr);
+                    list.Add(binding);
+                }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Adds a property binding.
+        /// </summary>
+        public TI AddBinding(Type genericType, Type[] typeArguments, params object[] instanceArguments)
+        {
+            var binding = TypeHelper.CreateInstance(genericType, typeArguments, instanceArguments) as TI;
+            return AddBinding(binding);
+        }
+
+        /// <summary>
+        /// Adds a property binding.
+        /// </summary>
+        public TI AddBinding(TI binding)
+        {
+            list.Add(binding);
+            return binding;
+        }
+
+        /// <summary>
+        /// Default creation of binding instance.
+        /// </summary>
+        protected static TI DefaultCreateInstance(PropertyInfo propInfo, TA attr)
+        {
+            var genericParams = new[] { propInfo.DeclaringType, propInfo.PropertyType, typeof(TA) };
+            return TypeHelper.CreateInstance(typeof(AttrPropertyBinding<,,>), genericParams, propInfo, attr, false, false) as TI;
+        }
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Lit.DataType
 {
@@ -7,6 +8,11 @@ namespace Lit.DataType
     /// </summary>
     public interface IPropertyBinding
     {
+        /// <summary>
+        /// Property information.
+        /// </summary>
+        PropertyInfo PropertyInfo { get; }
+
         /// <summary>
         /// Property name.
         /// </summary>

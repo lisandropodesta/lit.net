@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
+using Lit.DataType;
 
 namespace Lit.Db
 {
@@ -17,15 +17,13 @@ namespace Lit.Db
         /// <summary>
         /// Template data type.
         /// </summary>
-        public Type TemplateType => templateType;
-
-        private readonly Type templateType;
+        public Type TemplateType { get; private set; }
 
         #region Constructor
 
         protected DbTemplateBinding(Type templateType, IDbSetup setup)
         {
-            this.templateType = templateType;
+            TemplateType = templateType;
             Setup = setup;
         }
 
@@ -34,28 +32,14 @@ namespace Lit.Db
         /// <summary>
         /// Adds a binding to a list.
         /// </summary>
-        protected TI AddBinding<TI, TAttr>(ref List<TI> list, Type genClassType, PropertyInfo propertyInfo, TAttr attribute)
-            where TI : class
+        protected TI AddBinding<TI, TA>(ref TypeBinding<TI, TA> bindings, Type genericType, Type[] typeArguments, params object[] instanceArguments) where TI : class where TA : class
         {
-            if (list == null)
+            if (bindings == null)
             {
-                list = new List<TI>();
+                bindings = new TypeBinding<TI, TA>();
             }
 
-            var binding = CreateBinding<TI, TAttr>(genClassType, propertyInfo, attribute);
-            list.Add(binding);
-            return binding;
-        }
-
-        /// <summary>
-        /// Creates a binding.
-        /// </summary>
-        private TI CreateBinding<TI, TAttr>(Type genClassType, PropertyInfo propertyInfo, TAttr attribute)
-            where TI : class
-        {
-            var type = genClassType.MakeGenericType(propertyInfo.DeclaringType, propertyInfo.PropertyType);
-            var binding = Activator.CreateInstance(type, new object[] { this, propertyInfo, attribute });
-            return binding as TI;
+            return bindings.AddBinding(genericType, typeArguments, instanceArguments);
         }
     }
 }

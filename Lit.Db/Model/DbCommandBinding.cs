@@ -15,9 +15,7 @@ namespace Lit.Db
         /// <summary>
         /// Command type.
         /// </summary>
-        public CommandType CommandType => commandType;
-
-        private readonly CommandType commandType;
+        public CommandType CommandType { get; private set; }
 
         /// <summary>
         /// Execution mode.
@@ -27,49 +25,45 @@ namespace Lit.Db
         /// <summary>
         /// Stored procedure name / query text.
         /// </summary>
-        public string Text => name;
-
-        private readonly string name;
+        public string Text { get; private set; }
 
         /// <summary>
         /// Recordset referenced count.
         /// </summary>
-        public int RecordsetCount => (recordBindings?.Count ?? 0) + (recordsetBindings?.Count ?? 0);
+        public int RecordsetCount => (records?.BindingList.Count ?? 0) + (recordsets?.BindingList.Count ?? 0);
 
         /// <summary>
         /// Maximum Recordset index referenced.
         /// </summary>
-        public int MaxRecordsetIndex => maxRecordsetIndex;
-
-        private int maxRecordsetIndex;
+        public int MaxRecordsetIndex { get; private set; }
 
         /// <summary>
         /// Parameters.
         /// </summary>
-        public IReadOnlyList<IDbParameterBinding> Parameters => parameterBindings;
+        public IReadOnlyList<IDbParameterBinding> Parameters => parameters?.BindingList;
 
-        private List<IDbParameterBinding> parameterBindings;
+        private TypeBinding<IDbParameterBinding, DbParameterAttribute> parameters;
 
         /// <summary>
         /// Fields.
         /// </summary>
-        public IReadOnlyList<IDbFieldBinding> Fields => fieldBindings;
+        public IReadOnlyList<IDbFieldBinding> Fields => fields?.BindingList;
 
-        private List<IDbFieldBinding> fieldBindings;
+        private TypeBinding<IDbFieldBinding, DbFieldAttribute> fields;
 
         /// <summary>
         /// Records.
         /// </summary>
-        public IReadOnlyList<IDbRecordBinding> Records => recordBindings;
+        public IReadOnlyList<IDbRecordBinding> Records => records?.BindingList;
 
-        private List<IDbRecordBinding> recordBindings;
+        private TypeBinding<IDbRecordBinding, DbRecordAttribute> records;
 
         /// <summary>
         /// Recordsets.
         /// </summary>
-        public IReadOnlyList<IDbRecordsetBinding> Recordsets => recordsetBindings;
+        public IReadOnlyList<IDbRecordsetBinding> Recordsets => recordsets?.BindingList;
 
-        private List<IDbRecordsetBinding> recordsetBindings;
+        private TypeBinding<IDbRecordsetBinding, DbRecordsetAttribute> recordsets;
 
         #region Constructor
 
@@ -88,14 +82,14 @@ namespace Lit.Db
 
             if (qattr != null)
             {
-                name = qattr.QueryText;
-                commandType = CommandType.Text;
+                Text = qattr.QueryText;
+                CommandType = CommandType.Text;
             }
 
             if (sattr != null)
             {
-                name = setup.Naming.GetStoredProcedureName(templateType, sattr.StoredProcedureName);
-                commandType = CommandType.StoredProcedure;
+                Text = setup.Naming.GetStoredProcedureName(templateType, sattr.StoredProcedureName);
+                CommandType = CommandType.StoredProcedure;
             }
 
             AddProperties();
@@ -110,27 +104,29 @@ namespace Lit.Db
         {
             foreach (var propInfo in TemplateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
+                var typeArguments = new[] { TemplateType, propInfo.PropertyType };
+
                 if (TypeHelper.GetAttribute<DbRecordsetAttribute>(propInfo, out var rsAttr))
                 {
                     Mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordsetBindings, typeof(DbRecordsetBinding<,>), propInfo, rsAttr);
+                    AddBinding(ref recordsets, typeof(DbRecordsetBinding<,>), typeArguments, this, propInfo, rsAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
                 {
                     Mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordBindings, typeof(DbRecordBinding<,>), propInfo, rAttr);
+                    AddBinding(ref records, typeof(DbRecordBinding<,>), typeArguments, this, propInfo, rAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
                     || TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr) && (fAttr = new DbFieldAttribute(cAttr)) != null)
                 {
                     Mode = DbExecutionMode.Query;
-                    AddBinding(ref fieldBindings, typeof(DbFieldBinding<,>), propInfo, fAttr);
+                    AddBinding(ref fields, typeof(DbFieldBinding<,>), typeArguments, this, propInfo, fAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
                 {
-                    AddBinding(ref parameterBindings, typeof(DbParameterBinding<,>), propInfo, pAttr);
+                    AddBinding(ref parameters, typeof(DbParameterBinding<,>), typeArguments, this, propInfo, pAttr);
                 }
             }
         }
@@ -140,10 +136,10 @@ namespace Lit.Db
         /// </summary>
         internal void ResolveBinding()
         {
-            recordsetBindings?.ForEach(rs => rs.CalcBindingMode());
-            recordBindings?.ForEach(r => r.CalcBindingMode());
-            fieldBindings?.ForEach(f => f.CalcBindingMode());
-            parameterBindings?.ForEach(p => p.CalcBindingMode());
+            recordsets?.BindingList.ForEach(rs => rs.CalcBindingMode());
+            records?.BindingList.ForEach(r => r.CalcBindingMode());
+            fields?.BindingList.ForEach(f => f.CalcBindingMode());
+            parameters?.BindingList.ForEach(p => p.CalcBindingMode());
         }
 
         /// <summary>
@@ -151,16 +147,16 @@ namespace Lit.Db
         /// </summary>
         private void AssertRecordsetIndex(int index)
         {
-            var exists = (recordsetBindings?.Any(i => i.Attributes.Index == index) ?? false) || (recordBindings?.Any(i => i.Attributes.Index == index) ?? false);
+            var exists = (recordsets?.BindingList.Any(i => i.Attributes.Index == index) ?? false) || (records?.BindingList.Any(i => i.Attributes.Index == index) ?? false);
 
             if (exists)
             {
                 throw new ArgumentException($"Recordset index {index} is used more than once");
             }
 
-            if (maxRecordsetIndex < index)
+            if (MaxRecordsetIndex < index)
             {
-                maxRecordsetIndex = index;
+                MaxRecordsetIndex = index;
             }
         }
     }

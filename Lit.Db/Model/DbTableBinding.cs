@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Lit.DataType;
 
 namespace Lit.Db
@@ -15,12 +14,13 @@ namespace Lit.Db
         /// Table name.
         /// </summary>
         public string TableName { get; private set; }
+
         /// <summary>
         /// Columns.
         /// </summary>
-        public IReadOnlyList<IDbColumnBinding> Columns => columnBindings;
+        public IReadOnlyList<IDbColumnBinding> Columns => columns.BindingList;
 
-        private List<IDbColumnBinding> columnBindings;
+        private ITypeBinding<IDbColumnBinding> columns;
 
         /// <summary>
         /// Single column primary key.
@@ -89,33 +89,32 @@ namespace Lit.Db
             Dictionary<Type, List<IDbColumnBinding>> foreignKeyFields = null;
             List<string> uniqueKeyProps = null;
 
-            foreach (var propInfo in TemplateType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            columns = new TypeBinding<IDbColumnBinding, DbColumnAttribute>(TemplateType,
+                (p, a) => TypeHelper.CreateInstance(typeof(DbColumnBinding<,>), new[] { p.DeclaringType, p.PropertyType }, this, p, a) as IDbColumnBinding);
+
+            foreach (var col in columns.BindingList)
             {
-                if (TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr))
+                var keyConstraint = col.KeyConstraint;
+
+                if (keyConstraint == DbKeyConstraint.PrimaryKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
                 {
-                    var col = AddBinding(ref columnBindings, typeof(DbColumnBinding<,>), propInfo, cAttr);
-                    var keyConstraint = col.KeyConstraint;
+                    (primaryKeyProps = primaryKeyProps ?? new List<string>()).Add(col.PropertyName);
+                }
 
-                    if (keyConstraint == DbKeyConstraint.PrimaryKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
-                    {
-                        (primaryKeyProps = primaryKeyProps ?? new List<string>()).Add(col.PropertyName);
-                    }
+                if (keyConstraint == DbKeyConstraint.UniqueKey)
+                {
+                    (uniqueKeyProps = uniqueKeyProps ?? new List<string>()).Add(col.PropertyName);
+                }
 
-                    if (keyConstraint == DbKeyConstraint.UniqueKey)
+                if (keyConstraint == DbKeyConstraint.ForeignKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
+                {
+                    foreignKeyFields = foreignKeyFields ?? new Dictionary<Type, List<IDbColumnBinding>>();
+                    if (!foreignKeyFields.TryGetValue(col.PrimaryTableTemplate, out List<IDbColumnBinding> list))
                     {
-                        (uniqueKeyProps = uniqueKeyProps ?? new List<string>()).Add(col.PropertyName);
+                        list = new List<IDbColumnBinding>();
+                        foreignKeyFields.Add(col.PrimaryTableTemplate, list);
                     }
-
-                    if (keyConstraint == DbKeyConstraint.ForeignKey || keyConstraint == DbKeyConstraint.PrimaryForeignKey)
-                    {
-                        foreignKeyFields = foreignKeyFields ?? new Dictionary<Type, List<IDbColumnBinding>>();
-                        if (!foreignKeyFields.TryGetValue(col.PrimaryTableTemplate, out List<IDbColumnBinding> list))
-                        {
-                            list = new List<IDbColumnBinding>();
-                            foreignKeyFields.Add(col.PrimaryTableTemplate, list);
-                        }
-                        list.Add(col);
-                    }
+                    list.Add(col);
                 }
             }
 
@@ -162,7 +161,7 @@ namespace Lit.Db
         /// </summary>
         internal void ResolveBinding()
         {
-            columnBindings.ForEach(col => col.CalcBindingMode());
+            columns.BindingList.ForEach(col => col.CalcBindingMode());
         }
     }
 }
