@@ -26,6 +26,14 @@ namespace Lit.DataType
         protected readonly Dictionary<Type, ITypeBinding<TI>> cache = new Dictionary<Type, ITypeBinding<TI>>();
 
         /// <summary>
+        /// Clear cache.
+        /// </summary>
+        public void Clear()
+        {
+            cache.Clear();
+        }
+
+        /// <summary>
         /// Get the binding information for a type.
         /// </summary>
         public ITypeBinding<TI> Get(Type type, Func<PropertyInfo, TA, TI> createInstace)

@@ -14,7 +14,7 @@ namespace Lit.DataType
 
         #region Constructor
 
-        protected AttrPropertyBinding(PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
+        public AttrPropertyBinding(PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
             : base(propInfo, getterRequired, setterRequired)
         {
             this.Attributes = attr;
