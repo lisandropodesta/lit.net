@@ -53,7 +53,7 @@ namespace Lit.Db.MySql.Statements
         /// </summary>
         public CreateTable(IDbSetup setup, Type tableTemplate) : base(setup)
         {
-            var tableAttr = TypeHelper.GetAttribute<MySqlTableAttribute>(tableTemplate, true);
+            var tableAttr = TypeHelper.TryGetAttribute<MySqlTableAttribute>(tableTemplate, true);
 
             Engine = (tableAttr?.Engine ?? Custom.MySql.Engine.InnoDb).ToString();
             DefaultCharset = (tableAttr?.DefaultCharset ?? DefaultKey);

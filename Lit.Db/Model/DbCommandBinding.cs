@@ -72,8 +72,8 @@ namespace Lit.Db
         {
             Mode = DbExecutionMode.NonQuery;
 
-            var qattr = TypeHelper.GetAttribute<DbQueryAttribute>(templateType, true);
-            var sattr = TypeHelper.GetAttribute<DbStoredProcedureAttribute>(templateType, true);
+            var qattr = TypeHelper.TryGetAttribute<DbQueryAttribute>(templateType, true);
+            var sattr = TypeHelper.TryGetAttribute<DbStoredProcedureAttribute>(templateType, true);
 
             if ((qattr != null ? 1 : 0) + (sattr != null ? 1 : 0) > 1)
             {

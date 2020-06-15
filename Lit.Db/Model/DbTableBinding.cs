@@ -63,14 +63,14 @@ namespace Lit.Db
         internal DbTableBinding(Type templateType, IDbSetup setup)
             : base(templateType, setup)
         {
-            var tattr = TypeHelper.GetAttribute<DbTableAttribute>(templateType, true);
+            var tattr = TypeHelper.TryGetAttribute<DbTableAttribute>(templateType, true);
 
             if (tattr != null)
             {
                 TableName = setup.Naming.GetTableName(templateType, tattr.TableName);
             }
 
-            PrimaryKey = TypeHelper.GetAttribute<IDbTablePrimaryKeyAttribute>(templateType, true);
+            PrimaryKey = TypeHelper.TryGetAttribute<IDbTablePrimaryKeyAttribute>(templateType, true);
             foreignKeys = TypeHelper.GetAttributes<IDbTableForeignKeyAttribute>(templateType, true).ToList();
             uniqueKeys = TypeHelper.GetAttributes<IDbTableUniqueKeyAttribute>(templateType, true).ToList();
             indexes = TypeHelper.GetAttributes<IDbTableIndexAttribute>(templateType, true).ToList();

@@ -32,7 +32,7 @@ namespace Lit.Ui
         /// </summary>
         protected static object CreateControl(T parent, Type template, PropertyInfo propInfo, object data)
         {
-            var attr = TypeHelper.GetAttribute<LitUiAttribute>(template);
+            var attr = TypeHelper.TryGetAttribute<LitUiAttribute>(template);
             return CreateControl(parent, attr, propInfo, data);
         }
 

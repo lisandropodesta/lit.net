@@ -221,7 +221,7 @@ namespace Lit.DataType
             return type?.GetRuntimeProperties()?.Aggregate(dict, (d, p) =>
             {
                 TAttr attr = null;
-                if (typeof(TAttr) == typeof(object) || (attr = GetAttribute<TAttr>(p)) != null)
+                if (typeof(TAttr) == typeof(object) || (attr = TryGetAttribute<TAttr>(p)) != null)
                 {
                     d[p.Name] = new ReflectionProperty<TAttr>(p, attr);
                 }
@@ -262,7 +262,7 @@ namespace Lit.DataType
         {
             return type?.GetRuntimeFields()?.Select(i =>
             {
-                var attr = GetAttribute<TAttr>(i);
+                var attr = TryGetAttribute<TAttr>(i);
                 return attr != null ? new ReflectionMember<TAttr>(i, attr) : null;
             }).Where(t => t != null);
         }
@@ -280,7 +280,7 @@ namespace Lit.DataType
         /// </summary>
         public static bool FieldHasAttribute<TAttr>(Type enumType, object value) where TAttr : class
         {
-            return GetFieldAttribute<TAttr>(enumType, value) != null;
+            return TryGetFieldAttribute<TAttr>(enumType, value) != null;
         }
 
         /// <summary>
@@ -288,25 +288,26 @@ namespace Lit.DataType
         /// </summary>
         public static bool FieldHasAttribute<TAttr>(Type type, string name) where TAttr : class
         {
-            return GetAttribute<TAttr>(type.GetRuntimeField(name)) != null;
+            return TryGetAttribute<TAttr>(type.GetRuntimeField(name)) != null;
         }
+
         /// <summary>
         /// Get an attribute from an enum value.
         /// </summary>
-        public static TAttr GetFieldAttribute<TAttr, TEnum>(TEnum value) where TAttr : class
+        public static TAttr TryGetFieldAttribute<TAttr, TEnum>(TEnum value) where TAttr : class
         {
-            return GetFieldAttribute<TAttr>(typeof(TEnum), value);
+            return TryGetFieldAttribute<TAttr>(typeof(TEnum), value);
         }
 
 
         /// <summary>
         /// Get an attribute from an enum value.
         /// </summary>
-        public static TAttr GetFieldAttribute<TAttr>(Type enumType, object value) where TAttr : class
+        public static TAttr TryGetFieldAttribute<TAttr>(Type enumType, object value) where TAttr : class
         {
             if (IsEnumType(enumType))
             {
-                return GetFieldAttribute<TAttr>(enumType, Enum.GetName(enumType, value));
+                return TryGetFieldAttribute<TAttr>(enumType, Enum.GetName(enumType, value));
             }
 
             return null;
@@ -315,9 +316,9 @@ namespace Lit.DataType
         /// <summary>
         /// Get an attribute from an enum value.
         /// </summary>
-        public static TAttr GetFieldAttribute<TAttr>(Type type, string name) where TAttr : class
+        public static TAttr TryGetFieldAttribute<TAttr>(Type type, string name) where TAttr : class
         {
-            return GetAttribute<TAttr>(type.GetRuntimeField(name));
+            return TryGetAttribute<TAttr>(type.GetRuntimeField(name));
         }
 
         /// <summary>
@@ -334,10 +335,25 @@ namespace Lit.DataType
         public static bool GetEnumAttribute<TAttr>(Type enumType, object value, out TAttr attr) where TAttr : class
         {
             if (enumType != null && enumType.IsEnum && GetEnumAttribute(enumType, Enum.GetName(enumType, value), out attr))
+            {
                 return true;
+            }
 
             attr = default;
             return false;
+        }
+
+        /// <summary>
+        /// Finds an attribute in an enum value.
+        /// </summary>
+        public static TAttr TryGetEnumAttribute<TAttr>(Type enumType, object value) where TAttr : class
+        {
+            if (enumType != null && enumType.IsEnum)
+            {
+                return GetEnumAttribute<TAttr>(enumType, Enum.GetName(enumType, value));
+            }
+
+            return default;
         }
 
         /// <summary>
@@ -350,11 +366,20 @@ namespace Lit.DataType
         }
 
         /// <summary>
+        /// Finds an attribute in an enum field.
+        /// </summary>
+        public static TAttr GetEnumAttribute<TAttr>(Type enumType, string fieldName) where TAttr : class
+        {
+            var fieldInfo = enumType != null && enumType.IsEnum ? enumType.GetField(fieldName) : null;
+            return TryGetAttribute<TAttr>(fieldInfo);
+        }
+
+        /// <summary>
         /// Determines whether a member info has an attribute or not.
         /// </summary>
         public static bool HasAttribute<TAttr>(MemberInfo memberInfo) where TAttr : class
         {
-            return GetAttribute<TAttr>(memberInfo) != null;
+            return TryGetAttribute<TAttr>(memberInfo) != null;
         }
 
         /// <summary>
@@ -362,14 +387,14 @@ namespace Lit.DataType
         /// </summary>
         public static bool GetAttribute<TAttr>(MemberInfo memberInfo, out TAttr attr) where TAttr : class
         {
-            attr = GetAttribute<TAttr>(memberInfo);
+            attr = TryGetAttribute<TAttr>(memberInfo);
             return attr != null;
         }
 
         /// <summary>
         /// Get an attribute from a member info.
         /// </summary>
-        public static TAttr GetAttribute<TAttr>(MemberInfo memberInfo) where TAttr : class
+        public static TAttr TryGetAttribute<TAttr>(MemberInfo memberInfo) where TAttr : class
         {
             if (memberInfo != null)
             {
@@ -394,13 +419,13 @@ namespace Lit.DataType
         /// </summary>
         public static bool HasAttribute<TAttr>(Type type) where TAttr : class
         {
-            return GetAttribute<TAttr>(type) != null;
+            return TryGetAttribute<TAttr>(type) != null;
         }
 
         /// <summary>
         /// Get an attribute from a type.
         /// </summary>
-        public static TAttr GetAttribute<TAttr>(Type type, bool inherit = false) where TAttr : class
+        public static TAttr TryGetAttribute<TAttr>(Type type, bool inherit = false) where TAttr : class
         {
             var attrs = type?.GetTypeInfo().GetCustomAttributes(inherit);
             if (attrs != null)

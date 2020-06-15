@@ -24,7 +24,7 @@
         /// </summary>
         public static OperationAttribute Get(BinaryOperation value)
         {
-            return TypeHelper.GetFieldAttribute<OperationAttribute, BinaryOperation>(value);
+            return TypeHelper.TryGetFieldAttribute<OperationAttribute, BinaryOperation>(value);
         }
     }
 }
