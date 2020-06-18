@@ -220,7 +220,8 @@ namespace Lit.Db
         /// </summary>
         protected override TP EncodePropertyValue(object value)
         {
-            return (TP)EncodePropertyValue(value, ValuesTranslation);
+            value = EncodePropertyValue(value, ValuesTranslation);
+            return value != null ? (TP)value : default;
         }
 
         /// <summary>
