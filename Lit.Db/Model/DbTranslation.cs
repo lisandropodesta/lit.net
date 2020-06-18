@@ -33,26 +33,31 @@ namespace Lit.Db
                 return value;
             }
 
-            if (value is string)
+            if (value is string text)
             {
-                if (type.IsEnum && FindDbEnumCode(type, value as string, out var enumValue))
+                if (string.IsNullOrEmpty(text))
                 {
-                    return enumValue;
+                    return null;
+                }
+
+                if (type.IsEnum)
+                {
+                    return GetDbEnumCode(type, text);
                 }
 
                 if (type == typeof(bool))
                 {
-                    return bool.Parse((string)value);
+                    return bool.Parse(text);
                 }
 
                 if (TypeHelper.IsInteger(type))
                 {
-                    return long.Parse((string)value);
+                    return long.Parse(text);
                 }
 
                 if (TypeHelper.IsFloatingPoint(type))
                 {
-                    return double.Parse((string)value);
+                    return double.Parse(text);
                 }
 
                 return value;
@@ -69,31 +74,9 @@ namespace Lit.Db
         /// <summary>
         /// Finds a db code in an enum type.
         /// </summary>
-        public static bool FindDbEnumCode(Type enumType, string targetValue, out object enumValue)
+        public static object GetDbEnumCode(Type enumType, string targetValue)
         {
-            if (enumType.IsEnum && targetValue != null)
-            {
-                if (Enum.IsDefined(enumType, targetValue))
-                {
-                    enumValue = Enum.Parse(enumType, targetValue);
-                    return true;
-                }
-
-                foreach (var fieldInfo in enumType.GetFields())
-                {
-                    if (TypeHelper.GetAttribute<IDbCode>(fieldInfo, out var dbCodeAttr))
-                    {
-                        if (targetValue == dbCodeAttr.Code)
-                        {
-                            enumValue = fieldInfo.GetValue(null);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            enumValue = null;
-            return false;
+            return Serialization.DecodeEnum<IDbCode>(targetValue, enumType, (t, a) => targetValue == a?.Code);
         }
     }
 }

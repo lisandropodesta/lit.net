@@ -5,7 +5,7 @@ using Lit.DataType;
 
 namespace Lit.Common.Test
 {
-    public class Tests
+    public class TypeBindingTest
     {
         [SetUp]
         public void Setup()
@@ -15,7 +15,7 @@ namespace Lit.Common.Test
         private static TypeBindingCache<MyAttribute> bindingCache;
 
         [Test]
-        public void Test1()
+        public void BindingTest()
         {
             bindingCache = new TypeBindingCache<MyAttribute>();
 
