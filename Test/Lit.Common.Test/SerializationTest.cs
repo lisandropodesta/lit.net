@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Lit.DataType;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Lit.Common.Test
@@ -9,21 +10,80 @@ namespace Lit.Common.Test
     {
         private const int Repetitions = 1000;
 
-        [Test]
-        public void StringTest()
-        {
-            var sb = new StringBuilder();
+        private static readonly string bigString = BuildBigString();
 
-            for (var i = 0; i < 0xD800; i++)
+        [SetUp]
+        public void Setups()
+        {
+            Serialization.Setup();
+        }
+
+        [Test]
+        public void StringValidationTest()
+        {
+            string text, s1, s2;
+            for (var i = 0; i < bigString.Length; i++)
             {
-                sb.Append(char.ConvertFromUtf32(i));
+                text = bigString[i].ToString();
+                s1 = JsonConvert.SerializeObject(text);
+                s2 = Serialization.Encode(text);
+                Assert.AreEqual(s1, s2);
             }
 
-            var text = sb.ToString();
+            text = bigString;
+            s1 = JsonConvert.SerializeObject(text);
+            s2 = Serialization.Encode(text);
+            Assert.AreEqual(s1, s2);
 
-            var encodedText = Serialization.EncodeString(text, SerializationMode.Compact);
-            var decodedText = Serialization.DecodeString(encodedText, SerializationMode.Compact);
-            Assert.AreEqual(text, decodedText);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void StringEncodeTest()
+        {
+            for (var r = 0; r < 500; r++)
+            {
+                Serialization.Encode(bigString);
+            }
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void StringEncodeNewtonTest()
+        {
+            for (var r = 0; r < 500; r++)
+            {
+                JsonConvert.SerializeObject(bigString);
+            }
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void StringPerformanceTest()
+        {
+            var text = bigString;
+            for (var r = 0; r < Repetitions; r++)
+            {
+                var encodedText = Serialization.Encode(text);
+                var decodedText = Serialization.DecodeString(encodedText);
+                Assert.AreEqual(text, decodedText);
+            }
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public void StringPerformanceNewtonTest()
+        {
+            var text = bigString;
+            for (var r = 0; r < Repetitions; r++)
+            {
+                var encodedText = JsonConvert.SerializeObject(text);
+                var decodedText = JsonConvert.DeserializeObject<string>(encodedText);
+                Assert.AreEqual(text, decodedText);
+            }
 
             Assert.Pass();
         }
@@ -78,6 +138,21 @@ namespace Lit.Common.Test
             Option2,
 
             Option3
+        }
+
+        /// <summary>
+        /// Builds a big string with most of valid characters.
+        /// </summary>
+        private static string BuildBigString()
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < 0xD800; i++)
+            {
+                sb.Append(char.ConvertFromUtf32(i));
+            }
+
+            return sb.ToString();
         }
     }
 }

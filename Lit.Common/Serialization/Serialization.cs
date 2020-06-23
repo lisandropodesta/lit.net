@@ -80,13 +80,13 @@ namespace Lit
 
             if (type == typeof(char))
             {
-                EncodeChar(sb, (char)value, mode);
+                EncodeChar(sb, (char)value);
                 return;
             }
 
             if (type == typeof(string))
             {
-                EncodeString(sb, value as string, mode);
+                EncodeString(sb, value as string);
                 return;
             }
 
