@@ -57,14 +57,11 @@ namespace Lit.Ui.Wpf.CircularMenu
         {
             base.OnPropertyChanged(change, name);
 
-            if (change >= Change.Visibility)
+            if (change >= Change.Aspect)
             {
-                if (change >= Change.Visibility)
-                {
-                    ringSector.Update(this);
-                }
+                ringSector.Update(this);
 
-                Items.ForEach(i => i.BeginUpdate());
+                Items.ForEach(i => i.BeginChange());
 
                 Items.ForEach(item =>
                 {
@@ -74,7 +71,7 @@ namespace Lit.Ui.Wpf.CircularMenu
                     item.ToRadius = ToRadius;
                 });
 
-                Items.ForEach(i => i.EndUpdate());
+                Items.ForEach(i => i.EndChange());
             }
         }
 

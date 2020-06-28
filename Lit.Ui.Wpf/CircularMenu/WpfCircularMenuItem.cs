@@ -54,7 +54,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         {
             base.OnPropertyChanged(change, name);
 
-            if (change >= Change.Visibility)
+            if (change >= Change.Aspect)
             {
                 var first = ringSector.Path == null;
 

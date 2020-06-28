@@ -28,7 +28,7 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// </summary>
         public void ShowAt(Canvas canvas, Point pos)
         {
-            BeginUpdate();
+            BeginChange();
 
             base.Show = false;
 
@@ -37,7 +37,7 @@ namespace Lit.Ui.Wpf.CircularMenu
 
             base.Show = true;
 
-            EndUpdate();
+            EndChange();
         }
 
         /// <summary>

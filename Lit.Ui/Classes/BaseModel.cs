@@ -11,17 +11,17 @@ namespace Lit.Ui
         /// <summary>
         /// Property change affectation.
         /// </summary>
-        protected enum Change
+        public enum Change
         {
+            /// <summary>
+            /// Nothing changed.
+            /// </summary>
+            None,
+
             /// <summary>
             /// Change without affecting visual aspect.
             /// </summary>
             Data,
-
-            /// <summary>
-            /// Change affecting visibility.
-            /// </summary>
-            Visibility,
 
             /// <summary>
             /// Change affecting visual aspect.
@@ -31,7 +31,12 @@ namespace Lit.Ui
             /// <summary>
             /// Change affecting layout/shape.
             /// </summary>
-            Layout
+            Layout,
+
+            /// <summary>
+            /// Change affecting visibility.
+            /// </summary>
+            Visibility
         }
 
         /// <summary>
@@ -39,53 +44,56 @@ namespace Lit.Ui
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private int updatingCount;
+        private readonly object changedLock = new object();
 
-        private Change? updatingChange;
+        private Change changedState;
+
+        private ushort changedCounter;
 
         /// <summary>
-        /// Dispose allocated resources but the element still can be activated.
+        /// Begins changing an object, avoid sending notifications until changes are finished.
         /// </summary>
-        public void Dispose()
+        public void BeginChange()
         {
-            Release();
+            lock (changedLock)
+            {
+                if (changedCounter != 0xFFFF)
+                {
+                    changedCounter++;
+                }
+            }
         }
 
         /// <summary>
-        /// Holds notifications during an update.
+        /// End changing an object, if there are pending notifications they are delivered.
         /// </summary>
-        public void BeginUpdate()
+        public Change EndChange()
         {
-            lock (this)
+            Change changed;
+
+            lock (changedLock)
             {
-                updatingCount++;
+                if (changedCounter == 0 || --changedCounter != 0 || changedState == Change.None)
+                {
+                    return changedState;
+                }
+
+                changed = changedState;
+                changedState = Change.None;
             }
+
+            NotifyPropertyChanged(changed, null);
+            return changed;
         }
 
         /// <summary>
-        /// Holds notifications during an update.
+        /// Check if the model is being changed.
         /// </summary>
-        public void EndUpdate()
+        protected Change GetChanging()
         {
-            Change? flags = null;
-
-            lock (this)
+            lock (changedLock)
             {
-                if (updatingCount > 0)
-                {
-                    updatingCount--;
-                }
-
-                if (updatingCount == 0)
-                {
-                    flags = updatingChange;
-                    updatingChange = null;
-                }
-            }
-
-            if (flags.HasValue)
-            {
-                NotifyPropertyChanged(flags.Value, null);
+                return changedState;
             }
         }
 
@@ -97,7 +105,7 @@ namespace Lit.Ui
             if (prop == null && value != null || prop != null && !prop.Equals(value))
             {
                 prop = value;
-                InformPropertyChanged(change, name);
+                ReportPropertyChanged(change, name);
                 return true;
             }
 
@@ -105,44 +113,24 @@ namespace Lit.Ui
         }
 
         /// <summary>
-        /// Check if the model is being updated.
+        /// Reports a property has changed.
         /// </summary>
-        protected bool IsUpdating()
+        protected void ReportPropertyChanged(Change change, string name)
         {
-            lock (this)
+            lock (changedLock)
             {
-                return updatingCount > 0;
-            }
-        }
-
-        /// <summary>
-        /// Informs that a property has changed.
-        /// </summary>
-        protected void InformPropertyChanged(Change change, string name)
-        {
-            bool mustNotify;
-
-            lock (this)
-            {
-                if (updatingCount > 0)
+                if (changedCounter > 0)
                 {
-                    if (!updatingChange.HasValue || updatingChange.Value < change)
+                    if (changedState < change)
                     {
-                        updatingChange = change;
+                        changedState = change;
                     }
 
-                    mustNotify = false;
-                }
-                else
-                {
-                    mustNotify = true;
+                    return;
                 }
             }
 
-            if (mustNotify)
-            {
-                NotifyPropertyChanged(change, name);
-            }
+            NotifyPropertyChanged(change, name);
         }
 
         /// <summary>
@@ -160,6 +148,14 @@ namespace Lit.Ui
         /// </summary>
         protected virtual void OnPropertyChanged(Change change, string name)
         {
+        }
+
+        /// <summary>
+        /// Dispose allocated resources but the element still can be activated.
+        /// </summary>
+        public void Dispose()
+        {
+            Release();
         }
 
         /// <summary>
