@@ -472,14 +472,5 @@ namespace Lit.DataType
 
             return type.IsSubclassOf(ancestor);
         }
-
-        /// <summary>
-        /// Builds a generic type a creates an instace.
-        /// </summary>
-        public static object CreateInstance(Type genericType, Type[] typeArguments, params object[] instanceArguments)
-        {
-            var type = genericType.MakeGenericType(typeArguments);
-            return Activator.CreateInstance(type, instanceArguments);
-        }
     }
 }
