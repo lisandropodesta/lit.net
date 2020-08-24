@@ -332,6 +332,14 @@ namespace Lit.DataType
         /// <summary>
         /// Finds an attribute in an enum value.
         /// </summary>
+        public static bool GetEnumAttribute<TAttr>(object value, out TAttr attr) where TAttr : class
+        {
+            return GetEnumAttribute(value?.GetType(), value, out attr);
+        }
+
+        /// <summary>
+        /// Finds an attribute in an enum value.
+        /// </summary>
         public static bool GetEnumAttribute<TAttr>(Type enumType, object value, out TAttr attr) where TAttr : class
         {
             if (enumType != null && enumType.IsEnum && GetEnumAttribute(enumType, Enum.GetName(enumType, value), out attr))
@@ -341,6 +349,14 @@ namespace Lit.DataType
 
             attr = default;
             return false;
+        }
+
+        /// <summary>
+        /// Finds an attribute in an enum value.
+        /// </summary>
+        public static TAttr TryGetEnumAttribute<TAttr>(object value) where TAttr : class
+        {
+            return TryGetEnumAttribute<TAttr>(value?.GetType(), value);
         }
 
         /// <summary>
