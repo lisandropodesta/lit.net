@@ -28,18 +28,5 @@ namespace Lit.Db
         }
 
         #endregion
-
-        /// <summary>
-        /// Adds a binding to a list.
-        /// </summary>
-        protected TI AddBinding<TI, TA>(ref TypeBinding<TI, TA> bindings, Type genericType, Type[] typeArguments, params object[] instanceArguments) where TI : class where TA : class
-        {
-            if (bindings == null)
-            {
-                bindings = new TypeBinding<TI, TA>();
-            }
-
-            return bindings.AddBinding(genericType, typeArguments, instanceArguments);
-        }
     }
 }

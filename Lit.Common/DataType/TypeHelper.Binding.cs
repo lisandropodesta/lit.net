@@ -6,6 +6,34 @@ namespace Lit.DataType
     public static partial class TypeHelper
     {
         /// <summary>
+        /// Adds a binding.
+        /// </summary>
+        public static TI AddBinding<TI, TA>(ref TypeBinding<TI, TA> bindings, Type genericType, Type[] typeArguments, params object[] instanceArguments)
+            where TI : class
+            where TA : class
+        {
+            if (bindings == null)
+            {
+                bindings = new TypeBinding<TI, TA>();
+            }
+
+            var binding = CreateInstance(genericType, typeArguments, instanceArguments) as TI;
+            bindings.AddBinding(binding);
+            return binding;
+        }
+
+        /// <summary>
+        /// Adds a binding.
+        /// </summary>
+        public static TI AddBinding<TI>(List<TI> bindings, Type genericType, Type[] typeArguments, params object[] instanceArguments)
+            where TI : class
+        {
+            var binding = CreateInstance(genericType, typeArguments, instanceArguments) as TI;
+            bindings.Add(binding);
+            return binding;
+        }
+
+        /// <summary>
         /// Gets the binding kind of a property type.
         /// </summary>
         public static BindingMode GetBindingMode(ref Type type, out bool isNullable)
@@ -34,6 +62,11 @@ namespace Lit.DataType
                 else if (TypeHelper.IsGenericList(gdef))
                 {
                     type = gtype;
+                    if (GetBindingMode(ref gtype, out _) == BindingMode.Class)
+                    {
+                        return BindingMode.ClassList;
+                    }
+
                     return BindingMode.List;
                 }
             }

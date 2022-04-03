@@ -1,8 +1,20 @@
 ﻿using System;
 using System.Reflection;
+using Lit.DataType;
 
 namespace Lit.Db
 {
+    internal static class DbColumnBinding
+    {
+        /// <summary>
+        /// Creates an instance of a column binding.
+        /// </summary>
+        public static IDbColumnBinding CreateInstance(IDbSetup setup, PropertyInfo propInfo, DbColumnAttribute attr, IDbTableBinding table)
+        {
+            return TypeHelper.CreateInstance(typeof(DbColumnBinding<,>), new[] { propInfo.DeclaringType, propInfo.PropertyType }, setup, propInfo, attr, table) as IDbColumnBinding;
+        }
+    }
+
     /// <summary>
     /// Db field property binding.
     /// </summary>
@@ -46,11 +58,10 @@ namespace Lit.Db
 
         #region Constructor
 
-        public DbColumnBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbColumnAttribute attr)
-            : base(binding, propInfo, attr, true, true)
+        public DbColumnBinding(IDbSetup setup, PropertyInfo propInfo, DbColumnAttribute attr, IDbTableBinding table)
+            : base(setup, propInfo, attr, true, true)
         {
-            var setup = binding.Setup;
-            ColumnName = setup.Naming.GetColumnName((binding as IDbTableBinding)?.TableName, propInfo, Attributes.DbName, KeyConstraint);
+            ColumnName = setup.Naming.GetColumnName(table?.TableName, propInfo, Attributes.DbName, KeyConstraint);
             ColumnSize = attr.Size;
 
             if (string.IsNullOrEmpty(ColumnName))

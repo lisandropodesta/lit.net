@@ -15,8 +15,8 @@ namespace Lit.Db
 
         #region Constructor
 
-        public DbRecordsetBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbRecordsetAttribute attr)
-            : base(binding, propInfo, attr, false, true)
+        public DbRecordsetBinding(IDbSetup setup, PropertyInfo propInfo, DbRecordsetAttribute attr)
+            : base(setup, propInfo, attr, false, true)
         {
         }
 

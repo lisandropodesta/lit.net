@@ -74,19 +74,9 @@ namespace Lit.DataType
         /// <summary>
         /// Adds a property binding.
         /// </summary>
-        public TI AddBinding(Type genericType, Type[] typeArguments, params object[] instanceArguments)
-        {
-            var binding = TypeHelper.CreateInstance(genericType, typeArguments, instanceArguments) as TI;
-            return AddBinding(binding);
-        }
-
-        /// <summary>
-        /// Adds a property binding.
-        /// </summary>
-        public TI AddBinding(TI binding)
+        public void AddBinding(TI binding)
         {
             list.Add(binding);
-            return binding;
         }
     }
 }

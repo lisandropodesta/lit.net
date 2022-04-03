@@ -21,10 +21,10 @@ namespace Lit.Db
 
         #region Constructor
 
-        public DbParameterBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbParameterAttribute attr)
-            : base(binding, propInfo, attr, attr.IsInput, attr.IsOutput)
+        public DbParameterBinding(IDbSetup setup, PropertyInfo propInfo, DbParameterAttribute attr)
+            : base(setup, propInfo, attr, attr.IsInput, attr.IsOutput)
         {
-            SpParamName = binding.Setup.Naming.GetParameterName(propInfo, null, Attributes.ParameterName, attr.DoNotTranslate, KeyConstraint);
+            SpParamName = setup.Naming.GetParameterName(propInfo, null, Attributes.ParameterName, attr.DoNotTranslate, KeyConstraint);
 
             if (string.IsNullOrEmpty(SpParamName))
             {

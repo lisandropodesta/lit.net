@@ -90,7 +90,7 @@ namespace Lit.Db
             List<string> uniqueKeyProps = null;
 
             columns = new TypeBinding<IDbColumnBinding, DbColumnAttribute>(TemplateType,
-                (p, a) => TypeHelper.CreateInstance(typeof(DbColumnBinding<,>), new[] { p.DeclaringType, p.PropertyType }, this, p, a) as IDbColumnBinding);
+                (p, a) => DbColumnBinding.CreateInstance(Setup, p, a, this));
 
             foreach (var col in columns.BindingList)
             {

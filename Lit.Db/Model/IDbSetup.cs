@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace Lit.Db
+﻿namespace Lit.Db
 {
     /// <summary>
     /// Configuration setup for a DB.
     /// </summary>
-    public interface IDbSetup
+    public interface IDbSetup : IDbBindingCache
     {
         /// <summary>
         /// Naming manager.
@@ -16,15 +14,5 @@ namespace Lit.Db
         /// Translation.
         /// </summary>
         IDbTranslation Translation { get; }
-
-        /// <summary>
-        /// Gets a table binding.
-        /// </summary>
-        IDbTableBinding GetTableBinding(Type type);
-
-        /// <summary>
-        /// Gets a command binding.
-        /// </summary>
-        IDbCommandBinding GetCommandBinding(Type type);
     }
 }

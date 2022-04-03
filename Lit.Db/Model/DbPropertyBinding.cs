@@ -52,10 +52,10 @@ namespace Lit.Db
 
         #region Constructor
 
-        protected DbPropertyBinding(IDbTemplateBinding binding, PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
+        protected DbPropertyBinding(IDbSetup setup, PropertyInfo propInfo, TA attr, bool getterRequired, bool setterRequired)
             : base(propInfo, attr, getterRequired, setterRequired)
         {
-            this.Setup = binding.Setup;
+            this.Setup = setup;
 
             PrimaryTableTemplate = DbHelper.GetForeignKeyPropType(PropertyInfo.PropertyType);
             IsForeignKeyProp = PrimaryTableTemplate != null;
@@ -134,6 +134,10 @@ namespace Lit.Db
                     DataType = GetDataType(bindingType);
                     break;
 
+                case BindingMode.ClassList:
+                    DataType = DbDataType.Records;
+                    break;
+
                 case BindingMode.Class:
                 case BindingMode.List:
                 case BindingMode.Dictionary:
@@ -207,7 +211,7 @@ namespace Lit.Db
                     return DBNull.Value;
                 }
 
-                return translate ? Setup.Translation.ToDb(DataType, BindingType, value) : value;
+                return translate ? Setup.Translation.ToDb(Setup, DataType, BindingType, value) : value;
             }
             catch
             {
@@ -236,7 +240,7 @@ namespace Lit.Db
                     return default;
                 }
 
-                return translate ? Setup.Translation.FromDb(DataType, BindingType, value) : value;
+                return translate ? Setup.Translation.FromDb(Setup, DataType, BindingType, value) : value;
             }
             catch
             {

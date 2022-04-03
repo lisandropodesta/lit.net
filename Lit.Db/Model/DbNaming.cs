@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Lit.Db.Framework;
 using Lit.Names;
@@ -179,7 +181,7 @@ namespace Lit.Db
         /// </summary>
         public virtual string GetStoredProcedureName(Type template, string spName)
         {
-            return TranslateName(TextSource, Scope, template.Name, spName, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
+            return TranslateCompoundName(TextSource, Scope, template.Name, spName, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
@@ -205,7 +207,7 @@ namespace Lit.Db
                     break;
             }
 
-            return TranslateName(TextSource, Scope, null, name, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
+            return TranslateCompoundName(TextSource, Scope, null, name, StoredProceduresCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
@@ -221,7 +223,7 @@ namespace Lit.Db
         /// </summary>
         public virtual string GetTableName(Type template, string tableName)
         {
-            return TranslateName(TextSource, Scope, template.Name, tableName, TablesCase, false, AffixPlacing.DoNotChange, null);
+            return TranslateCompoundName(TextSource, Scope, template.Name, tableName, TablesCase, false, AffixPlacing.DoNotChange, null);
         }
 
         /// <summary>
@@ -260,6 +262,32 @@ namespace Lit.Db
         /// Gets a SQL type name.
         /// </summary>
         public abstract string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null);
+
+        /// <summary>
+        /// Translates a compound name.
+        /// </summary>
+        protected virtual string TranslateCompoundName(Source source, Translation scope, string reflectionName, string configurationName, Case namingCase, bool forceId, AffixPlacing idPlacing, params string[] affixes)
+        {
+            var compoundName = TranslateName(source, Translation.None, reflectionName, configurationName, default(Case), default(bool), default(AffixPlacing));
+            var parts = SplitParts(compoundName);
+            return JoinParts(parts.Select(name => TranslateName(source, scope, name, name, namingCase, forceId, idPlacing, affixes)));
+        }
+
+        /// <summary>
+        /// Splits parts of a compound name.
+        /// </summary>
+        protected virtual string[] SplitParts(string compoundName)
+        {
+            return new[] { compoundName };
+        }
+
+        /// <summary>
+        /// Join parts of a compound name.
+        /// </summary>
+        protected virtual string JoinParts(IEnumerable<string> parts)
+        {
+            return string.Join("", parts);
+        }
 
         /// <summary>
         /// Translates a name.

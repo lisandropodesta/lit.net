@@ -53,6 +53,8 @@
 
         Enumerated,
 
+        Records,
+
         Json
     }
 }

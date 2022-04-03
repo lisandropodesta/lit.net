@@ -110,23 +110,23 @@ namespace Lit.Db
                 {
                     Mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref recordsets, typeof(DbRecordsetBinding<,>), typeArguments, this, propInfo, rsAttr);
+                    TypeHelper.AddBinding(ref recordsets, typeof(DbRecordsetBinding<,>), typeArguments, Setup, propInfo, rsAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
                 {
                     Mode = DbExecutionMode.Query;
                     AssertRecordsetIndex(rsAttr.Index);
-                    AddBinding(ref records, typeof(DbRecordBinding<,>), typeArguments, this, propInfo, rAttr);
+                    TypeHelper.AddBinding(ref records, typeof(DbRecordBinding<,>), typeArguments, Setup, propInfo, rAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
                     || TypeHelper.GetAttribute<DbColumnAttribute>(propInfo, out var cAttr) && (fAttr = new DbFieldAttribute(cAttr)) != null)
                 {
                     Mode = DbExecutionMode.Query;
-                    AddBinding(ref fields, typeof(DbFieldBinding<,>), typeArguments, this, propInfo, fAttr);
+                    TypeHelper.AddBinding(ref fields, typeof(DbFieldBinding<,>), typeArguments, Setup, propInfo, fAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbParameterAttribute>(propInfo, out var pAttr))
                 {
-                    AddBinding(ref parameters, typeof(DbParameterBinding<,>), typeArguments, this, propInfo, pAttr);
+                    TypeHelper.AddBinding(ref parameters, typeof(DbParameterBinding<,>), typeArguments, Setup, propInfo, pAttr);
                 }
             }
         }

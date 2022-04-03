@@ -18,7 +18,12 @@
         Class,
 
         /// <summary>
-        /// List of objects.
+        /// Class list binding.
+        /// </summary>
+        ClassList,
+
+        /// <summary>
+        /// List binding.
         /// </summary>
         List,
 

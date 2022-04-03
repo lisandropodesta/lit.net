@@ -31,10 +31,10 @@ namespace Lit.Db
 
         #region Constructor
 
-        public DbFieldBinding(IDbTemplateBinding binding, PropertyInfo propInfo, DbFieldAttribute attr)
-            : base(binding, propInfo, attr, false, true)
+        public DbFieldBinding(IDbSetup setup, PropertyInfo propInfo, DbFieldAttribute attr)
+            : base(setup, propInfo, attr, false, true)
         {
-            FieldName = binding.Setup.Naming.GetFieldName(propInfo, Attributes.DbName, KeyConstraint);
+            FieldName = setup.Naming.GetFieldName(propInfo, Attributes.DbName, KeyConstraint);
 
             if (string.IsNullOrEmpty(FieldName))
             {

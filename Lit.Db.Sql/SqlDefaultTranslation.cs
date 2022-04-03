@@ -4,7 +4,7 @@ namespace Lit.Db.Sql
 {
     public class SqlDefaultTranslation : DbTranslation
     {
-        public override object ToDb(DbDataType dataType, Type type, object value)
+        public override object ToDb(IDbBindingCache bindingCache, DbDataType dataType, Type type, object value)
         {
             switch (dataType)
             {
@@ -34,13 +34,16 @@ namespace Lit.Db.Sql
                 case DbDataType.Enumerated:
                     return ScalarToDb(type, value);
 
+                case DbDataType.Records:
+                    return SqlHelper.CreateTable(bindingCache, value);
+
                 case DbDataType.Json:
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        public override object FromDb(DbDataType dataType, Type type, object value)
+        public override object FromDb(IDbBindingCache bindingCache, DbDataType dataType, Type type, object value)
         {
             switch (dataType)
             {
@@ -73,6 +76,7 @@ namespace Lit.Db.Sql
                 case DbDataType.Json:
                     break;
 
+                case DbDataType.Records:
                 default:
                     throw new NotImplementedException();
             }

@@ -142,6 +142,7 @@ namespace Lit.Db.MySql
                 case DbDataType.TimeSpan:
                     return ((TimeSpan)value).Ticks;
 
+                case DbDataType.Records:
                 case DbDataType.Json:
                     return JsonConvert.SerializeObject(value, Formatting.None);
 
@@ -189,6 +190,7 @@ namespace Lit.Db.MySql
                 case DbDataType.TimeSpan:
                     return new TimeSpan((long)value);
 
+                case DbDataType.Records:
                 case DbDataType.Json:
                     return JsonConvert.DeserializeObject((string)value, type);
 
@@ -272,6 +274,7 @@ namespace Lit.Db.MySql
                 case DbDataType.Enumerated:
                     return GetEnumList(type);
 
+                case DbDataType.Records:
                 case DbDataType.Json:
                     // NOTE: Json parameters throw an exception when running MySqlCommandBuilder.DeriveParameters so this implementation uses TEXT instead of JSON data type.
                     //return JsonDataType;

@@ -8,12 +8,12 @@ namespace Lit.Db
         /// <summary>
         /// Encodes a C# value into a DB value.
         /// </summary>
-        public abstract object ToDb(DbDataType dataType, Type type, object value);
+        public abstract object ToDb(IDbBindingCache bindingCache, DbDataType dataType, Type type, object value);
 
         /// <summary>
         /// Decodes a DB value into a C# value.
         /// </summary>
-        public abstract object FromDb(DbDataType dataType, Type type, object value);
+        public abstract object FromDb(IDbBindingCache bindingCache, DbDataType dataType, Type type, object value);
 
         /// <summary>
         /// Translates a common scalar to DB.
