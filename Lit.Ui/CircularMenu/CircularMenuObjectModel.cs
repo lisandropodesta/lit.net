@@ -15,56 +15,56 @@ namespace Lit.Ui.CircularMenu
         /// <summary>
         /// Show control.
         /// </summary>
-        public bool Show { get => show; set => SetProp(ref show, value, isVisible && !isHidden ? Change.Visibility : Change.Data, nameof(Show)); }
+        public bool Show { get => show; set => SetProp(ref show, value, isVisible && !isHidden ? Change.Visibility : Change.Data); }
 
         private bool show;
 
         /// <summary>
         /// Visible flag.
         /// </summary>
-        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, show && !isHidden ? Change.Visibility : Change.Data, nameof(IsVisible)); }
+        public bool IsVisible { get => isVisible; set => SetProp(ref isVisible, value, show && !isHidden ? Change.Visibility : Change.Data); }
 
         private bool isVisible;
 
         /// <summary>
         /// Hidden flag.
         /// </summary>
-        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, show && isVisible ? Change.Visibility : Change.Data, nameof(IsHidden)); }
+        public bool IsHidden { get => isHidden; set => SetProp(ref isHidden, value, show && isVisible ? Change.Visibility : Change.Data); }
 
         private bool isHidden;
 
         /// <summary>
         /// Starting radius.
         /// </summary>
-        public double FromRadius { get => fromRadius; set => SetProp(ref fromRadius, value, Change.Layout, nameof(FromRadius)); }
+        public double FromRadius { get => fromRadius; set => SetProp(ref fromRadius, value, Change.Layout); }
 
         private double fromRadius;
 
         /// <summary>
         /// Ending radius.
         /// </summary>
-        public double ToRadius { get => toRadius; set => SetProp(ref toRadius, value, Change.Layout, nameof(ToRadius)); }
+        public double ToRadius { get => toRadius; set => SetProp(ref toRadius, value, Change.Layout); }
 
         private double toRadius;
 
         /// <summary>
         /// Relative angle.
         /// </summary>
-        public double RelAngle { get => relAngle; set => SetProp(ref relAngle, value, Change.Layout, nameof(RelAngle)); }
+        public double RelAngle { get => relAngle; set => SetProp(ref relAngle, value, Change.Layout); }
 
         private double relAngle;
 
         /// <summary>
         /// Rotation angle.
         /// </summary>
-        public virtual double Rotation { get => rotation; set => SetProp(ref rotation, value, Change.Layout, nameof(Rotation)); }
+        public virtual double Rotation { get => rotation; set => SetProp(ref rotation, value, Change.Layout); }
 
         private double rotation;
 
         /// <summary>
         /// Item size.
         /// </summary>
-        public double Size { get => size; set => SetProp(ref size, value, Change.Layout, nameof(Size)); }
+        public double Size { get => size; set => SetProp(ref size, value, Change.Layout); }
 
         private double size;
 
@@ -78,7 +78,7 @@ namespace Lit.Ui.CircularMenu
             {
                 var delta = value - FromAngle;
                 size += delta;
-                SetProp(ref relAngle, relAngle + delta / 2, Change.Layout, nameof(RelAngle));
+                RelAngle += delta / 2;
             }
         }
 
@@ -92,7 +92,7 @@ namespace Lit.Ui.CircularMenu
             {
                 var delta = value - ToAngle;
                 size -= delta;
-                SetProp(ref relAngle, relAngle + delta / 2, Change.Layout, nameof(RelAngle));
+                RelAngle += delta / 2;
             }
         }
 

@@ -8,7 +8,7 @@
         /// <summary>
         /// Title.
         /// </summary>
-        public string Title { get => title; set => SetProp(ref title, value, Change.Aspect, nameof(Title)); }
+        public string Title { get => title; set => SetProp(ref title, value, Change.Aspect); }
 
         private string title;
 

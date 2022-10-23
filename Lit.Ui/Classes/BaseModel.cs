@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Lit.Ui
 {
@@ -100,7 +101,7 @@ namespace Lit.Ui
         /// <summary>
         /// Generic property assignment.
         /// </summary>
-        protected bool SetProp<T>(ref T prop, T value, Change change, string name = null)
+        protected bool SetProp<T>(ref T prop, T value, Change change, [CallerMemberName] string name = null)
         {
             if (prop == null && value != null || prop != null && !prop.Equals(value))
             {

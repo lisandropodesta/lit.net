@@ -12,14 +12,14 @@ namespace Lit.Ui.Wpf.CircularMenu
         /// <summary>
         /// Container canvas.
         /// </summary>
-        internal Canvas Canvas { get => canvas; private set => SetProp(ref canvas, value, Change.Visibility, nameof(Canvas)); }
+        internal Canvas Canvas { get => canvas; private set => SetProp(ref canvas, value, Change.Visibility); }
 
         private Canvas canvas;
 
         /// <summary>
         /// Position at canvas.
         /// </summary>
-        internal Point Position { get => position; private set => SetProp(ref position, value, Change.Layout, nameof(Position)); }
+        internal Point Position { get => position; private set => SetProp(ref position, value, Change.Layout); }
 
         private Point position;
 
