@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Lisandro Podesta</Authors>
+    <Company>Lisandro Podesta</Company>
+    <Version>1.0.1.20</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Lisandro Podesta</Copyright>
+    <PackageProjectUrl>https://github.com/lisandropodesta/lit.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/lisandropodesta/lit.net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lit.Common\Lit.Common.csproj" />
+    <ProjectReference Include="..\Lit.Db\Lit.Db.csproj" />
+  </ItemGroup>
+
+</Project>
