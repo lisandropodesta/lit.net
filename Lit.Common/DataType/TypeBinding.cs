@@ -8,7 +8,7 @@ namespace Lit.DataType
     /// Type binding.
     /// </summary>
     /// <typeparam name="TA">Property attributes class</typeparam>
-    public class TypeBinding<TA> : TypeBinding<IAttrPropertyBinding<TA>, TA> where TA : class
+    public class TypeBinding<TA> : TypeBinding<IAttrPropertyBinding<TA>, TA>, IAttrTypeBinding<TA> where TA : class
     {
         #region Constructors
 
