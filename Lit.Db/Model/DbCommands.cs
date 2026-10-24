@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Threading.Tasks;
 using Lit.Auditing;
 
 namespace Lit.Db
@@ -28,6 +29,8 @@ namespace Lit.Db
         {
             Setup = setup;
         }
+
+        #region Interface
 
         /// <summary>
         /// Executes a query template.
@@ -80,6 +83,61 @@ namespace Lit.Db
         {
             ExecuteTemplate(template, null, null);
         }
+
+
+        /// <summary>
+        /// Executes a query template.
+        /// </summary>
+        public async Task<T> ExecuteQueryAsync<T>(string query, Action<T> setup = null)
+            where T : new()
+        {
+            return await ExecuteTemplateAsync(query, CommandType.Text, setup);
+        }
+
+        /// <summary>
+        /// Executes a query template.
+        /// </summary>
+        public async Task<T> ExecuteQueryAsync<T>(Action<T> setup = null)
+            where T : new()
+        {
+            return ExecuteTemplate(null, CommandType.Text, setup);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        public async Task<T> ExecuteStoredProcedureAsync<T>(string storedProcedureName, Action<T> setup = null)
+            where T : new()
+        {
+            return await ExecuteTemplateAsync(storedProcedureName, CommandType.StoredProcedure, setup);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure template.
+        /// </summary>
+        public async Task ExecuteStoredProcedureAsync<T>(string storedProcedureName, T template)
+        {
+            await ExecuteTemplateAsync(template, storedProcedureName, CommandType.StoredProcedure);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure/query template.
+        /// </summary>
+        public async Task<T> ExecuteTemplateAsync<T>(Action<T> setup = null)
+            where T : new()
+        {
+            return await ExecuteTemplateAsync(null, null, setup);
+        }
+
+        /// <summary>
+        /// Execute a stored procedure/query template.
+        /// </summary>
+        public async Task ExecuteTemplateAsync(object template)
+        {
+            await ExecuteTemplateAsync(template, null, null);
+        }
+
+        #endregion
 
         /// <summary>
         /// Initializes and executes a stored procedure or query template.
@@ -137,6 +195,77 @@ namespace Lit.Db
 
                             case DbExecutionMode.Query:
                                 using (var reader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                                {
+                                    LoadResults(binding, reader, template);
+                                }
+                                break;
+                        }
+                    }
+                    catch (Exception x)
+                    {
+                        Audit.Exception(x, $"Executing: {text}");
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes and executes a stored procedure or query template.
+        /// </summary>
+        protected async Task<T> ExecuteTemplateAsync<T>(string text, CommandType? commandType, Action<T> setup)
+            where T : new()
+        {
+            var template = new T();
+            setup?.Invoke(template);
+            await ExecuteTemplateAsync(template, text, commandType);
+            return template;
+        }
+
+        /// <summary>
+        /// Execute a stored procedure or query with a template already initialized.
+        /// </summary>
+        protected async Task ExecuteTemplateAsync<T>(T template, string text, CommandType? commandType)
+        {
+            var type = template?.GetType() ?? typeof(T);
+            var binding = Setup.GetCommandBinding(type);
+            var cmdType = commandType ?? binding.CommandType;
+            var spCmdType = cmdType;
+
+            if (string.IsNullOrEmpty(text))
+            {
+                text = binding.Text;
+                if (string.IsNullOrEmpty(text))
+                {
+                    throw new ArgumentException($"Class {type.FullName} has no stored procedure / query defined");
+                }
+            }
+
+            if (cmdType == CommandType.Text)
+            {
+                text = binding.SetInputParameters(text, template);
+            }
+
+            using (var connection = GetOpenedConnection())
+            {
+                using (var cmd = GetCommand(text, connection, spCmdType))
+                {
+                    try
+                    {
+                        if (cmdType == CommandType.StoredProcedure)
+                        {
+                            binding.SetInputParameters(cmd, template);
+                        }
+
+                        switch (binding.Mode)
+                        {
+                            case DbExecutionMode.NonQuery:
+                                await cmd.ExecuteNonQueryAsync();
+                                binding.GetOutputParameters(cmd, template);
+                                break;
+
+                            case DbExecutionMode.Query:
+                                using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection))
                                 {
                                     LoadResults(binding, reader, template);
                                 }
