@@ -115,7 +115,7 @@ namespace Lit.Db
                 else if (TypeHelper.GetAttribute<DbRecordAttribute>(propInfo, out var rAttr))
                 {
                     Mode = DbExecutionMode.Query;
-                    AssertRecordsetIndex(rsAttr.Index);
+                    AssertRecordsetIndex(rAttr.Index);
                     TypeHelper.AddBinding(ref records, typeof(DbRecordBinding<,>), typeArguments, Setup, propInfo, rAttr);
                 }
                 else if (TypeHelper.GetAttribute<DbFieldAttribute>(propInfo, out var fAttr)
