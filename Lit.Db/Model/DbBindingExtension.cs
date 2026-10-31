@@ -274,8 +274,9 @@ namespace Lit.Db
             var recordsetCount = binding.RecordsetCount;
             if (recordsetCount == 0)
             {
+                DbHelper.SetDbRef(instance, db);
                 reader.Read();
-                binding.GetOutputFields(db, reader, instance);
+                LoadRecord(binding, reader, instance);
             }
             else
             {
@@ -300,19 +301,6 @@ namespace Lit.Db
                         }
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// Get output fields.
-        /// </summary>
-        public static void GetOutputFields(this IDbCommandBinding binding, IDbDataAccess db, DbDataReader reader, object instance)
-        {
-            DbHelper.SetDbRef(instance, db);
-
-            if (reader.HasRows)
-            {
-                binding.Fields?.ForEach(b => b.GetOutputField(reader, instance));
             }
         }
 
@@ -358,28 +346,6 @@ namespace Lit.Db
         public static void GetOutputField(this IDbColumnBinding binding, DbDataReader reader, object instance)
         {
             binding.SetValue(instance, reader[binding.ColumnName]);
-        }
-
-        #endregion
-
-        #region IDbFieldBinding
-
-        /// <summary>
-        /// Get output field.
-        /// </summary>
-        public static void GetOutputField(this IDbFieldBinding binding, DbDataReader reader, object instance)
-        {
-            try
-            {
-                binding.SetValue(instance, reader[binding.FieldName]);
-            }
-            catch
-            {
-                if (!binding.Attributes.IsOptional)
-                {
-                    throw;
-                }
-            }
         }
 
         #endregion
@@ -491,17 +457,134 @@ namespace Lit.Db
         private static object LoadSqlRecordset(IDbDataAccess db, DbDataReader reader, Type type, int maxCount)
         {
             var binding = db.Setup.GetCommandBinding(type);
-            var result = TypeHelper.CreateInstance(typeof(List<>), new[] { type });
-            var list = result as IList;
+            var records = LoadRecords(binding, reader, type, maxCount);
+            DbHelper.SetDbRef(records, db);
+            return records;
+        }
 
-            for (var ri = 0; ri < maxCount && reader.Read(); ri++)
+        private static IEnumerable<object> LoadRecords(IDbCommandBinding binding, DbDataReader reader, Type type, int maxCount)
+        {
+            var r = new RecordsReader(binding, reader);
+            return r.Load(type, maxCount);
+        }
+
+        private static void LoadRecord(IDbCommandBinding binding, DbDataReader reader, object instance)
+        {
+            var r = new RecordsReader(binding, reader);
+            r.LoadRecord(instance);
+        }
+
+        #region Readers
+
+        private class RecordsReader
+        {
+            public RecordsReader(IDbCommandBinding binding, DbDataReader reader)
             {
-                var record = Activator.CreateInstance(type);
-                binding.GetOutputFields(db, reader, record);
-                list.Add(record);
+                this.binding = binding;
+                this.reader = reader;
             }
 
-            return result;
+            private readonly IDbCommandBinding binding;
+
+            private readonly DbDataReader reader;
+
+            private List<FieldsReader> fieldsReader;
+
+            public IEnumerable<object> Load(Type type, int maxCount)
+            {
+                var result = TypeHelper.CreateInstance(typeof(List<>), [type]);
+                var list = result as IList;
+
+                for (var ri = 0; ri < maxCount && reader.Read(); ri++)
+                {
+                    var record = Activator.CreateInstance(type);
+                    LoadRecord(record);
+                    list.Add(record);
+                }
+
+                return result as IEnumerable<object>;
+            }
+
+            public void LoadRecord(object record)
+            {
+                if (fieldsReader == null)
+                {
+                    fieldsReader = [];
+                    foreach (var field in binding.Fields)
+                    {
+                        fieldsReader.Add(new FieldsReader(field, reader));
+                    }
+                }
+
+                fieldsReader.ForEach(f => f.Load(record));
+            }
         }
+
+        private class FieldsReader
+        {
+            public FieldsReader(IDbFieldBinding binding, DbDataReader reader)
+            {
+                this.binding = binding;
+                this.reader = reader;
+
+                if (binding.FieldName.EndsWith("*"))
+                {
+                    columns = new Dictionary<int, string>();
+
+                    var key = binding.FieldName.Substring(binding.FieldName.Length - 1);
+                    for (var i = 0; i < reader.FieldCount; i++)
+                    {
+                        var name = reader.GetName(i);
+                        if (name.StartsWith(key, StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            name = name.Substring(key.Length);
+                            columns[i] = name;
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        columnIndex = reader.GetOrdinal(binding.FieldName);
+                    }
+                    catch
+                    {
+                        if (!binding.Attributes.IsOptional)
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+
+            private readonly IDbFieldBinding binding;
+
+            private readonly DbDataReader reader;
+
+            private readonly int columnIndex = -1;
+
+            private readonly Dictionary<int, string> columns = new();
+
+            public void Load(object instance)
+            {
+                if (columnIndex >= 0)
+                {
+                    binding.SetValue(instance, reader[columnIndex]);
+                }
+                else
+                {
+                    var value = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
+                    foreach (var kvp in columns)
+                    {
+                        value[kvp.Value] = reader[kvp.Key];
+                    }
+
+                    binding.SetValue(instance, value);
+                }
+            }
+        }
+
+        #endregion
     }
 }

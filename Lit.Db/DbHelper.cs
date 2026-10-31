@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 
 namespace Lit.Db
 {
@@ -96,6 +98,20 @@ namespace Lit.Db
             var result = Activator.CreateInstance(type, args);
             SetDbRef(result, db);
             return result;
+        }
+
+        /// <summary>
+        /// Assigns data access reference.
+        /// </summary>
+        public static void SetDbRef<T>(IEnumerable<T> obj, IDbDataAccess db)
+        {
+            if (db != null && obj?.Any() == true && obj.First() is IDbDataAccessRef)
+            {
+                foreach (var item in obj)
+                {
+                    ((IDbDataAccessRef)item).Db = db;
+                }
+            }
         }
 
         /// <summary>
