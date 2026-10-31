@@ -488,7 +488,7 @@ namespace Lit.Db
 
             private readonly DbDataReader reader;
 
-            private List<FieldsReader> fieldsReader;
+            private List<SingleFieldReader> fieldsReader;
 
             public IEnumerable<object> Load(Type type, int maxCount)
             {
@@ -512,7 +512,15 @@ namespace Lit.Db
                     fieldsReader = [];
                     foreach (var field in binding.Fields)
                     {
-                        fieldsReader.Add(new FieldsReader(field, reader));
+                        if (field.FieldName.EndsWith("*"))
+                        {
+                            var key = field.FieldName.Substring(field.FieldName.Length);
+                            fieldsReader.Add(new MultiFieldsReader(field, reader, key, binding.Fields));
+                        }
+                        else
+                        {
+                            fieldsReader.Add(new SingleFieldReader(field, reader));
+                        }
                     }
                 }
 
@@ -520,40 +528,24 @@ namespace Lit.Db
             }
         }
 
-        private class FieldsReader
+        private class SingleFieldReader
         {
-            public FieldsReader(IDbFieldBinding binding, DbDataReader reader)
+            public SingleFieldReader() { }
+
+            public SingleFieldReader(IDbFieldBinding binding, DbDataReader reader)
             {
                 this.binding = binding;
                 this.reader = reader;
 
-                if (binding.FieldName.EndsWith("*"))
+                try
                 {
-                    columns = new Dictionary<int, string>();
-
-                    var key = binding.FieldName.Substring(binding.FieldName.Length);
-                    for (var i = 0; i < reader.FieldCount; i++)
-                    {
-                        var name = reader.GetName(i);
-                        if (name.StartsWith(key, StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            name = name.Substring(key.Length);
-                            columns[i] = name;
-                        }
-                    }
+                    columnIndex = reader.GetOrdinal(binding.FieldName);
                 }
-                else
+                catch
                 {
-                    try
+                    if (!binding.Attributes.IsOptional)
                     {
-                        columnIndex = reader.GetOrdinal(binding.FieldName);
-                    }
-                    catch
-                    {
-                        if (!binding.Attributes.IsOptional)
-                        {
-                            throw;
-                        }
+                        throw;
                     }
                 }
             }
@@ -564,24 +556,48 @@ namespace Lit.Db
 
             private readonly int columnIndex = -1;
 
+            public virtual void Load(object instance)
+            {
+                binding.SetValue(instance, reader[columnIndex]);
+            }
+        }
+
+        private class MultiFieldsReader : SingleFieldReader
+        {
+            public MultiFieldsReader(IDbFieldBinding binding, DbDataReader reader, string key, IReadOnlyList<IDbFieldBinding> allFields)
+            {
+                this.binding = binding;
+                this.reader = reader;
+
+                columns = new Dictionary<int, string>();
+
+                for (var i = 0; i < reader.FieldCount; i++)
+                {
+                    var name = reader.GetName(i);
+                    if (name.StartsWith(key, StringComparison.CurrentCultureIgnoreCase)
+                        && !allFields.Any(f => f.FieldName.Equals(name, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        name = name.Substring(key.Length);
+                        columns[i] = name;
+                    }
+                }
+            }
+
+            private readonly IDbFieldBinding binding;
+
+            private readonly DbDataReader reader;
+
             private readonly Dictionary<int, string> columns = new();
 
-            public void Load(object instance)
+            public override void Load(object instance)
             {
-                if (columnIndex >= 0)
+                var value = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
+                foreach (var kvp in columns)
                 {
-                    binding.SetValue(instance, reader[columnIndex]);
+                    value[kvp.Value] = reader[kvp.Key];
                 }
-                else
-                {
-                    var value = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
-                    foreach (var kvp in columns)
-                    {
-                        value[kvp.Value] = reader[kvp.Key];
-                    }
 
-                    binding.SetValue(instance, value);
-                }
+                binding.SetValue(instance, value);
             }
         }
 
