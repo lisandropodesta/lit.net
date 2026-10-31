@@ -531,7 +531,7 @@ namespace Lit.Db
                 {
                     columns = new Dictionary<int, string>();
 
-                    var key = binding.FieldName.Substring(binding.FieldName.Length - 1);
+                    var key = binding.FieldName.Substring(binding.FieldName.Length);
                     for (var i = 0; i < reader.FieldCount; i++)
                     {
                         var name = reader.GetName(i);
