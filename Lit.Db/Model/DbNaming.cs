@@ -10,7 +10,7 @@ namespace Lit.Db
     /// <summary>
     /// Common naming conventions.
     /// </summary>
-    public abstract class DbNaming : IDbNaming
+    public class DbNaming : IDbNaming
     {
         #region Helper enums
 
@@ -261,7 +261,10 @@ namespace Lit.Db
         /// <summary>
         /// Gets a SQL type name.
         /// </summary>
-        public abstract string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null);
+        public virtual string GetSqlType(DbDataType dataType, Type type = null, ulong? size = null, int? precision = null)
+        {
+            return dataType.ToString();
+        }
 
         /// <summary>
         /// Translates a compound name.

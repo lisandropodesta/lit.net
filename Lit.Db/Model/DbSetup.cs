@@ -21,6 +21,12 @@ namespace Lit.Db
 
         #region Constructor
 
+        public DbSetup(IDbTranslation translation)
+        {
+            Naming = new DbNaming();
+            Translation = translation;
+        }
+
         public DbSetup(IDbNaming naming, IDbTranslation translation)
         {
             Naming = naming;

@@ -1,4 +1,4 @@
-﻿using System.Data;
+﻿using System;
 using System.Data.Common;
 
 namespace Lit.Db
@@ -29,7 +29,10 @@ namespace Lit.Db
         {
             if (parameters != null)
             {
-                command.Parameters.AddRange(parameters);
+                foreach (var parameter in parameters)
+                {
+                    command.Parameters.Add((TP)((ICloneable)parameter).Clone());
+                }
             }
         }
 
