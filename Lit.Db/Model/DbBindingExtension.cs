@@ -512,14 +512,20 @@ namespace Lit.Db
                     fieldsReader = [];
                     foreach (var field in binding.Fields)
                     {
+                        SingleFieldReader fieldReader;
                         if (field.FieldName.EndsWith("*"))
                         {
                             var key = field.FieldName.Substring(field.FieldName.Length);
-                            fieldsReader.Add(new MultiFieldsReader(field, reader, key, binding.Fields));
+                            fieldReader = new MultiFieldsReader(field, reader, key, binding.Fields);
                         }
                         else
                         {
-                            fieldsReader.Add(new SingleFieldReader(field, reader));
+                            fieldReader = new SingleFieldReader(field, reader);
+                        }
+
+                        if (fieldReader.IsValid)
+                        {
+                            fieldsReader.Add(fieldReader);
                         }
                     }
                 }
@@ -556,6 +562,8 @@ namespace Lit.Db
 
             private readonly int columnIndex = -1;
 
+            public virtual bool IsValid => columnIndex >= 0;
+
             public virtual void Load(object instance)
             {
                 binding.SetValue(instance, reader[columnIndex]);
@@ -588,6 +596,8 @@ namespace Lit.Db
             private readonly DbDataReader reader;
 
             private readonly Dictionary<int, string> columns = new();
+
+            public override bool IsValid => true;
 
             public override void Load(object instance)
             {
